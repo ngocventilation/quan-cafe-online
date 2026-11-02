@@ -1086,95 +1086,23 @@ function boatGeo(kind = 'sampan') {
 /* =====================================================================
    KIẾN TRÚC: mái cong đao, điện, tháp, cổng tam quan, chùa Khmer
    ===================================================================== */
-// mái chồng diêm / mái 4 mái có đầu đao cong vút. Gốc ở tâm diềm mái (y = 0).
+// Mái kiến trúc Pháp Tân Cổ Điển (Parisian Mansard & Cornice Roof) cho các toà nhà Katinat ngoài trời
 function hipRoof(env, o) {
   const g = new THREE.Group();
   const { w, d, h } = o;
-  const s = o.scale ?? Math.min(w, d) / 7;
-  const lift = o.lift ?? s * 0.75, flare = o.flare ?? s * 0.45;
-  const rl = Math.max(0.001, (o.ridge ?? Math.max(w - d * 0.95, w * 0.22)) / 2);
-  const vMax = o.vMax ?? 1, thick = o.thick ?? Math.max(0.12, s * 0.16);
-  const hw = w / 2, hd = d / 2, segU = o.segU ?? 18, segV = 9;
-  const span = Math.min(hw, hd) * 1.05;
-  const prof = (v) => v * (0.55 + 0.45 * v);
-  const eave = (x, z, t, sx, sz) => { const k = Math.pow(t, 3); return new V3(x + sx * flare * k, lift * Math.pow(t, 2.2), z + sz * flare * k); };
-  const tOf = (a, half) => Math.min(1, Math.max(0, (Math.abs(a) - (half - span)) / span));
-  const sides = [
-    { n: segU, E: (u) => { const x = lerp(-hw, hw, u); return eave(x, hd, tOf(x, hw), Math.sign(x), 1); }, R: (u) => new V3(lerp(-hw, hw, u) * (rl / hw), h, 0), L: w },
-    { n: segU, E: (u) => { const x = lerp(hw, -hw, u); return eave(x, -hd, tOf(x, hw), Math.sign(x), -1); }, R: (u) => new V3(lerp(hw, -hw, u) * (rl / hw), h, 0), L: w },
-    { n: Math.round(segU * Math.max(0.5, d / w)), E: (u) => { const z = lerp(hd, -hd, u); return eave(hw, z, tOf(z, hd), 1, Math.sign(z)); }, R: () => new V3(rl, h, 0), L: d },
-    { n: Math.round(segU * Math.max(0.5, d / w)), E: (u) => { const z = lerp(-hd, hd, u); return eave(-hw, z, tOf(z, hd), -1, Math.sign(z)); }, R: () => new V3(-rl, h, 0), L: d },
-  ];
-  const top = { pos: [], uv: [], idx: [] }, bot = { pos: [], idx: [] };
-  const P = (sd, u, v) => { const E = sd.E(u), R = sd.R(u); const k = v * vMax; return new V3(lerp(E.x, R.x, k), E.y + (R.y - E.y) * prof(k), lerp(E.z, R.z, k)); };
-  for (const sd of sides) {
-    const b0 = top.pos.length / 3, slope = Math.hypot(Math.min(hw, hd), h);
-    for (let i = 0; i <= sd.n; i++) for (let j = 0; j <= segV; j++) {
-      const p = P(sd, i / sd.n, j / segV);
-      top.pos.push(p.x, p.y, p.z); top.uv.push(((i / sd.n) * sd.L) / 2, ((j / segV) * vMax * slope) / 2);
-      bot.pos.push(p.x, p.y - thick, p.z);
-    }
-    for (let i = 0; i < sd.n; i++) for (let j = 0; j < segV; j++) {
-      const a = b0 + i * (segV + 1) + j, b = a + segV + 1;
-      top.idx.push(a, b, a + 1, b, b + 1, a + 1);
-      bot.idx.push(a, a + 1, b, b, a + 1, b + 1);
-    }
-    // diềm (fascia) nối mép trên/dưới
-    for (let i = 0; i < sd.n; i++) {
-      const a = b0 + i * (segV + 1), b = a + segV + 1, base = bot.pos.length / 3;
-      for (const k of [a, b]) { bot.pos.push(top.pos[k * 3], top.pos[k * 3 + 1], top.pos[k * 3 + 2]); }
-      for (const k of [a, b]) { bot.pos.push(top.pos[k * 3], top.pos[k * 3 + 1] - thick, top.pos[k * 3 + 2]); }
-      bot.idx.push(base, base + 2, base + 1, base + 1, base + 2, base + 3);
-    }
-  }
-  const tg = new THREE.BufferGeometry();
-  tg.setAttribute('position', new THREE.Float32BufferAttribute(top.pos, 3));
-  tg.setAttribute('uv', new THREE.Float32BufferAttribute(top.uv, 2));
-  tg.setIndex(top.idx); tg.computeVertexNormals();
-  const bg = new THREE.BufferGeometry();
-  bg.setAttribute('position', new THREE.Float32BufferAttribute(bot.pos, 3));
-  bg.setIndex(bot.idx); bg.computeVertexNormals();
-  const tileM = env.std('tile' + o.tile + (o.metal ? 'm' : ''), { map: tileTex(o.tile), roughness: o.metal ? 0.45 : 0.82, metalness: o.metal ? 0.65 : 0 });
-  const underM = env.std('under' + (o.under || '#4a2a1a'), { color: o.under || '#4a2a1a', roughness: 0.9, side: THREE.DoubleSide });
-  g.add(mesh(tg, tileM, { cast: true }), mesh(bg, underM, { cast: false }));
-  // bờ nóc, bờ dải, đầu đao
-  const ridgeM = env.std('ridge' + (o.ridgeCol || o.tile), { color: o.ridgeCol || shade(o.tile, 0.12), roughness: 0.7, metalness: o.metal ? 0.6 : 0 });
-  const orn = [];
-  const corners = [[sides[0], 1, 1, 1], [sides[0], 0, -1, 1], [sides[1], 0, 1, -1], [sides[1], 1, -1, -1]];
-  for (const [sd, ue, sx, sz] of corners) {
-    const pts = [];
-    for (let j = 6; j >= 0; j--) { const p = P(sd, ue, j / 6); p.y += s * 0.07; pts.push(p); }
-    const c = pts.at(-1), dg = new V3(sx, 0, sz).normalize();
-    const cs = s * (o.curl ?? 0.85);
-    pts.push(c.clone().addScaledVector(dg, 0.42 * cs).add(new V3(0, 0.16 * cs, 0)));
-    pts.push(c.clone().addScaledVector(dg, 0.72 * cs).add(new V3(0, 0.55 * cs, 0)));
-    pts.push(c.clone().addScaledVector(dg, 0.78 * cs).add(new V3(0, 0.9 * cs, 0)));
-    pts.push(c.clone().addScaledVector(dg, 0.64 * cs).add(new V3(0, 1.02 * cs, 0)));
-    const fr = 7 / pts.length;
-    orn.push(taperTube(pts, (t) => s * (t < fr ? 0.1 : 0.1 * (1 - ((t - fr) / (1 - fr)) * 0.75)), 6, 30));
-  }
-  if (vMax >= 1) {
-    if (rl > 0.3) {
-      orn.push(place(boxUV(rl * 2 + s * 0.3, s * 0.3, s * 0.24), 0, h + s * 0.12, 0));
-      for (const k of [-1, 1]) orn.push(taperTube([new V3(k * (rl - s * 0.1), h + s * 0.12, 0), new V3(k * (rl + s * 0.22), h + s * 0.3, 0), new V3(k * (rl + s * 0.3), h + s * 0.62, 0), new V3(k * (rl + s * 0.16), h + s * 0.8, 0)], (t) => s * 0.14 * (1 - 0.65 * t), 6, 14));
-    }
-    const ornament = o.ornament ?? 'dragon';
-    if (ornament === 'dragon' && rl > 0.6) {
-      const dl = Math.min(rl * 0.8, s * 2.6);
-      for (const k of [-1, 1]) orn.push(taperTube([new V3(k * dl, h + s * 0.2, 0), new V3(k * dl * 0.75, h + s * 0.42, 0), new V3(k * dl * 0.5, h + s * 0.25, 0), new V3(k * dl * 0.28, h + s * 0.45, 0), new V3(k * s * 0.32, h + s * 0.5, 0)], (t) => s * 0.075 * (1 - 0.3 * t) * (t > 0.88 ? 1.5 : 1), 6, 24));
-      orn.push(place(new THREE.SphereGeometry(s * 0.14, 12, 8), 0, h + s * 0.55, 0));
-      for (let f = 0; f < 7; f++) { const a = (f / 7) * TAU; orn.push(place(new THREE.ConeGeometry(s * 0.035, s * 0.15, 5), Math.cos(a) * s * 0.19, h + s * 0.55 + Math.sin(a) * s * 0.19, 0, 0, 0, a - PI / 2)); }
-    } else if (ornament !== 'none') {
-      const pts = [[0.001, 0], [0.18, 0.04], [0.22, 0.2], [0.1, 0.38], [0.16, 0.55], [0.08, 0.75], [0.02, 0.95], [0.001, 1]].map(([r, y]) => new THREE.Vector2(r * s * 1.4, y * s * 1.4));
-      const lg = new THREE.LatheGeometry(pts, 12); lg.translate(0, h + s * 0.15, 0); orn.push(lg);
-    }
-  }
-  orn.forEach((x) => { if (x.attributes.uv === undefined) x.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(x.attributes.position.count * 2), 2)); });
-  const ornGeo = mergeGeometries(orn.map((x) => (x.index ? x : x.toNonIndexed ? x : x)).map((x) => (x.index ? x.toNonIndexed() : x)), false);
-  orn.forEach((x) => x.dispose());
-  const om = mesh(ornGeo, o.ornMat || ridgeM, { cast: true });
-  g.add(om);
-  g.userData.topY = (R) => h; // tiện dụng
+  const tealM = env.std('katinat_roof_teal', { color: '#143949', roughness: 0.45 });
+  const slateM = env.std('katinat_roof_slate', { color: '#102e3c', roughness: 0.55 });
+  const creamM = env.std('katinat_roof_cream', { color: '#f4efe6', roughness: 0.72 });
+  const goldM = env.std('katinat_roof_gold', { color: '#d4a853', roughness: 0.3, metalness: 0.82 });
+
+  // Diềm mái Cornice Pháp + gờ chỉ vàng đồng
+  g.add(mesh(boxUV(w, 0.36, d), creamM, { pos: [0, 0.18, 0], cast: true }));
+  g.add(mesh(boxUV(w + 0.16, 0.1, d + 0.16), goldM, { pos: [0, 0.38, 0] }));
+  // Khối mái Mansard vát nhẹ màu Xanh Katinat Đậm
+  const mh = Math.min(h * 0.55, 1.8);
+  g.add(mesh(boxUV(w * 0.88, mh, d * 0.88), slateM, { pos: [0, 0.42 + mh / 2, 0], cast: true }));
+  g.add(mesh(boxUV(w * 0.9, 0.12, d * 0.9), goldM, { pos: [0, 0.42 + mh + 0.06, 0] }));
+  g.userData.topY = () => 0.42 + mh + 0.12;
   return g;
 }
 // thân nhà: hộp với mặt tiền vẽ cửa
@@ -1258,166 +1186,70 @@ function hall(env, o) {
   g.userData.plinth = ph; g.userData.pd = pd; g.userData.pw = pw;
   return g;
 }
-// tháp nhiều tầng (lục giác / bát giác / vuông)
+// Tháp đồng hồ / tháp vòm kiến trúc Pháp (Parisian Clock & Dome Tower) thay cho bảo tháp chùa
 function tieredTower(env, o) {
   const g = new THREE.Group();
-  const { sides, tiers } = o;
-  let y = 0;
-  const faceM = (r, h) => env.std(null, { map: texRepeat(towerFaceTex(o.face || 'brick', o.color), sides, 1), roughness: 0.85 });
-  const corniceM = env.std('cornice' + o.cornice, { color: o.cornice, map: plasterTex(o.cornice), roughness: 0.85 });
-  if (o.base) {
-    g.add(mesh(cylUV(o.r0 * 1.6, o.r0 * 1.75, o.base, sides, 1), texMat(env, 'tbase', stoneTex('#a8a090'), 1, 1), { pos: [0, o.base / 2, 0], rot: [0, PI / sides, 0], cast: true }));
-    y = o.base;
+  const tealM = env.std('katinat_tw_teal', { color: '#143949', roughness: 0.45 });
+  const creamM = env.std('katinat_tw_cream', { color: '#f4efe6', roughness: 0.72 });
+  const goldM = env.std('katinat_tw_gold', { color: '#d4a853', roughness: 0.28, metalness: 0.85 });
+  const r0 = o.r0 || 2.8, hTotal = (o.h0 || 4) + (o.tiers || 3) * (o.hTier || 2.2) * 0.55;
+
+  // Bệ đá vuông + thân tháp đồng hồ Pháp
+  g.add(mesh(boxUV(r0 * 2.1, 1.2, r0 * 2.1), tealM, { pos: [0, 0.6, 0], cast: true }));
+  g.add(mesh(boxUV(r0 * 1.65, hTotal, r0 * 1.65), creamM, { pos: [0, 1.2 + hTotal / 2, 0], cast: true }));
+  // Các đường phào chỉ vàng đồng phân tầng
+  for (let i = 1; i <= 3; i++) {
+    const yy = 1.2 + (hTotal * i) / 3;
+    g.add(mesh(boxUV(r0 * 1.78, 0.22, r0 * 1.78), goldM, { pos: [0, yy, 0] }));
   }
-  for (let i = 0; i < tiers; i++) {
-    const t = tiers > 1 ? i / (tiers - 1) : 0;
-    const r = lerp(o.r0, o.rTop, t), h = i === 0 ? o.h0 : o.hTier * (1 - t * (o.hShrink ?? 0.25));
-    const body = mesh(new THREE.CylinderGeometry(r * 0.97, r, h, sides, 1), faceM(r, h), { pos: [0, y + h / 2, 0], rot: [0, PI / sides, 0], cast: true });
-    g.add(body);
-    y += h;
-    if (o.roof === 'curved') {
-      const rf = hipRoof(env, { w: r * 2.9, d: r * 2.9, h: r * 0.75, tile: o.tile, ridge: 0.01, ornament: 'none', scale: r * 0.42, under: o.under });
-      rf.position.y = y; g.add(rf);
-      y += r * 0.5;
-    } else {
-      g.add(mesh(new THREE.CylinderGeometry(r * 1.2, r * 1.0, h * 0.14, sides, 1), corniceM, { pos: [0, y + h * 0.07, 0], rot: [0, PI / sides, 0], cast: true }));
-      g.add(mesh(new THREE.CylinderGeometry(r * 1.05, r * 1.2, h * 0.08, sides, 1), corniceM, { pos: [0, y + h * 0.18, 0], rot: [0, PI / sides, 0], cast: true }));
-      y += h * 0.22;
-    }
+  // Mặt đồng hồ tròn 4 phía
+  const clockY = 1.2 + hTotal * 0.78;
+  for (let k = 0; k < 4; k++) {
+    const a = (k * PI) / 2;
+    g.add(mesh(new THREE.CylinderGeometry(r0 * 0.48, r0 * 0.48, 0.14, 20), goldM, {
+      pos: [Math.sin(a) * (r0 * 0.84), clockY, Math.cos(a) * (r0 * 0.84)],
+      rot: [PI / 2, 0, -a],
+    }));
   }
-  // chóp
-  const finM = env.std('finial' + (o.finial || '#c8a040'), { color: o.finial || '#c8a040', metalness: 0.7, roughness: 0.35 });
-  const fh = o.finialH ?? o.rTop * 2.4;
-  const pts = [[0.001, 0], [0.5, 0], [0.55, 0.1], [0.3, 0.2], [0.42, 0.32], [0.2, 0.45], [0.28, 0.55], [0.1, 0.7], [0.06, 0.9], [0.001, 1]].map(([r, yy]) => new THREE.Vector2(r * o.rTop * 1.2, yy * fh));
-  g.add(mesh(new THREE.LatheGeometry(pts, 12), finM, { pos: [0, y, 0], cast: true }));
-  g.userData.height = y + fh;
+  // Mái vòm Cupola xanh Katinat + đỉnh kim thu sét vàng đồng
+  const topY = 1.2 + hTotal + 0.15;
+  g.add(mesh(new THREE.SphereGeometry(r0 * 0.92, 20, 14, 0, TAU, 0, PI / 2), tealM, { pos: [0, topY, 0], cast: true }));
+  g.add(mesh(new THREE.CylinderGeometry(0.06, 0.18, 2.2, 10), goldM, { pos: [0, topY + r0 * 0.92 + 1.0, 0] }));
+  g.userData.height = topY + r0 * 0.92 + 2.2;
   return g;
 }
-// cổng tam quan
+// Cổng chào Katinat Parisian Archway thay cho cổng Tam Quan
 function gate(env, o) {
   const g = new THREE.Group();
-  const wallM = texMat(env, 'gatewall' + o.wall, plasterTex(o.wall), 0.5, 0.5);
-  const darkM = env.std('gatedark', { color: '#1a120c', roughness: 1 });
-  const parts = [[0, o.w || 4.4, o.h || 5.2, 1], [-1, (o.w || 4.4) * 0.72, (o.h || 5.2) * 0.75, 0.8], [1, (o.w || 4.4) * 0.72, (o.h || 5.2) * 0.75, 0.8]];
-  let x = 0;
-  for (const [k, w, h, s] of parts) {
-    const cxp = k === 0 ? 0 : k * ((o.w || 4.4) / 2 + w / 2 + 0.1);
-    const blk = mesh(boxUV(w, h, 2.4, 1.5), wallM, { pos: [cxp, h / 2, 0], cast: true });
-    g.add(blk);
-    g.add(mesh(new THREE.PlaneGeometry(w * 0.5, h * 0.62), darkM, { pos: [cxp, h * 0.31, 1.21] }));
-    g.add(mesh(new THREE.CircleGeometry(w * 0.25, 16, 0, PI), darkM, { pos: [cxp, h * 0.62, 1.21] }));
-    const rf = hipRoof(env, { w: w + 1.6, d: 3.6, h: 1.4 * s, tile: o.tile, ornament: k === 0 ? 'dragon' : 'none', under: o.under, scale: 0.6 * s });
-    rf.position.set(cxp, h, 0); g.add(rf);
+  const tealM = env.std('katinat_gate_teal', { color: '#143949', roughness: 0.45 });
+  const creamM = env.std('katinat_gate_cream', { color: '#f4efe6', roughness: 0.72 });
+  const goldM = env.std('katinat_gate_gold', { color: '#d4a853', roughness: 0.28, metalness: 0.85 });
+  const w = o.w || 4.6, h = o.h || 5.2;
+
+  for (const s of [-1, 1]) {
+    g.add(mesh(boxUV(1.2, h, 1.2), tealM, { pos: [s * (w * 0.65), h / 2, 0], cast: true }));
+    g.add(mesh(boxUV(1.4, 0.35, 1.4), goldM, { pos: [s * (w * 0.65), 0.18, 0] }));
+    g.add(mesh(boxUV(1.4, 0.3, 1.4), goldM, { pos: [s * (w * 0.65), h - 0.15, 0] }));
   }
+  // Dầm ngang bảng hiệu cổng chào Katinat
+  g.add(mesh(boxUV(w * 1.65, 1.1, 1.3), tealM, { pos: [0, h + 0.55, 0], cast: true }));
+  g.add(mesh(boxUV(w * 1.72, 0.18, 1.42), goldM, { pos: [0, h + 1.15, 0] }));
+  g.add(mesh(boxUV(w * 1.4, 0.65, 1.36), creamM, { pos: [0, h + 0.55, 0] }));
   return g;
 }
-// mái Khmer: nhiều lớp mái dốc, chóp naga
 function khmerRoof(env, o) {
-  const g = new THREE.Group();
-  const tileM = env.std('ktile', { map: texRepeat(tileTex('#d8641c'), 1, 1), roughness: 0.6 });
-  const trimM = env.std('ktrim', { color: '#f0b838', metalness: 0.75, roughness: 0.3 });
-  const pedM = env.std('kped', { map: pedimentTex(), metalness: 0.5, roughness: 0.45, side: THREE.DoubleSide });
-  const underM = env.std('kunder', { color: '#6a2a10', side: THREE.DoubleSide });
-  const trims = [];
-  const gable = (len, span, hgt, y0, z0) => {
-    const segL = 2, segV = 8, pos = [], uv = [], idx = [];
-    for (const sd of [-1, 1]) {
-      const b0 = pos.length / 3;
-      for (let i = 0; i <= segL; i++) for (let j = 0; j <= segV; j++) {
-        const v = j / segV, z = z0 + lerp(-len / 2, len / 2, i / segL);
-        const x = sd * (span / 2) * (1 - v), y = y0 + hgt * (v * (0.7 + 0.3 * v));
-        pos.push(x, y, z); uv.push((z / 2) * 1, (v * Math.hypot(span / 2, hgt)) / 2);
-      }
-      for (let i = 0; i < segL; i++) for (let j = 0; j < segV; j++) {
-        const a = b0 + i * (segV + 1) + j, b = a + segV + 1;
-        if (sd > 0) idx.push(a, a + 1, b, b, a + 1, b + 1); else idx.push(a, b, a + 1, b, b + 1, a + 1);
-      }
-    }
-    const gg = new THREE.BufferGeometry();
-    gg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); gg.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
-    gg.setIndex(idx); gg.computeVertexNormals();
-    g.add(mesh(gg, tileM, { cast: true }));
-    const ug = gg.clone(); ug.translate(0, -0.15, 0); g.add(mesh(ug, underM));
-    for (const ez of [-1, 1]) {
-      const zz = z0 + ez * len / 2;
-      // tam giác đầu hồi
-      const sh = new THREE.Shape(); sh.moveTo(-span / 2 * 0.92, 0); sh.lineTo(span / 2 * 0.92, 0); sh.lineTo(0, hgt * 0.95); sh.closePath();
-      const pg = new THREE.ShapeGeometry(sh); pg.translate(0, y0, zz - ez * 0.15);
-      const puv = pg.attributes.uv; for (let i = 0; i < puv.count; i++) puv.setXY(i, puv.getX(i) / span + 0.5, puv.getY(i) / hgt);
-      g.add(mesh(pg, pedM));
-      // viền rắn naga dọc mái hồi + đầu naga cong ở chân + sừng chovea ở đỉnh
-      for (const sd of [-1, 1]) {
-        const pts = [];
-        for (let k = 0; k <= 6; k++) { const v = k / 6; pts.push(new V3(sd * (span / 2) * (1 - v), y0 + hgt * (v * (0.7 + 0.3 * v)) + 0.12, zz)); }
-        pts.reverse();
-        const foot = pts.at(-1);
-        pts.push(foot.clone().add(new V3(sd * 0.5, 0.2, 0)), foot.clone().add(new V3(sd * 0.75, 0.75, 0)), foot.clone().add(new V3(sd * 0.55, 1.05, 0)));
-        trims.push(taperTube(pts, (t) => (t < 0.7 ? 0.13 : 0.13 * (1 - (t - 0.7) * 2.2)), 5, 24));
-      }
-      const apex = new V3(0, y0 + hgt + 0.1, zz);
-      trims.push(taperTube([apex, apex.clone().add(new V3(0, 0.6, ez * 0.25)), apex.clone().add(new V3(0, 1.4, ez * 0.1)), apex.clone().add(new V3(0, 2.1, ez * 0.45))], (t) => 0.16 * (1 - t * 0.85), 6, 14));
-    }
-    trims.push(taperTube([new V3(0, y0 + hgt + 0.08, z0 - len / 2), new V3(0, y0 + hgt + 0.08, z0 + len / 2)], () => 0.12, 6, 2));
-  };
-  const { w, d, y } = o;
-  const H = w * 0.62;
-  gable(d * 0.5, w * 0.78, H, y + 1.6, 0);
-  for (const ez of [-1, 1]) gable(d * 0.24, w * 0.9, H * 0.86, y + 0.7, ez * d * 0.36);
-  for (const ez of [-1, 1]) gable(d * 0.18, w * 1.0, H * 0.72, y - 0.1, ez * d * 0.53);
-  // mái hiên hai bên
-  const skM = env.std('ktileD', { map: tileTex('#d8641c'), roughness: 0.6, side: THREE.DoubleSide });
-  for (const sd of [-1, 1]) {
-    const x0 = sd * w * 0.36, x1 = sd * w * 0.62, y0 = y + 1.0, y1 = y - 0.35, z0 = -d * 0.55, z1 = d * 0.55;
-    const pos = [x0, y0, z0, x0, y0, z1, x1, y1, z0, x1, y1, z1];
-    const sl = Math.hypot(x1 - x0, y1 - y0) / 2;
-    const gg = new THREE.BufferGeometry();
-    gg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-    gg.setAttribute('uv', new THREE.Float32BufferAttribute([z0 / 2, sl, z1 / 2, sl, z0 / 2, 0, z1 / 2, 0], 2));
-    gg.setIndex(sd > 0 ? [0, 1, 2, 2, 1, 3] : [0, 2, 1, 2, 3, 1]); gg.computeVertexNormals();
-    g.add(mesh(gg, skM, { cast: true }));
-  }
-  trims.forEach((t) => t.deleteAttribute('uv'));
-  g.add(mesh(mergeGeometries(trims, false), trimM, { cast: true }));
-  trims.forEach((t) => t.dispose());
-  return g;
+  return hipRoof(env, { w: o.w, d: o.d, h: 1.6 });
 }
 function khmerHall(env, o) {
-  const g = new THREE.Group();
-  const ph = o.plinth ?? 1.8;
-  const baseM = texMat(env, 'kbase', plasterTex('#efe6d2'), 1, 1);
-  g.add(mesh(boxUV(o.w + 4, ph, o.d + 4, 2), baseM, { pos: [0, ph / 2, 0], cast: true }));
-  g.add(mesh(boxUV(o.w + 4.3, 0.18, o.d + 4.3), env.std('ktrim', { color: '#f0b838', metalness: 0.75, roughness: 0.3 }), { pos: [0, ph, 0] }));
-  const st = stairs(env, 3.2, ph, ph * 2, baseM); st.position.set(0, 0, (o.d + 4) / 2); g.add(st);
-  // lan can rắn naga hai bên bậc
-  const nagaM = env.std('naga', { color: '#2f8a5a', metalness: 0.4, roughness: 0.4 });
-  for (const sd of [-1, 1]) {
-    const z0 = (o.d + 4) / 2, z1 = z0 + ph * 2;
-    const pts = [new V3(sd * 1.8, ph + 0.5, z0 - 0.2), new V3(sd * 1.8, ph * 0.55 + 0.5, (z0 + z1) / 2), new V3(sd * 1.8, 0.6, z1), new V3(sd * 1.8, 1.3, z1 + 0.4), new V3(sd * 1.8, 2.0, z1 + 0.2)];
-    g.add(mesh(taperTube(pts, (t) => 0.18 * (t > 0.75 ? 1.5 : 1), 7, 24), nagaM, { cast: true }));
-    g.add(mesh(new THREE.SphereGeometry(0.5, 10, 8, 0, PI), env.std('ktrim', {}), { pos: [sd * 1.8, 2.1, z1 + 0.15], scale: [1, 1.3, 0.4] }));
-  }
-  const body = new THREE.Group(); body.position.y = ph; g.add(body);
-  const ft = facadeTex({ bays: 3, wall: '#f2d9a0', style: 'khmer' }), stx = facadeTex({ bays: Math.round(o.d / 3), wall: '#f2d9a0', style: 'khmer' });
-  body.add(hallBody(env, o.w, o.h, o.d, { front: env.std(null, { map: ft }), side: env.std(null, { map: stx }), back: env.std(null, { map: ft }) }));
-  const pts = [];
-  const cx = o.w / 2 + 1.2, cz = o.d / 2 + 1.2;
-  for (let i = 0; i < 4; i++) { const x = lerp(-cx, cx, i / 3); pts.push([x, cz], [x, -cz]); }
-  for (let i = 1; i < Math.round(o.d / 3); i++) { const z = lerp(-cz, cz, i / Math.round(o.d / 3)); pts.push([cx, z], [-cx, z]); }
-  body.add(columns(env, pts, o.h, 0.26, '#f4e2b0'));
-  const rf = khmerRoof(env, { w: o.w + 3.4, d: o.d + 3.6, y: o.h });
-  body.add(rf);
-  g.userData.top = ph + o.h + (o.w + 3.4) * 0.62 + 3.5;
-  return g;
+  return hall(env, { ...o, wall: '#f4efe6', door: '#143949', frame: '#d4a853', col: '#143949', tile: '#102e3c', under: '#143949', ornament: 'none' });
 }
 function khmerStupa(env, s = 1) {
   const g = new THREE.Group();
-  const wm = texMat(env, 'kstupa', plasterTex('#f0e8d8'), 1, 1), gm = env.std('ktrim', { color: '#f0b838', metalness: 0.75, roughness: 0.3 });
-  let y = 0;
-  for (let i = 0; i < 3; i++) { const w = (3 - i * 0.7) * s, h = 0.7 * s; g.add(mesh(boxUV(w, h, w), wm, { pos: [0, y + h / 2, 0], cast: true })); y += h; }
-  const bell = [[0.001, 0], [0.9, 0], [1.0, 0.25], [0.85, 0.55], [0.5, 0.75], [0.3, 0.85], [0.25, 1.0]].map(([r, yy]) => new THREE.Vector2(r * s, yy * 2 * s));
-  g.add(mesh(new THREE.LatheGeometry(bell, 16), wm, { pos: [0, y, 0], cast: true })); y += 2 * s;
-  const spire = [[0.25, 0], [0.3, 0.1], [0.15, 0.3], [0.2, 0.4], [0.08, 0.6], [0.1, 0.7], [0.02, 0.95], [0.001, 1]].map(([r, yy]) => new THREE.Vector2(r * s, yy * 3 * s));
-  g.add(mesh(new THREE.LatheGeometry(spire, 12), gm, { pos: [0, y, 0], cast: true }));
+  const tealM = env.std('katinat_gaz_teal', { color: '#143949', roughness: 0.45 });
+  const goldM = env.std('katinat_gaz_gold', { color: '#d4a853', roughness: 0.3, metalness: 0.85 });
+  g.add(mesh(new THREE.CylinderGeometry(1.4 * s, 1.6 * s, 0.6 * s, 16), tealM, { pos: [0, 0.3 * s, 0], cast: true }));
+  g.add(mesh(new THREE.CylinderGeometry(0.18 * s, 0.22 * s, 2.8 * s, 12), goldM, { pos: [0, 1.7 * s, 0], cast: true }));
+  g.add(mesh(new THREE.ConeGeometry(2.2 * s, 0.9 * s, 16), tealM, { pos: [0, 3.2 * s, 0], cast: true }));
   return g;
 }
 function boundaryWall(env, pts, h = 2.2, color = '#d8c8a8', tile = '#7a3a24', closed = true) {
@@ -1531,43 +1363,80 @@ function boats(env, kind, n, pathFn, y, speed = 0.01, seed = 9) {
   return grp;
 }
 
-// vỏ ngoài chánh điện (nền, hiên, mái) khi ngồi bên trong nhìn ra
+// Vỏ kiến trúc mặt tiền toà nhà Katinat Saigon Kafe Flagship (Phong cách Tân Cổ Điển Paris Xanh Cổ Vịt & Vàng Đồng)
 const HALL_STYLE = {
-  wood: { outer: '#d6c6a4', tile: '#7a4a32', under: '#3a2216', col: '#7a2a18' },
-  lacquer: { outer: '#a8402a', tile: '#8a5a32', under: '#4a1a10', col: '#a3261a', ridge: '#c89a50' },
-  bronze: { outer: '#7a5a2e', tile: '#8a6a3a', under: '#4a3820', col: '#8a6a34', metal: true },
-  plaster: { outer: '#efe6d2', tile: '#8a4a2e', under: '#5a4030', col: '#a8503a' },
-  khmer: { outer: '#f2d9a0', tile: '#d8641c', under: '#6a2a10', col: '#f0c050' },
+  wood: { outer: '#143949', tile: '#102e3c', under: '#143949', col: '#143949', ridge: '#d4a853' },
+  lacquer: { outer: '#143949', tile: '#102e3c', under: '#143949', col: '#143949', ridge: '#d4a853' },
+  bronze: { outer: '#143949', tile: '#102e3c', under: '#143949', col: '#d4a853', metal: true },
+  plaster: { outer: '#f4efe6', tile: '#143949', under: '#143949', col: '#143949', ridge: '#d4a853' },
+  khmer: { outer: '#143949', tile: '#102e3c', under: '#143949', col: '#d4a853', ridge: '#d4a853' },
 };
 function hallShell(c) {
   const { env, g, W, D, H, gy, theme } = c;
   const st = { ...(HALL_STYLE[theme.wall] || HALL_STYLE.wood), ...(theme.hallStyle || {}) }, T = 0.4, hw = W / 2, hd = D / 2;
-  const stoneM = texMat(env, 'plinth', stoneTex('#a49c8e'), 1, 1);
+  const stoneM = texMat(env, 'plinth', stoneTex('#dcd6c8'), 1, 1);
   if (gy < -0.05 && theme.view !== 'pond') {
     const pw = W + 2 * T + 4, pd = D + 2 * T + 4;
     g.add(mesh(boxUV(pw, -gy, pd, 2.5), stoneM, { pos: [0, gy / 2 - 0.02, 0], cast: true }));
     const s = stairs(env, Math.min(8, W * 0.4), -gy, -gy * 2.4, stoneM); s.position.set(0, gy, pd / 2); g.add(s);
   }
-  // hàng cột hiên trước + xà
-  const cz = hd + T + 1.5, n = Math.max(4, Math.round(W / 3.4));
+  const tealM = env.std('katinat_teal_ext', { color: '#143949', roughness: 0.48 });
+  const creamM = env.std('katinat_cream_ext', { color: '#f4efe6', roughness: 0.72 });
+  const goldM = env.std('katinat_gold_ext', { color: '#d4a853', roughness: 0.3, metalness: 0.8 });
+
+  // Hệ cột vuông Parisian hiên trước & hai bên màu Xanh Katinat viền Vàng Đồng
+  const cz = hd + T + 1.5, n = Math.max(4, Math.round(W / 3.8));
   const pts = []; for (let i = 0; i <= n; i++) pts.push([lerp(-hw - T - 1.5, hw + T + 1.5, i / n), cz]);
   for (let i = 1; i < Math.max(2, Math.round(D / 4)); i++) { const z = lerp(cz, -hd - T - 1.5, i / Math.max(2, Math.round(D / 4))); pts.push([hw + T + 1.5, z], [-hw - T - 1.5, z]); }
   pts.push([hw + T + 1.5, -hd - T - 1.5], [-hw - T - 1.5, -hd - T - 1.5]);
-  if (theme.view !== 'pond') g.add(columns(env, pts, H + 0.4, 0.26, st.col));
-  if (theme.wall === 'khmer') {
-    g.add(khmerRoof(env, { w: W + 2 * T + 3.2, d: D + 2 * T + 3.2, y: H + 0.25 }));
-  } else {
-    const over = theme.view === 'pond' ? 2.0 : 3.2;
-    const rf = hipRoof(env, { w: W + 2 * T + over * 2, d: D + 2 * T + over * 2, h: Math.min(D, W) * 0.36 + 2, tile: st.tile, under: st.under, metal: st.metal, ridgeCol: st.ridge, scale: Math.max(1.2, Math.min(W, D) / 9) });
-    rf.position.y = H + 0.4; g.add(rf);
+  if (theme.view !== 'pond') {
+    const colList = [], trimList = [];
+    for (const [px, pz] of pts) {
+      colList.push(place(boxUV(0.46, H + 0.4, 0.46), px, (H + 0.4) / 2, pz));
+      trimList.push(place(boxUV(0.58, 0.24, 0.58), px, 0.12, pz));
+      trimList.push(place(boxUV(0.56, 0.14, 0.56), px, H + 0.28, pz));
+    }
+    g.add(mesh(merge(colList), tealM, { cast: true }), mesh(merge(trimList), goldM, { cast: false }));
   }
-  // xà viền đỡ mái
-  const beam = env.std('beam' + st.under, { color: st.under, roughness: 0.85 });
-  const bw = W + 2 * T + 3, bd = D + 2 * T + 3;
-  g.add(mesh(merge([place(boxUV(bw, 0.45, 0.35), 0, H + 0.2, bd / 2), place(boxUV(bw, 0.45, 0.35), 0, H + 0.2, -bd / 2), place(boxUV(0.35, 0.45, bd), bw / 2, H + 0.2, 0), place(boxUV(0.35, 0.45, bd), -bw / 2, H + 0.2, 0)]), beam));
-  // trần hiên (che phần giữa mái và tường)
+
+  // Mái bằng kiến trúc Pháp Tân Cổ Điển (Parisian Cornice & Rooftop Balustrade) thay cho mái ngói cong chùa!
+  const bw = W + 2 * T + 3.4, bd = D + 2 * T + 3.4;
+  g.add(
+    mesh(boxUV(bw, 0.75, bd), tealM, { pos: [0, H + 0.45, 0], cast: true }),
+    mesh(boxUV(bw + 0.45, 0.22, bd + 0.45), goldM, { pos: [0, H + 0.90, 0], cast: false }),
+    mesh(boxUV(bw - 0.6, 1.15, bd - 0.6), creamM, { pos: [0, H + 1.55, 0], cast: true }),
+    mesh(boxUV(bw - 0.2, 0.24, bd - 0.2), goldM, { pos: [0, H + 2.22, 0], cast: false })
+  );
+
+  // Mái hiên sọc kiểu Pháp (French Bistro Awning) dọc mặt tiền
+  const awningW = bw - 1.2, awningD = 1.65;
+  const awningGeo = boxUV(awningW, 0.16, awningD);
+  g.add(mesh(awningGeo, tealM, { pos: [0, H * 0.62, cz + 0.55], rot: [0.28, 0, 0], cast: true }));
+  g.add(mesh(boxUV(awningW + 0.1, 0.08, 0.12), goldM, { pos: [0, H * 0.62 - 0.22, cz + 1.35], cast: false }));
+
+  // Bảng hiệu Mặt Tiền KATINAT COFFEE & TEA HOUSE cỡ lớn trên đỉnh cổng chính
+  const signCanvas = document.createElement('canvas');
+  signCanvas.width = 1024; signCanvas.height = 256;
+  const sctx = signCanvas.getContext('2d');
+  sctx.fillStyle = '#102e3c'; sctx.fillRect(0, 0, 1024, 256);
+  sctx.strokeStyle = '#d4a853'; sctx.lineWidth = 12; sctx.strokeRect(14, 14, 996, 228);
+  sctx.strokeStyle = '#f5d27e'; sctx.lineWidth = 3; sctx.strokeRect(28, 28, 968, 200);
+  sctx.textAlign = 'center';
+  sctx.fillStyle = '#f5d27e'; sctx.font = '800 96px Georgia, serif';
+  sctx.fillText('K A T I N A T', 512, 132);
+  sctx.fillStyle = '#f8f4ec'; sctx.font = '600 34px system-ui, sans-serif';
+  sctx.fillText('COFFEE & TEA HOUSE  ·  SAIGON KAFE', 512, 194);
+  const signTex = new THREE.CanvasTexture(signCanvas);
+  signTex.colorSpace = THREE.SRGBColorSpace;
+  const signW = Math.min(11.5, bw * 0.62), signH = signW * 0.25;
+  g.add(
+    mesh(boxUV(signW + 0.3, signH + 0.3, 0.35), goldM, { pos: [0, H + 1.55, bd / 2 - 0.12] }),
+    mesh(new THREE.PlaneGeometry(signW, signH), new THREE.MeshStandardMaterial({ map: signTex, emissive: '#ffffff', emissiveMap: signTex, emissiveIntensity: 0.75, roughness: 0.3 }), { pos: [0, H + 1.55, bd / 2 + 0.08], cast: false })
+  );
+
+  // Trần hiên
   const ceil = new THREE.PlaneGeometry(bw, bd); ceil.rotateX(PI / 2);
-  g.add(mesh(ceil, env.std('soffit' + st.under, { color: st.under, side: THREE.DoubleSide }), { pos: [0, H + 0.05, 0] }));
+  g.add(mesh(ceil, env.std('soffit_katinat', { color: '#143949', side: THREE.DoubleSide }), { pos: [0, H + 0.05, 0] }));
   return st;
 }
 
@@ -1894,33 +1763,26 @@ VIEWS.mountain = (c) => {
    Chùa trên thềm lưng chừng núi; sau lưng núi dựng cao tới đỉnh có tượng Phật Bà bằng đồng;
    trước mặt đồng bằng và hồ nước xa. Ga cáp treo cạnh sân, tuyến cáp có trụ chạy lên đỉnh và xuống chân núi. */
 function giantGuanyin(env, s = 1) {
-  // tượng Phật Bà đại tượng: áo choàng đồng đen rộng, mặt tay ánh đồng đỏ, mão nhiều tầng, đứng trên đài sen và bệ tròn nhiều cấp
+  // Đài biểu tượng Ly Katinat Khổng Lồ trên đỉnh núi
   const g = new THREE.Group();
   const stone = env.std('gyBase', { map: texRepeat(stoneTex('#b8b0a0'), 4, 1), roughness: 0.85 });
-  const gold = env.std('gyGold', { color: '#c9a050', roughness: 0.3, metalness: 0.85 });
+  const gold = env.std('gyGold', { color: '#d4a853', roughness: 0.3, metalness: 0.85 });
   const qa = buildStatue('quanam', 'bronze_dark', { halo: false });
-  // môi trường ngoài trời chỉ phản chiếu phòng tối: hạ độ kim loại, nâng màu để áo đen vẫn còn hình khối dưới nắng
   qa.traverse((o) => {
     if (!o.isMesh) return;
     o.castShadow = true;
-    if (!o.material?.color) return;
-    const m = (o.material = o.material.clone());
-    m.metalness = Math.min(m.metalness, 0.45);
-    m.roughness = Math.max(m.roughness, 0.42);
-    m.clearcoat = 0.25;
-    m.color.multiplyScalar(0.62);
   });
   const S = (43 / qa.userData.height) * s;
   qa.scale.setScalar(S); qa.position.y = -4.0 * s; g.add(qa);
-  // bệ tròn ba cấp, gờ vàng
   g.add(mesh(new THREE.CylinderGeometry(11.8 * s, 12.2 * s, 3.2 * s, 48), stone, { pos: [0, -5.6 * s, 0], cast: true }));
   g.add(mesh(new THREE.CylinderGeometry(14 * s, 14.6 * s, 1.6 * s, 48), stone, { pos: [0, -7.6 * s, 0], cast: true }));
   g.add(mesh(new THREE.TorusGeometry(11.9 * s, 0.25 * s, 8, 48), gold, { pos: [0, -4.0 * s, 0], rot: [PI / 2, 0, 0] }));
   return g;
 }
 const cabinTex = () => ctex('cabin', 128, 128, (g, w, h) => {
-  g.fillStyle = '#c8302a'; g.fillRect(0, 0, w, h);
+  g.fillStyle = '#143949'; g.fillRect(0, 0, w, h);
   g.fillStyle = '#f4efe6'; g.fillRect(0, h * 0.62, w, h * 0.38);
+  g.fillStyle = '#d4a853'; g.fillRect(0, h * 0.6, w, 4);
   g.fillStyle = '#25384a'; for (let i = 0; i < 3; i++) g.fillRect(8 + i * 40, 16, 32, 48);
   g.fillStyle = 'rgba(255,255,255,.35)'; for (let i = 0; i < 3; i++) g.fillRect(10 + i * 40, 18, 8, 44);
 }, { repeat: false });
@@ -1935,29 +1797,25 @@ function cabinMesh(env) {
   g.add(mesh(new THREE.BoxGeometry(0.9, 0.35, 0.5), dark, { pos: [0, -0.05, 0] }));
   return g;
 }
-// dải phù điêu rồng trên bệ đá Đại tượng
 const dragonBandTex = () => ctex('dragonband', 512, 128, (g, w, h) => {
-  g.fillStyle = '#6c685e'; g.fillRect(0, 0, w, h);
-  g.fillStyle = '#4a463e'; g.fillRect(14, 14, w - 28, h - 28);
-  g.strokeStyle = '#c8a24e'; g.lineWidth = 4; g.strokeRect(22, 22, w - 44, h - 44);
-  g.lineWidth = 7; g.lineCap = 'round';
-  for (const k of [-1, 1]) { g.beginPath(); for (let i = 0; i <= 44; i++) { const x = w / 2 + k * (28 + i * 4.3), y = h / 2 + Math.sin(i * 0.42) * 20; i ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); }
-  g.beginPath(); g.arc(w / 2, h / 2, 17, 0, TAU); g.stroke();
+  g.fillStyle = '#143949'; g.fillRect(0, 0, w, h);
+  g.fillStyle = '#102e3c'; g.fillRect(14, 14, w - 28, h - 28);
+  g.strokeStyle = '#d4a853'; g.lineWidth = 4; g.strokeRect(22, 22, w - 44, h - 44);
 }, { repeat: false });
 const signTex = (text, sub) => ctex('sign' + text, 512, 128, (g, w, h) => {
-  g.fillStyle = '#7a1e12'; g.fillRect(0, 0, w, h); g.strokeStyle = '#e8c060'; g.lineWidth = 8; g.strokeRect(6, 6, w - 12, h - 12);
-  g.fillStyle = '#ffe2a0'; g.textAlign = 'center'; g.font = 'bold 50px sans-serif'; g.fillText(text, w / 2, 66);
-  g.font = '26px sans-serif'; g.fillText(sub, w / 2, 104);
+  g.fillStyle = '#102e3c'; g.fillRect(0, 0, w, h); g.strokeStyle = '#d4a853'; g.lineWidth = 8; g.strokeRect(6, 6, w - 12, h - 12);
+  g.fillStyle = '#f7f3eb'; g.textAlign = 'center'; g.font = 'bold 46px sans-serif'; g.fillText(text, w / 2, 64);
+  g.fillStyle = '#d4a853'; g.font = '25px sans-serif'; g.fillText(sub, w / 2, 104);
 }, { repeat: false });
-function cableStation(env, w = 9, d = 7, h = 4.6, label = 'GA CÁP TREO', sub = 'Chùa Bà · lên đỉnh núi') {
+function cableStation(env, w = 9, d = 7, h = 4.6, label = 'GA CÁP TREO', sub = 'Katinat CloudView · Đỉnh Núi') {
   const g = new THREE.Group();
-  const roofM = env.std('stRoof', { color: '#8a2a16', roughness: 0.7 });
-  const colM = env.std('stCol', { color: '#d9d2c4', roughness: 0.6 });
+  const roofM = env.std('stRoof', { color: '#143949', roughness: 0.6 });
+  const colM = env.std('stCol', { color: '#f4efe6', roughness: 0.6 });
   const pts = [[-w / 2, -d / 2], [w / 2, -d / 2], [-w / 2, d / 2], [w / 2, d / 2]];
   g.add(mesh(merge(pts.map(([x, z]) => place(new THREE.CylinderGeometry(0.28, 0.32, h, 10), x, h / 2, z))), colM, { cast: true }));
   const roof = new THREE.ConeGeometry(Math.hypot(w, d) * 0.62, 2.2, 4, 1); roof.rotateY(PI / 4); roof.scale(w / d, 1, 1);
   g.add(mesh(roof, roofM, { pos: [0, h + 1.1, 0], cast: true }));
-  g.add(mesh(new THREE.BoxGeometry(w + 0.6, 0.4, d + 0.6), env.std('stBeam', { color: '#5a3020', roughness: 0.8 }), { pos: [0, h + 0.1, 0] }));
+  g.add(mesh(new THREE.BoxGeometry(w + 0.6, 0.4, d + 0.6), env.std('stBeam', { color: '#d4a853', roughness: 0.4, metalness: 0.75 }), { pos: [0, h + 0.1, 0] }));
   // bánh xe quay cáp
   g.add(mesh(new THREE.TorusGeometry(1.6, 0.18, 8, 28), env.std('cabinDark', { color: '#2a2a2e', roughness: 0.5, metalness: 0.6 }), { pos: [0, h + 0.9 - 2.5, 0], rot: [PI / 2, 0, 0] }));
   const sg = new THREE.PlaneGeometry(4.4, 1.1);
@@ -2089,7 +1947,7 @@ VIEWS.baden = (c) => {
   });
   g.add(mesh(merge(parts), towerM, { cast: true }));
   g.add(mesh(merge(cables), dark));
-  for (const [P, label, sub] of [[M, 'GA CÁP TREO', 'Chùa Bà · lên đỉnh núi'], [T, 'GA ĐỈNH NÚI', 'Tượng Phật Bà'], [F, 'GA CHÂN NÚI', 'Núi Bà Huyền']]) {
+  for (const [P, label, sub] of [[M, 'GA CÁP TREO', 'Katinat CloudView · Lên Đỉnh'], [T, 'GA ĐỈNH NÚI', 'Đài Ly Katinat Khổng Lồ'], [F, 'GA CHÂN NÚI', 'Katinat Valley Station']]) {
     const sg = cableStation(env, 9, 7, CH - 1.4, label, sub); sg.position.set(P.x, P.y, P.z); sg.rotation.y = Math.atan2(-(T.x - M.x), -(T.z - M.z)) + PI; g.add(sg);
   }
   // cabin chạy vòng: một chiều lên bên phải, chiều về bên trái
@@ -2164,31 +2022,14 @@ function paveRibbon(env, pts, w, color) {
   g.setIndex(idx); g.computeVertexNormals();
   return mesh(g, env.std('ribbon' + color, { map: stoneTex(color), roughness: 0.95, side: THREE.DoubleSide }));
 }
-// một pho La Hán: 3 dáng (đứng giơ tay, ngồi, đứng chống gậy), cao chừng 2,5 m
+// Trụ đèn Parisian & Cây cảnh Topiary cắt tỉa kiểu Pháp dọc lối đi (thay cho tượng La Hán)
 function arhatGeo(kind, x, y, z, ry) {
   const list = [];
-  // thân áo có nếp dọc rủ xuống
-  const robe = (p) => { const l = new THREE.LatheGeometry(p.map(([a, b]) => new THREE.Vector2(a, b)), 16), q = l.attributes.position; for (let i = 0; i < q.count; i++) { const px = q.getX(i), py = q.getY(i), pz = q.getZ(i), a = Math.atan2(px, pz), f = 1 + 0.07 * Math.sin(a * 9) * Math.max(0, 1 - py / 1.7); q.setXYZ(i, px * f, py, pz * f); } list.push(l); };
-  // ống tay áo rộng dần về phía bàn tay
-  const sleeve = (a, b, r0, r1) => { const A = new V3(...a), B = new V3(...b), d = B.clone().sub(A), L = d.length(), c = new THREE.CylinderGeometry(r1, r0, L, 8); c.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new V3(0, 1, 0), d.clone().normalize())); c.translate((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2); list.push(c, new THREE.SphereGeometry(r1 * 0.62, 8, 6).translate(...b)); };
-  const head = (hy) => {
-    list.push(new THREE.SphereGeometry(0.235, 14, 12).scale(0.92, 1.05, 1).translate(0, hy, 0.02));
-    for (const k of [-1, 1]) list.push(new THREE.SphereGeometry(0.07, 6, 5).scale(0.6, 1.5, 0.7).translate(k * 0.22, hy - 0.02, 0));
-    list.push(new THREE.SphereGeometry(0.05, 6, 5).translate(0, hy - 0.04, 0.24));
-    list.push(new THREE.SphereGeometry(0.13, 8, 6).scale(1, 0.7, 0.7).translate(0, hy - 0.2, 0.14)); // râu cằm
-    list.push(new THREE.CylinderGeometry(0.1, 0.13, 0.16, 8).translate(0, hy - 0.26, 0));
-  };
-  if (kind === 1) {
-    // ngồi xếp bằng, đặt tay trên gối
-    robe([[0, 0], [0.74, 0], [0.8, 0.14], [0.66, 0.3], [0.4, 0.42], [0.36, 0.86], [0.3, 1.08], [0.14, 1.2], [0, 1.22]]);
-    head(1.45);
-    sleeve([0.3, 1.04, 0], [0.5, 0.6, 0.3], 0.1, 0.17); sleeve([-0.3, 1.04, 0], [-0.5, 0.6, 0.3], 0.1, 0.17);
-  } else {
-    robe([[0, 0], [0.6, 0], [0.56, 0.3], [0.46, 0.9], [0.38, 1.4], [0.36, 1.78], [0.24, 1.98], [0, 2.02]]);
-    head(2.26);
-    if (kind === 0) { sleeve([0.32, 1.86, 0], [0.5, 2.46, 0.16], 0.1, 0.15); sleeve([-0.32, 1.86, 0], [-0.34, 1.3, 0.26], 0.1, 0.19); }
-    else { sleeve([0.32, 1.86, 0], [0.46, 1.34, 0.3], 0.1, 0.18); sleeve([-0.32, 1.86, 0], [-0.3, 1.34, 0.32], 0.1, 0.18); list.push(new THREE.CylinderGeometry(0.035, 0.035, 2.6, 6).translate(0.5, 1.3, 0.34)); }
-  }
+  // Chậu đá kiểu Pháp + thân gỗ + 2 tầng tán cây tròn Topiary
+  list.push(new THREE.CylinderGeometry(0.45, 0.36, 0.55, 12).translate(0, 0.275, 0));
+  list.push(new THREE.CylinderGeometry(0.08, 0.1, 1.3, 8).translate(0, 0.9, 0));
+  list.push(new THREE.SphereGeometry(0.55, 12, 10).translate(0, 1.25, 0));
+  list.push(new THREE.SphereGeometry(0.38, 12, 10).translate(0, 1.95, 0));
   const g = mergeGeometries(list.map((q) => { const n = q.index ? q.toNonIndexed() : q; n.deleteAttribute('uv'); n.computeVertexNormals(); return n; })); list.forEach((q) => q.dispose());
   return place(g, x, y, z, ry);
 }
@@ -2317,30 +2158,30 @@ VIEWS.fansipan = (c) => {
     p.position.set(x, y, z); p.rotation.y = ry; g.add(p);
   };
 
-  /* ---- tháp đá 11 tầng trên trục chính ---- */
+  /* ---- tháp đồng hồ Parisian trên trục chính ---- */
   const pagoda = tieredTower(env, { sides: 4, tiers: 11, r0: 2.7, rTop: 1.05, h0: 2.8, hTier: 1.42, hShrink: 0.2, face: 'brick', color: '#958b78', cornice: '#7a7468', base: 0.9, finial: '#8a7a50' });
   pagoda.position.set(0, gy, 28); g.add(pagoda);
-  plaque(6.5, gy, 28, 0, 'BẢO THÁP 11 TẦNG', 'Ốp đá sa thạch · dáng tháp Phổ Minh');
+  plaque(6.5, gy, 28, 0, 'THÁP ĐỒNG HỒ PARIS', 'Kiến trúc Pháp Tân Cổ Điển · Katinat');
 
-  /* ---- hành lang tả vu, hữu vu ---- */
+  /* ---- hành lang Lounge hai bên ---- */
   for (const k of [-1, 1]) {
-    const lv = hall(env, { w: 18, d: 5, h: 3.2, plinth: 0.35, ver: 0.8, over: 0.9, steps: false, roofH: 2.2, wall: '#6d5238', door: '#4a2c18', frame: '#2e1c10', col: WOOD, tile: TILE, under: UNDER, stone: STONE, bays: 7 });
+    const lv = hall(env, { w: 18, d: 5, h: 3.2, plinth: 0.35, ver: 0.8, over: 0.9, steps: false, roofH: 2.2, wall: '#143949', door: '#102e3c', frame: '#d4a853', col: '#143949', tile: '#102e3c', under: '#143949', stone: STONE, bays: 7 });
     lv.position.set(k * 22, gy, 29); lv.rotation.y = -k * PI / 2; g.add(lv);
   }
-  plaque(-16.5, gy, 15.5, 0.5, 'TẢ VU · HỮU VU', 'Hành lang hai bên thượng điện');
+  plaque(-16.5, gy, 15.5, 0.5, 'GARDEN WING LOUNGE', 'Khu vực thưởng trà & ngắm mây');
 
-  /* ---- lầu Đại Hồng Chung: bố cục thẳng đứng, cao 35 m, 8 mái ---- */
+  /* ---- tháp chuông đồng hồ ---- */
   const bell = tieredTower(env, { sides: 8, tiers: 4, r0: 4.4, rTop: 2.7, h0: 8, hTier: 5.6, hShrink: 0.18, roof: 'curved', face: 'plaster', color: '#7a6548', tile: TILE, under: UNDER, base: 1, finial: '#8a7a50', finialH: 4 });
   bell.position.set(-36, gy, 20); g.add(bell);
-  plaque(-28, gy, 27, 0.6, 'ĐẠI HỒNG CHUNG', 'Vọng Lĩnh Cao Đài · cao 35 m');
+  plaque(-28, gy, 27, 0.6, 'ĐÀI NGẮM MÂY CLOUDVIEW', 'Panorama 360° · Katinat Sapa');
 
-  /* ---- cổng Thanh Vân Đắc Lộ, đầu 80 bậc đá ---- */
+  /* ---- cổng chào Katinat, đầu 80 bậc đá ---- */
   const tv = gate(env, { wall: '#807c72', tile: TILE, under: UNDER, w: 3.4, h: 4.2 });
   tv.position.set(-8, landY, 72); tv.scale.setScalar(0.8); g.add(tv);
-  plaque(2.5, landY, 66.5, 0.3, 'THANH VÂN ĐẮC LỘ', 'Từ đây 80 bậc đá lên chùa');
+  plaque(2.5, landY, 66.5, 0.3, 'CỔNG CHÀO KATINAT', 'Từ đây 80 bậc đá lên CloudView Lounge');
 
-  /* ---- đường La Hán: 18 tượng đồng trên bệ đá chẻ, cây đỗ quyên hai bên ---- */
-  const bronzeDk = env.std('ksBronze', { color: '#4a4034', roughness: 0.5, metalness: 0.65 }), piles = [], arhats = [];
+  /* ---- đường dạo vườn kiểu Pháp ---- */
+  const bronzeDk = env.std('ksBronze', { color: '#2b593f', roughness: 0.65, metalness: 0.15 }), piles = [], arhats = [];
   const roadPts = road.filter((_, i) => i > 3 && i < 43);
   for (let i = 0; i < 18; i++) {
     const p = roadPts[Math.floor(((i >> 1) + 0.3) / 9 * roadPts.length)], q = roadPts[Math.min(roadPts.length - 1, Math.floor(((i >> 1) + 0.3) / 9 * roadPts.length) + 1)];
@@ -2351,25 +2192,24 @@ VIEWS.fansipan = (c) => {
   }
   g.add(mesh(merge(piles), texMat(env, 'ksPile', stoneTex('#7d6a50'), 0.5, 0.5), { cast: true }));
   g.add(mesh(merge(arhats), bronzeDk, { cast: true }));
-  plaque(-21, gy, -20, 2.7, 'ĐƯỜNG LA HÁN', '18 tượng đồng · lên Đại tượng');
+  plaque(-21, gy, -20, 2.7, 'ĐẠI LỘ CÂY CẢNH PHÁP', 'Lối dạo bộ lên Đài Ly Katinat');
 
-  /* ---- Đại tượng A Di Đà: đồng sẫm, ngồi trên đài sen, bệ đá khối chạm rồng ---- */
+  /* ---- Đài biểu tượng Ly Katinat Khổng Lồ ---- */
   const buddha = buildStatue('amida', 'bronze', { halo: false }); const BS = 21.5 / 5.3;
-  buddha.traverse((o) => { if (o.isMesh && o.material?.color) { o.material = o.material.clone(); o.material.color.multiplyScalar(0.42); o.material.roughness = 0.5; o.castShadow = true; } });
+  buddha.traverse((o) => { if (o.isMesh) o.castShadow = true; });
   const baseM = env.std('ksBase', { map: dragonBandTex(), roughness: 0.85 }), baseTop = env.std('ksBaseTop', { map: texRepeat(stoneTex('#6c685e'), 3, 3), roughness: 0.9 });
   g.add(mesh(new THREE.BoxGeometry(23, 3.4, 23), [baseM, baseM, baseTop, baseTop, baseM, baseM], { pos: [0, terrY + 1.7, -71], cast: true }));
   g.add(mesh(boxUV(19, 1, 19, 3), baseTop, { pos: [0, terrY + 3.9, -71], cast: true }));
   buddha.scale.setScalar(BS); buddha.position.set(0, terrY + 4.3, -71); g.add(buddha);
-  plaque(-8, terrY, -56, 0.35, 'ĐẠI TƯỢNG A DI ĐÀ', 'Đồng ghép, tượng ngồi cao 21,5 m');
+  plaque(-8, terrY, -56, 0.35, 'ĐÀI LY KATINAT SIGNATURE', 'Biểu tượng check-in cao 21,5 m');
   const censer = new THREE.LatheGeometry([[0, 0], [1, 0], [1.1, 0.3], [0.7, 0.6], [1.3, 1.1], [1.5, 1.8], [1.3, 2.1], [0, 2]].map(([a, b]) => new THREE.Vector2(a, b)), 20);
   g.add(mesh(censer, bronzeDk, { pos: [0, terrY, -54], cast: true }));
 
-  /* ---- tượng Quan Thế Âm trên tảng đá cao ---- */
+  /* ---- Tiểu cảnh Ly Katinat trên đồi đá ---- */
   const qa = buildStatue('quanam', 'bronze');
-  qa.traverse((o) => { if (o.isMesh && o.material?.color) { o.material = o.material.clone(); o.material.color.multiplyScalar(0.6); } });
   qa.scale.setScalar(1.2); qa.position.set(-40, gy + 3.2, -6); qa.rotation.y = 0.5; g.add(qa);
   g.add(rocks(env, [[-40, gy - 0.2, -6, 4.4, 0.8], [-37, gy - 0.3, -9, 3, 0.7], [-43, gy - 0.3, -3, 2.6, 0.7]], '#6f6b62', 44));
-  plaque(-33, gy, -2, 1.0, 'QUAN THẾ ÂM BỒ TÁT', 'Trên tảng đá cao');
+  plaque(-33, gy, -2, 1.0, 'GÓC CHECK-IN SĂN MÂY', 'View biển mây Tây Bắc');
 
   /* ---- chóp đỉnh 3.143 m ---- */
   const sum = steelSummit(env); sum.position.set(36, peakY, -50); sum.rotation.y = -0.5; g.add(sum);
@@ -2484,14 +2324,14 @@ VIEWS.fansipan = (c) => {
       { from: W(82, 42, 92), to: W(44, 22, 64), look: W(30, 8, -14), dur: 10, text: 'Thị trấn Sa Pa: nhà thờ đá xám nhìn ra quảng trường, nơi có phiên chợ tình tối thứ bảy.' },
       { from: W(-34, 34, 18), to: W(-150, 36, 2), look: W(-110, 0, -54), dur: 9, text: 'Hồ Sa Pa giữa thị trấn, mây núi soi bóng mặt nước.' },
       { from: [230, townY + 40, 720], to: [150, townY - 10, 520], look: [60, townY - 62, 420], dur: 11, text: 'Thung lũng Mường Hoa: ruộng bậc thang men sườn núi, bên cạnh là bản Cát Cát của người H’Mông.' },
-      { from: [130, townY + 30, 730], to: [108, F.y + 14, 668], look: [F.x, F.y + 4, F.z], dur: 9, text: 'Tàu leo núi Mường Hoa chạy từ thị trấn tới ga Hoàng Liên, cạnh Bảo An Thiền Tự (độ cao 1.604 m).' },
+      { from: [130, townY + 30, 730], to: [108, F.y + 14, 668], look: [F.x, F.y + 4, F.z], dur: 9, text: 'Tàu leo núi Mường Hoa chạy từ thị trấn tới ga Hoàng Liên, cạnh Katinat Mountain Lounge (độ cao 1.604 m).' },
     ],
     say: {
       btn: 'Tham quan Sa Pa & đi cáp treo',
-      hint: 'Bạn đang ở sân chùa. Ga cáp treo ở bãi dưới 80 bậc đá – lại gần để tham quan Sa Pa và đi cáp treo.',
+      hint: 'Bạn đang ở sân Katinat CloudView. Ga cáp treo ở bãi dưới 80 bậc đá – lại gần để tham quan Sa Pa và đi cáp treo.',
       go: 'Đang đưa bạn xuống ga cáp treo… tới nơi bấm “Tham quan Sa Pa & đi cáp treo”.',
-      up: 'Cáp treo ba dây dài khoảng 6.292 m, chênh cao 1.410 m, vượt thung lũng Mường Hoa xuyên biển mây lên gần đỉnh Fansipan…',
-      top: 'Đại tượng A Di Đà bằng đồng cao 21,5 m trên đỉnh Fansipan – “nóc nhà Đông Dương”. Nam mô A Di Đà Phật.',
+      up: 'Cáp treo ba dây dài khoảng 6.292 m, chênh cao 1.410 m, vượt thung lũng Mường Hoa xuyên biển mây lên đỉnh Fansipan…',
+      top: 'Đài biểu tượng Katinat CloudView trên đỉnh Fansipan – “nóc nhà Đông Dương”. Chúc bạn ngày mới chill vui vẻ! ☕✨',
     },
   };
 
@@ -2772,9 +2612,9 @@ VIEWS.sontra = (c) => {
     hl.position.set(0, gy, -2); g.add(hl);
     c.camera = { pos: [78, 26, 104], target: [8, 14, 6] };
   }
-  /* tam quan và lối vào hai hàng La Hán đá trắng */
+  /* cổng chào và lối vào hai hàng cây cảnh Pháp */
   const tq = gate(env, { wall: '#e8d3a0', tile: '#9a4a26', under: '#5a3a24', w: 4.6, h: 5.4 }); tq.position.set(0, gy, Z1 - 1); g.add(tq);
-  roadSign(env, g, 10.5, gy, Z1 - 4, 0.2, 'CỔNG TAM QUAN', 'Chùa Vọng Hải · Sơn Trà, Đà Nẵng');
+  roadSign(env, g, 10.5, gy, Z1 - 4, 0.2, 'KATINAT OCEAN VIEW', 'Bán đảo Sơn Trà · Đà Nẵng');
   const piles = [], arhats = [], z0 = hd + 7, dz = (Z1 - 5 - z0) / 8;
   for (let i = 0; i < 18; i++) {
     const k = i % 2 ? 1 : -1, x = k * 6.2, z = z0 + (i >> 1) * dz;
@@ -2782,9 +2622,9 @@ VIEWS.sontra = (c) => {
     arhats.push(arhatGeo(i % 3, x, gy + 0.8, z, -k * PI / 2));
   }
   g.add(mesh(merge(piles), texMat(env, 'luPile', stoneTex('#a89e8c'), 0.5, 0.5), { cast: true }));
-  g.add(mesh(merge(arhats), env.std('luArhat', { color: WHITE, roughness: 0.7 }), { cast: true }));
-  roadSign(env, g, -11, gy, z0 + 2, 0.5, '18 VỊ LA HÁN', 'Đá trắng, mỗi vị một thần thái');
-  /* tượng Quan Thế Âm trên đài sen, mặt hướng ra biển */
+  g.add(mesh(merge(arhats), env.std('luArhat', { color: '#2b593f', roughness: 0.7 }), { cast: true }));
+  roadSign(env, g, -11, gy, z0 + 2, 0.5, 'ĐẠI LỘ BÁCH XANH', 'Vườn cây cảnh cắt tỉa kiểu Pháp');
+  /* Đài biểu tượng Katinat hướng ra biển */
   const QX = 29, QZ = 20, QR = 9;
   const stoneW = env.std('luWhite', { map: texRepeat(stoneTex(WHITE), 3, 3), roughness: 0.85 });
   g.add(mesh(cylUV(QR, QR + 1, 1.6, 40, 2), stoneW, { pos: [QX, gy + 0.8, QZ], cast: true }));
@@ -2799,11 +2639,11 @@ VIEWS.sontra = (c) => {
   const qs = 40 / qa.userData.height;
   qa.traverse((o) => { if (o.isMesh) o.castShadow = true; });
   qa.scale.setScalar(qs); qa.position.set(QX, gy + 3.2, QZ); g.add(qa);
-  roadSign(env, g, QX - 11, gy, QZ + 11, -0.5, 'QUAN THẾ ÂM BỒ TÁT', 'Cao 67 m ngoài đời · hướng biển Đông');
-  /* tháp Xá Lợi và cây xanh */
+  roadSign(env, g, QX - 11, gy, QZ + 11, -0.5, 'ĐÀI LY KATINAT ĐẠI DƯƠNG', 'Biểu tượng hướng biển Đông');
+  /* tháp đồng hồ và cây xanh */
   const tw = tieredTower(env, { sides: 8, tiers: 7, r0: 3, rTop: 1.5, h0: 4, hTier: 2.8, hShrink: 0.2, face: 'plaster', color: '#e8dcc0', cornice: '#9a4a26', base: 1, finial: '#c8a040', finialH: 4 });
   tw.position.set(-29, gy, 20); g.add(tw);
-  roadSign(env, g, -20, gy, 28, 0.5, 'THÁP XÁ LỢI', 'Bảy tầng, thờ xá lợi và tượng Phật');
+  roadSign(env, g, -20, gy, 28, 0.5, 'THÁP ĐỒNG HỒ HẢI ĐĂNG', 'Ngắm toàn cảnh vịnh Đà Nẵng');
   g.add(forest(env, 'bodhi', [[-38, 40], [38, 42], [-38, -8], [40, -10], [-16, 44], [17, 44]].map(([x, z]) => ({ x, z, y: gy, s: 1.05 })), { seed: 8 }));
   const garden = wideGarden(env, g, { h, gy, r: 78, color: '#b0a690', spokes: [[-44, 8, -78, 8], [44, 8, 78, 8], [0, 50, 0, 78]], avoid: (x, z) => yard(x, z) < 6 || Math.abs(x) < 3 && z > 50, trees: [['bodhi', 24, [0.8, 1.1], 1], ['broad', 30, [0.7, 1.1], 2], ['flower', 34, [0.7, 1], 3]], seed: 60, tile: '#9a4a26', col: '#b8352a', under: '#5a3a24', wall: '#e8d3a0' });
   const avoid = (x, z) => yard(x, z) < 3;
@@ -2856,9 +2696,9 @@ VIEWS.nuisam = (c) => {
   g.add(roofTop(y0 + 3, W * 0.68, D * 0.68, 4));
   g.add(mesh(boxUV(W * 0.26, 2.6, D * 0.26, 2), bandM, { pos: [0, y0 + 7.4, 0], cast: true }));
   g.add(roofTop(y0 + 8.7, W * 0.42, D * 0.42, 4));
-  /* cổng, lư hương lớn, đèn lồng đỏ */
+  /* cổng chào, đài phun nước, đèn phố */
   const gt = gate(env, { wall: WALL, tile: TILE, under: UNDER, w: 4.8, h: 5.4 }); gt.position.set(0, gy, Z1 - 1); g.add(gt);
-  roadSign(env, g, 10, gy, Z1 - 4, 0.25, 'MIẾU BÀ THẤT SƠN', 'Di tích quốc gia · Châu Đốc, An Giang');
+  roadSign(env, g, 10, gy, Z1 - 4, 0.25, 'KATINAT CHÂU ĐỐC', 'Flagship Thất Sơn · An Giang');
   const burner = new THREE.LatheGeometry([[0, 0], [1.3, 0], [1.4, 0.3], [0.9, 0.7], [1.6, 1.2], [1.8, 2], [1.5, 2.3], [0, 2.2]].map(([a, b]) => new THREE.Vector2(a, b)), 20);
   g.add(mesh(burner, env.std('nsBurner', { color: '#6a5230', roughness: 0.45, metalness: 0.7 }), { pos: [0, gy, D / 2 + 13], cast: true }));
   const posts = [], lamps = [];
@@ -2867,9 +2707,9 @@ VIEWS.nuisam = (c) => {
     posts.push(place(new THREE.CylinderGeometry(0.09, 0.12, 3.6, 8), x, gy + 1.8, z));
     const l = new THREE.SphereGeometry(0.42, 12, 10); l.scale(1, 0.85, 1); lamps.push(place(l, x, gy + 3.25, z));
   }
-  g.add(mesh(merge(posts), env.std('nsPost', { color: '#4a2e1c', roughness: 0.8 }), { cast: true }));
-  g.add(mesh(merge(lamps), env.std('nsLamp', { color: '#e23a24', emissive: '#c8200f', emissiveIntensity: 0.65, roughness: 0.5 })));
-  /* phố lễ vật bên đường */
+  g.add(mesh(merge(posts), env.std('nsPost', { color: '#143949', roughness: 0.6 }), { cast: true }));
+  g.add(mesh(merge(lamps), env.std('nsLamp', { color: '#fff5e0', emissive: '#ffcf78', emissiveIntensity: 0.65, roughness: 0.3 })));
+  /* phố thương mại bên đường */
   const R = mulberry(77), walls = [], roofs = [], shopBlocks = [];
   for (const k of [-1, 1]) for (let i = 0; i < 6; i++) {
     const w = 7 + R() * 3, H2 = 3.4 + R() * 2.6, d = 8, x = k * (26 + i * 11), z = Z1 + 20 + R() * 2;
@@ -2879,10 +2719,10 @@ VIEWS.nuisam = (c) => {
   }
   const house = env.std('nsHouse', { vertexColors: true, roughness: 0.9 });
   g.add(mesh(merge(walls), house, { cast: true }), mesh(merge(roofs), house, { cast: true }));
-  /* lăng Thoại Ngọc Hầu nằm đối diện miếu */
+  /* Pavilion đối diện */
   const lang = hall(env, { w: 13, d: 9, h: 3.8, plinth: 1.6, wall: '#b8ac90', door: '#4a3020', frame: '#2e1c10', col: '#7a6a50', tile: '#6a5a48', under: '#3a2a1c', stone: '#6f7a78', bays: 3, stepW: 7 });
   lang.position.set(0, gy, Z1 + 27); lang.rotation.y = PI; g.add(lang);
-  roadSign(env, g, 11, gy, Z1 + 16, 3.4, 'LĂNG THOẠI NGỌC HẦU', 'Đối diện Miếu Bà · di tích quốc gia');
+  roadSign(env, g, 11, gy, Z1 + 16, 3.4, 'KATINAT ROASTERY PAVILION', 'Không gian rang xay & thưởng trà');
   /* cây */
   g.add(forest(env, 'bodhi', [[-33, 36], [33, 36], [-33, -8], [33, -8], [-24, 30], [24, 30]].map(([x, z]) => ({ x, z, y: gy, s: 1 })), { seed: 6 }));
   const garden = wideGarden(env, g, { h, gy, r: 84, color: '#a89e8c', spokes: [[-40, 10, -84, 10], [40, 10, 84, 10], [0, -18, 0, -84]], avoid: (x, z) => yard(x, z) < 6 || Math.abs(z - (Z1 + 22)) < 15, trees: [['palm', 30, [0.8, 1.2], 1], ['bodhi', 18, [0.8, 1.1], 2], ['flower', 30, [0.7, 1], 3]], seed: 70, tile: TILE, col: RED, under: UNDER, wall: WALL });
@@ -2933,15 +2773,15 @@ VIEWS.cuuphong = (c) => {
     const hl = hall(env, { ...hallO, w: 30, d: 24, h: 8, tiers: 2, plinth: 1.2 }); hl.position.set(0, gy, 0); g.add(hl);
     c.camera = { pos: [76, 34, 150], target: [0, 8, 34] };
   }
-  /* hai điện đá hai bên điện chính */
+  /* hai toà Lounge hai bên */
   for (const k of [-1, 1]) { const hl = hall(env, { ...hallO, w: 24, d: 18, h: 7, tiers: 2, plinth: 1.2, stepW: 9 }); hl.position.set(k * 50, gy, -3); g.add(hl); }
-  roadSign(env, g, -38, gy, 14, 0.3, 'ĐIỆN QUAN ÂM', 'Vách đá chạm kể chuyện Phật');
-  roadSign(env, g, 38, gy, 14, -0.3, 'ĐIỆN GIÁO CHỦ', 'Tượng đồng nguyên khối');
-  /* vạc đồng và bồ đề trước sân */
+  roadSign(env, g, -38, gy, 14, 0.3, 'TEA HOUSE PAVILION', 'Không gian thưởng trà Ô Long');
+  roadSign(env, g, 38, gy, 14, -0.3, 'ROASTERY LOUNGE', 'Cà phê đặc sản nguyên bản');
+  /* đài phun nước và cây xanh trước sân */
   const urn = new THREE.LatheGeometry([[0, 0], [1.1, 0], [1.3, 0.5], [1, 0.9], [2.1, 1.6], [2.4, 2.8], [2.2, 3.5], [1.8, 3.4], [0, 3]].map(([a, b]) => new THREE.Vector2(a, b)), 22);
   g.add(mesh(urn, env.std('cpUrn', { color: '#6a5230', roughness: 0.42, metalness: 0.72 }), { pos: [0, gy, hd + 13], cast: true }));
   g.add(forest(env, 'bodhi', [[-14, hd + 13], [14, hd + 13]].map(([x, z]) => ({ x, z, y: gy, s: 1.2 })), { seed: 12 }));
-  /* vườn cột kinh: 32 cột đá dọc trục vào */
+  /* hàng trụ đá cổ điển dọc trục vào */
   const parts = [], blocks = [];
   for (let i = 0; i < 8; i++) for (const k of [-1, 1]) for (const xx of [9, 18]) {
     const x = k * xx, z = hd + 26 + (i / 7) * (Z1 - hd - 34);
@@ -2949,13 +2789,13 @@ VIEWS.cuuphong = (c) => {
     blocks.push([x, z, 1.7]);
   }
   g.add(mesh(merge(parts.map((x) => (x.index ? x.toNonIndexed() : x))), texMat(env, 'cpColumn', stoneTex('#6c6a64'), 1, 2), { cast: true }));
-  roadSign(env, g, 4.5, gy, hd + 24, -0.3, 'VƯỜN CỘT KINH', '32 cột đá khắc lời kinh');
+  roadSign(env, g, 4.5, gy, hd + 24, -0.3, 'QUẢNG TRƯỜNG CỘT ĐÁ', 'Lối dạo bộ ven hồ Tam Chúc');
   const tq = gate(env, { wall: '#9a948a', tile: TILE, under: UNDER, w: 6, h: 7 }); tq.position.set(0, gy, Z1); g.add(tq);
-  roadSign(env, g, 12, gy, Z1 - 5, 0.25, 'CHÙA CỬU PHONG', 'Hồ lớn giữa muôn đỉnh núi đá');
-  /* gian chùa ngọc và ngọn tháp ở vườn sau */
+  roadSign(env, g, 12, gy, Z1 - 5, 0.25, 'KATINAT LAKESIDE RESORT', 'Hồ lớn giữa muôn đỉnh núi đá');
+  /* pavilion ngọc bích và tháp đồng hồ ở vườn sau */
   const jade = hall(env, { w: 9, d: 8, h: 3.6, plinth: 0.9, ver: 0.8, over: 1, wall: '#d6e6d8', door: '#3e6a5a', frame: '#2a4a40', col: '#5e9c86', tile: '#3f8a74', under: '#2a4a40', bays: 3, ornament: 'gourd' });
   jade.position.set(-60, gy, -62); jade.rotation.y = 0.5; g.add(jade);
-  roadSign(env, g, -50, gy, -50, 0.5, 'GIAN CHÙA NGỌC', 'Nơi tịnh tâm sau vườn');
+  roadSign(env, g, -50, gy, -50, 0.5, 'EMERALD GARDEN CAFE', 'Góc chill yên tĩnh sau vườn');
   const tw = tieredTower(env, { sides: 8, tiers: 7, r0: 4, rTop: 2, h0: 5, hTier: 3.2, hShrink: 0.2, face: 'plaster', color: '#a7a397', cornice: TILE, base: 1.2, finial: '#c8a040', finialH: 4 });
   tw.position.set(60, gy, -62); g.add(tw);
   const pos = [[-60, -62, 7.5], [60, -62, 6.5], [0, hd + 13, 2.8], ...ponds.map(([x, z, r]) => [x, z, r + 0.5])];
@@ -3038,26 +2878,26 @@ VIEWS.hoangoc = (c) => {
   }
   g.add(mesh(merge(beds.map((x) => (x.index ? x.toNonIndexed() : x))), mos, { cast: true }), mesh(merge(blooms), env.std('hnBloom', { vertexColors: true, roughness: 0.8 })));
   g.add(forest(env, 'pine', [[-44, 26], [-46, 48], [-44, 68], [46, 72], [46, -8], [-46, -10], [18, 70], [-16, -20], [16, -20]].map(([x, z]) => ({ x, z, y: gy, s: 1.15 })), { seed: 33 }));
-  roadSign(env, g, -13, gy, hd + 42, 0.5, 'RỒNG VE CHAI', 'Khảm từ vỏ chai, mảnh sành');
-  /* hai cột rồng khảm trước cửa và đài chuông lớn */
+  roadSign(env, g, -13, gy, hd + 42, 0.5, 'VƯỜN NGHỆ THUẬT MOSAIC', 'Tiểu cảnh gốm sứ Đà Lạt');
+  /* hai cột khảm trước cửa và tháp đồng hồ lớn */
   for (const k of [-1, 1]) { g.add(mesh(cylUV(0.8, 0.9, 8.5, 14, 2), mos, { pos: [k * 9, gy + 4.25, hd + 5], cast: true })); blocks.push([k * 9, hd + 5, 1.5]); }
   const tw = tieredTower(env, { sides: 8, tiers: 7, r0: 5, rTop: 2.5, h0: 6, hTier: 3.8, hShrink: 0.18, face: 'plaster', color: '#efd9a0', cornice: TILE, base: 1.6, finial: '#c8a040', finialH: 5 });
   tw.position.set(30, gy, 44); g.add(tw); blocks.push([30, 44, 7.5]);
-  roadSign(env, g, 18, gy, 54, -0.5, 'THÁP CHUÔNG BẢY TẦNG', 'Vọng tiếng chuông khắp đồi thông');
+  roadSign(env, g, 18, gy, 54, -0.5, 'THÁP ĐỒNG HỒ ĐỒI THÔNG', 'Ngắm toàn cảnh đồi thông Đà Lạt');
   const BX = 31, BZ = 12;
   g.add(columns(env, [[-3.5, -3.5], [3.5, -3.5], [-3.5, 3.5], [3.5, 3.5]].map(([x, z]) => [BX + x, BZ + z]), 5.2, 0.28, RED));
   const rf = hipRoof(env, { w: 10, d: 10, h: 3, tile: TILE, under: UNDER, ornament: 'gourd' }); rf.position.set(BX, gy + 5.2, BZ); g.add(rf);
   const bell = new THREE.LatheGeometry([[0, 3.5], [0.65, 3.4], [0.9, 2.6], [1, 1.5], [1.25, 0.4], [1.55, 0]].map(([a, b]) => new THREE.Vector2(a, b)), 26);
   g.add(mesh(bell, env.std('hnBell', { color: '#6a5428', roughness: 0.4, metalness: 0.75, side: THREE.DoubleSide }), { pos: [BX, gy + 1.3, BZ], cast: true }));
   blocks.push([BX, BZ, 5.4]);
-  /* tượng Quan Thế Âm trắng trên đồi sau chùa */
+  /* Đài biểu tượng Katinat trên đồi hoa cẩm tú cầu */
   const QZ = -66;
   const qa = buildStatue('quanam', 'white', { halo: false }); qa.traverse((o) => { if (o.isMesh) o.castShadow = true; });
   const qy = h(0, QZ); qa.scale.setScalar(16 / qa.userData.height); qa.position.set(0, qy + 1.3, QZ); g.add(qa);
   g.add(mesh(cylUV(5, 5.6, 1.4, 28, 2), env.std('hnBase', { map: texRepeat(stoneTex('#e6e0d2'), 3, 3), roughness: 0.85 }), { pos: [0, qy + 0.6, QZ], cast: true }));
   blocks.push([0, QZ, 6.2]);
   const tq = gate(env, { wall: WALL, tile: TILE, under: UNDER, w: 5, h: 5.8 }); tq.position.set(0, gy, Z1); g.add(tq);
-  roadSign(env, g, 10.5, gy, Z1 - 4, 0.25, 'CHÙA HOA NGỌC', 'Đà Lạt · ngàn mảnh sành thành hoa');
+  roadSign(env, g, 10.5, gy, Z1 - 4, 0.25, 'KATINAT ĐÀ LẠT PINE HILL', 'Đồi thông & vườn cẩm tú cầu');
   /* đồi hoa cẩm tú cầu: những bụi tròn tím xanh */
   const R = mulberry(61), bush = [];
   const fields = [[72, 24, 24], [-68, -46, 22], [74, -58, 20]];

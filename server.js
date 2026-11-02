@@ -147,7 +147,7 @@ app.get('/api/meta', (req, res) => {
 });
 
 app.get('/api/build', (req, res) => {
-  res.json({ build: 'cafe3d-v3' });
+  res.json({ build: 'cafe3d-v4' });
 });
 
 app.get('/api/challenge', (req, res) => {

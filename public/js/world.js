@@ -26,16 +26,16 @@ function haloTexture(tier) {
   return (HALO_TEX[tier] = t);
 }
 
-// Pháp danh ngẫu nhiên cho Phật tử ảo
-const PD_A = ['Diệu', 'Minh', 'Tâm', 'Thiện', 'Nhuận', 'Chánh', 'Huệ', 'Thanh', 'Tịnh', 'Phước', 'Đức', 'Nguyên', 'Quảng', 'Từ', 'Hạnh', 'Như', 'Viên', 'An'];
-const PD_B = ['An', 'Hạnh', 'Hiền', 'Liên', 'Ngọc', 'Tâm', 'Từ', 'Quang', 'Huệ', 'Nguyên', 'Tuệ', 'Hòa', 'Lạc', 'Thảo', 'Như', 'Nhàn', 'Châu', 'Hương', 'Trí', 'Đạo', 'Bảo', 'Phúc', 'Giác', 'Duyên', 'Thiện', 'Minh'];
+// Tên khách quen GenZ ngẫu nhiên trong quán Katinat
+const PD_A = ['Minh', 'Bảo', 'Gia', 'Khánh', 'Tuấn', 'Phương', 'Hoàng', 'Thảo', 'Nhật', 'Cẩm', 'Đức', 'Quỳnh', 'Hải', 'Trúc', 'Khôi', 'Lan', 'Việt', 'Mai'];
+const PD_B = ['Anh', 'Ngọc', 'Huy', 'Linh', 'Kiệt', 'Nhi', 'Nam', 'Vy', 'Minh', 'Ly', 'Hương', 'Đăng', 'Châu', 'My', 'Nguyên', 'Tâm', 'Khang', 'Thư'];
 function phapDanh(used) {
   for (let k = 0; k < 40; k++) {
     const a = PD_A[Math.floor(Math.random() * PD_A.length)], b = PD_B[Math.floor(Math.random() * PD_B.length)];
     const n = `${a} ${b}`;
-    if (a !== b && !used.has(n) && n !== 'Quảng Đức') { used.add(n); return n; }
+    if (a !== b && !used.has(n)) { used.add(n); return n; }
   }
-  return 'Phật tử';
+  return 'Khách Chill';
 }
 import { labelTex, honorLabelTex, rand, canvasTex } from './textures.js';
 import { drawIcon, emoteColor, EMOTES } from './icons.js';
@@ -251,10 +251,10 @@ export class World {
     [this.scene.fog.near, this.scene.fog.far] = out ? [400, 2500] : this._fogIn;
   }
 
-  /* ---------------- Barista Trưởng & Nghệ Sĩ Acoustic ---------------- */
+  /* ---------------- Barista Trưởng Katinat & Nghệ Sĩ Acoustic ---------------- */
   spawnAbbot(temple) {
-    const info = this.abbotInfo?.(temple) || { name: 'Barista Trưởng' };
-    const av = makeAvatar({ appearance: { hair: 'ngan', skin: '#e0a67e' }, robe: { color: '#3b2416', sash: '#d9a443' } });
+    const info = this.abbotInfo?.(temple) || { name: 'Barista Trưởng Katinat' };
+    const av = makeAvatar({ appearance: { hair: 'ngan', gender: 'nam', skin: '#e0a67e' }, robe: { color: '#143949', sash: '#d4a853' } });
     setSeated(av, false);
     av.root.scale.setScalar(0.95);
     const b = this.temple.bounds;
@@ -263,23 +263,23 @@ export class World {
     av.root.position.set(x, 0, z);
     av.homeRot = Math.atan2(0.4, -1);
     av.root.rotation.y = av.homeRot;
-    const label = new THREE.Sprite(new THREE.SpriteMaterial({ map: labelTex(info.name, 'Barista Trưởng · chạm để gọi món', '#ffd36b'), depthWrite: false, transparent: true }));
-    label.scale.set(2.05, 0.48, 1); label.position.y = 2.25;
+    const label = new THREE.Sprite(new THREE.SpriteMaterial({ map: labelTex(info.name, 'Barista Trưởng Katinat · chạm để gọi món', '#f5d27e'), depthWrite: false, transparent: true }));
+    label.scale.set(2.15, 0.48, 1); label.position.y = 2.25;
     av.root.add(label);
-    const ring = new THREE.Mesh(new THREE.RingGeometry(0.45, 0.6, 40), new THREE.MeshBasicMaterial({ color: '#ffd36b', transparent: true, opacity: 0.45, depthWrite: false }));
+    const ring = new THREE.Mesh(new THREE.RingGeometry(0.45, 0.6, 40), new THREE.MeshBasicMaterial({ color: '#d4a853', transparent: true, opacity: 0.45, depthWrite: false }));
     ring.rotation.x = -Math.PI / 2; ring.position.y = 0.03; av.root.add(ring); av.ring = ring;
     this.scene.add(av.root);
     this.abbot = av;
   }
   spawnHermit(temple) {
-    const av = makeAvatar({ appearance: { hair: 'dai', skin: '#e0a67e' }, robe: { color: '#4f7a65', sash: '#e6bd45' } });
+    const av = makeAvatar({ appearance: { hair: 'dai', gender: 'nu', skin: '#f1c7a3' }, robe: { color: '#1c4b5e', sash: '#f5d27e' } });
     setSeated(av, false);
     av.root.scale.setScalar(0.92);
     const b = this.temple.bounds;
     av.root.position.set(-Math.min(-b.minX - 1.2, Math.max(2.6, (temple.theme.size[0] / 2) * 0.32)), 0, b.minZ + 0.6);
     av.homeRot = Math.atan2(-0.4, -1);
     av.root.rotation.y = av.homeRot;
-    const label = new THREE.Sprite(new THREE.SpriteMaterial({ map: labelTex('DJ Lofi & Acoustic', 'Chạm để nhận quà & kết bạn thú cưng', '#9fe3c0'), depthWrite: false, transparent: true }));
+    const label = new THREE.Sprite(new THREE.SpriteMaterial({ map: labelTex('DJ Lofi & Acoustic', 'Chạm để nhận quà & kết bạn thú cưng', '#a8e6cf'), depthWrite: false, transparent: true }));
     label.scale.set(2.15, 0.48, 1); label.position.y = 2.25;
     av.root.add(label);
     this.scene.add(av.root);
@@ -589,17 +589,35 @@ export class World {
     for (let i = 0; i < Math.min(n, free.length - 2); i++) this.addNpc(free[i]);
   }
   addNpc(cu) {
-    const av = makeAvatar({ appearance: { hair: 'troc', skin: SKINS[Math.floor(Math.random() * SKINS.length)] }, robe: { color: '#b8c0c8', sash: '#e6bd45' } });
+    const npcOutfits = [
+      ['#143949', '#d4a853'],
+      ['#8c4a27', '#f5d27e'],
+      ['#1f4d5f', '#e5dccb'],
+      ['#3d5a45', '#d4a853'],
+      ['#6b2d3c', '#f5d27e'],
+      ['#2b3a4a', '#d4a853']
+    ];
+    const [rCol, sCol] = npcOutfits[cu.index % npcOutfits.length];
+    const hairs = ['ngan', 'dai', 'bui'];
+    const isFemale = cu.index % 2 === 1;
+    const av = makeAvatar({
+      appearance: {
+        hair: hairs[cu.index % hairs.length],
+        gender: isFemale ? 'nu' : 'nam',
+        skin: SKINS[cu.index % SKINS.length]
+      },
+      robe: { color: rCol, sash: sCol }
+    });
     av.root.scale.setScalar(AV_SCALE);
     av.npc = true; av.cushion = cu; cu.occupant = av;
     av.root.position.set(cu.pos.x, av.baseY, cu.pos.z);
     av.root.rotation.y = rand(-0.08, 0.08);
     av.bowing = Math.random() < 0.4; av.bowT = Math.random();
-    av.bowSlow = rand(1.8, 2.6); // NPC lạy chậm rãi, mỗi người một nhịp
+    av.bowSlow = rand(1.8, 2.6);
     av.nextChange = rand(8, 30);
     av.npcName = phapDanh(this.npcNames ||= new Set());
-    const label = new THREE.Sprite(new THREE.SpriteMaterial({ map: labelTex(av.npcName, 'Phật tử', '#d9c9a8'), depthWrite: false, transparent: true, opacity: 0.85 }));
-    label.scale.set(1.1 / AV_SCALE, 0.28 / AV_SCALE, 1); label.position.y = 1.85; label.visible = false;
+    const label = new THREE.Sprite(new THREE.SpriteMaterial({ map: labelTex(av.npcName, 'Khách Katinat ☕', '#f5d27e'), depthWrite: false, transparent: true, opacity: 0.88 }));
+    label.scale.set(1.2 / AV_SCALE, 0.30 / AV_SCALE, 1); label.position.y = 1.85; label.visible = false;
     av.root.add(label); av.label = label;
     av.root.visible = this.showNpc;
     this.scene.add(av.root);
@@ -796,26 +814,28 @@ export class World {
     if (immediate) this.player.bowT = 0;
   }
   get seated() { return !!this.seat; }
-  // Mõ gỗ và dùi đặt trước bồ đoàn khi tụng kinh
+  // Máy đĩa than Vinyl Lofi & Loa Marshall đặt cạnh bàn khi bật Playlist Lofi
   showMo(on) {
     if (this.mo) { this.scene.remove(this.mo.group); this.mo.group.traverse((o) => { o.geometry?.dispose(); o.material?.dispose(); }); this.mo = null; }
     if (!on || !this.seat) return;
     const group = new THREE.Group();
-    const wood = new THREE.MeshStandardMaterial({ color: '#8a4a1e', roughness: 0.45 });
-    const body = new THREE.Mesh(new THREE.SphereGeometry(0.2, 20, 14), wood);
-    body.scale.set(1.1, 0.8, 1); body.position.y = 0.16; body.castShadow = true;
-    const slit = new THREE.Mesh(new THREE.TorusGeometry(0.14, 0.012, 6, 20, Math.PI), new THREE.MeshStandardMaterial({ color: '#2a1408', roughness: 1 }));
-    slit.position.set(0, 0.14, -0.19); slit.rotation.z = Math.PI;
-    const pivot = new THREE.Group(); pivot.position.set(0.42, 0.34, 0); pivot.rotation.z = 0.45;
-    const stick = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.42, 8), new THREE.MeshStandardMaterial({ color: '#c79a5c', roughness: 0.6 }));
-    stick.rotation.z = Math.PI / 2; stick.position.x = -0.18;
-    const tip = new THREE.Mesh(new THREE.SphereGeometry(0.04, 10, 8), new THREE.MeshStandardMaterial({ color: '#5a3a22', roughness: 0.8 }));
-    tip.position.x = -0.4;
-    pivot.add(stick, tip);
-    group.add(body, slit, pivot);
-    group.position.set(this.seat.pos.x + 0.8, 0, this.seat.pos.z - 0.25); // đặt bên phải để camera sau lưng vẫn thấy
+    const boxMat = new THREE.MeshStandardMaterial({ color: '#143949', roughness: 0.45 });
+    const brassMat = new THREE.MeshStandardMaterial({ color: '#d4a853', metalness: 0.8, roughness: 0.25 });
+    const vinylMat = new THREE.MeshStandardMaterial({ color: '#111827', roughness: 0.2, metalness: 0.3 });
+    const body = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.14, 0.30), boxMat);
+    body.position.y = 0.08; body.castShadow = true;
+    const platter = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.02, 20), vinylMat);
+    platter.position.set(-0.02, 0.16, 0);
+    const label = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.022, 16), brassMat);
+    label.position.set(-0.02, 0.162, 0);
+    const pivot = new THREE.Group(); pivot.position.set(0.13, 0.17, -0.09);
+    const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.16, 8), brassMat);
+    arm.rotation.x = Math.PI / 2; arm.position.z = 0.07;
+    pivot.add(arm);
+    group.add(body, platter, label, pivot);
+    group.position.set(this.seat.pos.x + 0.65, 0, this.seat.pos.z - 0.35);
     this.scene.add(group);
-    this.mo = { group, body, pivot, t: 1 };
+    this.mo = { group, body: platter, pivot, t: 1 };
   }
   strikeMo() { if (this.mo) this.mo.t = 0; }
   // Đẩy khung hình lên trên để nhân vật không bị bảng kinh che (px = 0: trả về bình thường)
@@ -1080,8 +1100,7 @@ export class World {
     if (best !== this.nearBeastId && !this.bondId) { this.nearBeastId = best; this.onBeastNear?.(best ? this.beasts.get(best) : null); }
   }
 
-  /* ---------------- lộc chùa: hoa sen vàng ngoài khuôn viên ---------------- */
-  // list: [{id,x,z}] – thay toàn bộ; gone: id vừa có người nhận
+  /* ---------------- Quà Voucher Ly Cafe Vàng ngoài khuôn viên Katinat ---------------- */
   setLoc(list) {
     this.loc ||= new Map();
     const want = new Set(list.map((l) => l.id));
@@ -1090,19 +1109,29 @@ export class World {
   }
   addLoc({ id, x, z }) {
     if (!this.od || !this.walkMeshes) return;
-    // độ cao mặt đất: chiếu tia từ trên cao xuống
     const ray = new THREE.Raycaster(new THREE.Vector3(x, 40, z), new THREE.Vector3(0, -1, 0), 0, 80);
     const hit = ray.intersectObjects(this.walkMeshes.filter(({ bb }) => x >= bb.min.x && x <= bb.max.x && z >= bb.min.z && z <= bb.max.z).map((e) => e.o), false)[0];
     const y = hit ? hit.point.y : (this.od.groundY || 0);
     if (!LOC_GEO) {
-      const petal = new THREE.SphereGeometry(0.16, 10, 6); petal.scale(1, 0.45, 2.1); petal.translate(0, 0, 0.26);
-      LOC_GEO = { petal, core: new THREE.SphereGeometry(0.12, 12, 8) };
-      LOC_MAT = { gold: new THREE.MeshStandardMaterial({ color: '#ffd36a', emissive: '#e8a020', emissiveIntensity: 0.9, roughness: 0.35, metalness: 0.3 }),
-        glow: new THREE.SpriteMaterial({ map: glowTex(), color: '#ffcf60', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }) };
+      LOC_GEO = {
+        cup: new THREE.CylinderGeometry(0.18, 0.13, 0.38, 16),
+        lid: new THREE.SphereGeometry(0.18, 16, 10, 0, Math.PI * 2, 0, Math.PI * 0.5),
+        straw: new THREE.CylinderGeometry(0.02, 0.02, 0.28, 8)
+      };
+      LOC_MAT = {
+        teal: new THREE.MeshStandardMaterial({ color: '#143949', emissive: '#0c2633', emissiveIntensity: 0.5, roughness: 0.3, metalness: 0.2 }),
+        gold: new THREE.MeshStandardMaterial({ color: '#ffd36a', emissive: '#e8a020', emissiveIntensity: 0.9, roughness: 0.25, metalness: 0.6 }),
+        glow: new THREE.SpriteMaterial({ map: glowTex(), color: '#ffcf60', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending })
+      };
     }
     const g = new THREE.Group(), flower = new THREE.Group();
-    for (let i = 0; i < 8; i++) { const m = new THREE.Mesh(LOC_GEO.petal, LOC_MAT.gold); m.rotation.y = (i / 8) * Math.PI * 2; m.rotation.x = -0.5; flower.add(m); }
-    flower.add(new THREE.Mesh(LOC_GEO.core, LOC_MAT.gold));
+    const cupMesh = new THREE.Mesh(LOC_GEO.cup, LOC_MAT.teal);
+    const lidMesh = new THREE.Mesh(LOC_GEO.lid, LOC_MAT.gold);
+    lidMesh.position.y = 0.19;
+    const strawMesh = new THREE.Mesh(LOC_GEO.straw, LOC_MAT.gold);
+    strawMesh.position.set(0.04, 0.30, 0);
+    strawMesh.rotation.z = -0.22;
+    flower.add(cupMesh, lidMesh, strawMesh);
     const glow = new THREE.Sprite(LOC_MAT.glow); glow.scale.set(2.4, 2.4, 1);
     g.add(flower, glow);
     g.position.set(x, y + 0.9, z);
@@ -1375,18 +1404,13 @@ export class World {
     requestAnimationFrame(step);
   }
 
-  // Hào quang sau đầu theo cấp: cấp 1 chưa có, càng lên cấp càng sáng và rộng. Sprite đặt ngang đầu nên phần đầu tự che phía trước.
-  setHalo(av, level) {
-    if (!av?.upper) return;
-    const tier = level >= 50 ? 3 : level >= 20 ? 2 : level >= 2 ? 1 : 0;
-    if (av.haloTier === tier) return;
-    if (av.haloSprite) { av.haloSprite.removeFromParent(); av.haloSprite.material.dispose(); av.haloSprite = null; }
-    av.haloTier = tier;
-    if (!tier) return;
-    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: haloTexture(tier), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: [0, 0.6, 0.85, 1][tier] }));
-    const sc = [0, 1.25, 1.5, 1.9][tier];
-    sp.scale.set(sc, sc, 1); sp.position.set(0, 0.97, 0);
-    av.upper.add(sp); av.haloSprite = sp;
+  // Tắt vòng hào quang Phật giáo phía sau đầu nhân vật (chuẩn phong cách quán Cafe Katinat hiện đại)
+  setHalo(av, _level) {
+    if (av?.haloSprite) {
+      av.haloSprite.removeFromParent();
+      av.haloSprite.material.dispose();
+      av.haloSprite = null;
+    }
   }
 
   // Hào quang khi thăng cấp

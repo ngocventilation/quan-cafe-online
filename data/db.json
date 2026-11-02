@@ -43,10 +43,10 @@
         "skin": "#d98b5f"
       },
       "sect": "tinhdo",
-      "level": 1,
-      "exp": 15,
+      "level": 2,
+      "exp": 160,
       "currencies": {
-        "sen": 200,
+        "sen": 232,
         "ngoc": 15
       },
       "equipped": {
@@ -60,11 +60,14 @@
         "beads": 0,
         "rounds": 0,
         "mo": 0,
-        "visits": 4,
-        "meditateMin": 0,
+        "visits": 20,
+        "meditateMin": 1,
         "donated": 0
       },
-      "createdAt": 1793547495010
+      "createdAt": 1793547495010,
+      "order": "phin",
+      "study": true,
+      "_medStart": 1793641615017
     },
     "1793548018508": {
       "id": 1793548018508,
@@ -262,7 +265,7 @@
         "id": "meditate_5",
         "title": "Bật Laptop Học bài / Làm việc 5 phút",
         "goal": 5,
-        "progress": 0,
+        "progress": 1,
         "reward": {
           "sen": 70
         },
@@ -273,11 +276,11 @@
         "id": "light_incense",
         "title": "Gọi 1 ly Cà Phê Phin Sữa Đá lên bàn",
         "goal": 1,
-        "progress": 0,
+        "progress": 1,
         "reward": {
           "sen": 40
         },
-        "done": false,
+        "done": true,
         "claimed": false
       },
       {

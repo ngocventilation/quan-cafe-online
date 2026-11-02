@@ -43,28 +43,28 @@ function announce(text, fx) {
   document.querySelector('.hy-card')?.remove();
   const el = document.createElement('div');
   el.className = 'hy-card';
-  el.innerHTML = `<div class="hy-inner"><div class="hy-glyph">囍</div><div class="hy-title">Cầu duyên</div><div class="hy-text">${esc(text)}</div><div class="hy-foot">Nam mô A Di Đà Phật</div></div>`;
+  el.innerHTML = `<div class="hy-inner"><div class="hy-glyph">☕</div><div class="hy-title">Góc Hẹn Hò Katinat</div><div class="hy-text">${esc(text)}</div><div class="hy-foot">Katinat Coffee & Tea House · Chill Vibes</div></div>`;
   document.body.appendChild(el);
   const close = () => { el.classList.add('out'); setTimeout(() => el.remove(), 600); };
   el.onclick = close; setTimeout(close, 10000);
   try { Sound.success(); } catch {}
-  petalShower(46, ['🌸', '💗', '💕', '🌸', '✨', '🏮']);
+  petalShower(46, ['🌸', '💗', '💕', '☕', '✨', '🧋']);
   setTimeout(() => el.isConnected && petalShower(30, ['🌸', '💗', '✨']), 3800);
 }
 // Lời chúc cuối tuần: 6-8h sáng thứ Bảy, Chủ nhật giờ Việt Nam, mỗi máy một lời ngẫu nhiên, mỗi ngày một lần. Chạy ở máy người chơi nên không tốn tải máy chủ.
 const WEEKEND_WISHES = [
-  'Chúc bạn cuối tuần an lành, tâm sáng như nắng sớm.',
-  'Sáng cuối tuần thong thả, chúc bạn thân khoẻ, tâm an.',
+  'Chúc bạn cuối tuần an lành, thưởng thức ly Katinat thật chill.',
+  'Sáng cuối tuần thong thả, chúc bạn tràn đầy năng lượng tích cực.',
   'Chúc gia đình bạn một ngày nghỉ sum vầy, đầm ấm.',
-  'Chúc bạn cuối tuần nhẹ nhàng, buông bớt lo toan.',
-  'Mong mỗi hơi thở sáng nay đều mang lại bình an cho bạn.',
+  'Chúc bạn cuối tuần nhẹ nhàng, buông bớt deadline.',
+  'Mong mỗi ngụm cà phê sáng nay đều mang lại cảm hứng cho bạn.',
   'Chúc bạn một ngày nghỉ nhiều nụ cười, nhiều điều lành.',
-  'Cuối tuần chậm lại một chút, chúc bạn gặp được chính mình.',
-  'Chúc bạn và người thân luôn mạnh khoẻ, phước lành tròn đầy.',
-  'Chúc bạn sáng nay lòng nhẹ như hoa sen nở trên hồ.',
-  'Một câu niệm Phật đầu ngày, chúc bạn cả ngày hoan hỷ.',
-  'Chúc bạn cuối tuần gieo được nhiều hạt lành, gặt nhiều niềm vui.',
-  'Chúc bạn ngày nghỉ an nhiên, việc gì cũng thuận duyên.',
+  'Cuối tuần chậm lại một chút, nghe bản nhạc Lofi thật êm.',
+  'Chúc bạn và người thân luôn mạnh khoẻ, hạnh phúc trọn vẹn.',
+  'Chúc bạn sáng nay thơm nồng như tách Cappuccino mới pha.',
+  'Một bản nhạc Jazz đầu ngày, chúc bạn cả ngày vui vẻ.',
+  'Chúc bạn cuối tuần gặt hái nhiều ý tưởng mới và niềm vui.',
+  'Chúc bạn ngày nghỉ thật chill, việc gì cũng suôn sẻ.',
 ];
 function weekendWish() {
   const vn = new Date(Date.now() + 7 * 36e5), day = vn.getUTCDay(), hour = vn.getUTCHours(), key = vn.toISOString().slice(0, 10);
@@ -72,7 +72,7 @@ function weekendWish() {
   local.set('wish', key);
   const el = document.createElement('div');
   el.className = 'hy-card';
-  el.innerHTML = `<div class="hy-inner"><div class="hy-glyph">福</div><div class="hy-title">Lời chúc cuối tuần</div><div class="hy-text">${esc(WEEKEND_WISHES[Math.floor(Math.random() * WEEKEND_WISHES.length)])}</div><div class="hy-foot">Nam mô A Di Đà Phật</div></div>`;
+  el.innerHTML = `<div class="hy-inner"><div class="hy-glyph">☕</div><div class="hy-title">Lời chúc cuối tuần</div><div class="hy-text">${esc(WEEKEND_WISHES[Math.floor(Math.random() * WEEKEND_WISHES.length)])}</div><div class="hy-foot">Katinat Coffee & Tea House</div></div>`;
   document.body.appendChild(el);
   const close = () => { el.classList.add('out'); setTimeout(() => el.remove(), 600); };
   el.onclick = close; setTimeout(close, 10000);
@@ -182,7 +182,7 @@ function setProfile(data) {
 function handleResult(r, { silent = false } = {}) {
   if (!r) return;
   setProfile(r);
-  if (r.gained && !silent) floater(`+${r.gained} công đức`);
+  if (r.gained && !silent) floater(`+${r.gained} Vibe Chill`);
   for (const id of r.questsDone || []) {
     const q = S.profile.quests.find((x) => x.id === id);
     if (q) setTimeout(() => toast(`<svg class="i"><use href="#i-check"/></svg> Hoàn thành: <b>${esc(q.name)}</b><br><small>Mở <svg class="i"><use href="#i-scroll"/></svg> Nhiệm vụ để nhận thưởng</small>`), 300);
@@ -190,12 +190,12 @@ function handleResult(r, { silent = false } = {}) {
   if (r.levelUps?.length) celebrateLevel(r.levelUps.at(-1));
   if (r.extra?.abbotGift) abbotGiftModal(r.extra.abbotGift);
 }
-// Thầy trụ trì tặng tăng bào khi thiền hoặc đi dạo đủ lâu
+// Barista Trưởng tặng Outfit Katinat khi học bài hoặc đi dạo đủ lâu
 function abbotGiftModal(id) {
-  const it = S.items[id], abbot = ABBOTS[S.temple?.id] || 'Thầy trụ trì';
+  const it = S.items[id], abbot = ABBOTS[S.temple?.id] || 'Barista Trưởng';
   Sound.success?.(); petalShower(30);
-  modal(`<div class="big">${ic('lotus')}</div><h3>${esc(abbot)} tặng bạn ${esc(it?.name || 'tăng bào')}</h3>
-    <p>Thầy thấy con tinh tấn đã lâu, xin tặng con tấm tăng bào này. Nam mô A Di Đà Phật.</p>
+  modal(`<div class="big">${ic('lotus')}</div><h3>${esc(abbot)} tặng bạn ${esc(it?.name || 'Outfit Katinat')}</h3>
+    <p>Barista thấy bạn ghé quán học bài và chill rất chăm chỉ, xin tặng bạn bộ trang phục đặc biệt này! ☕</p>
     <button class="btn gold" id="mEq">Mặc ngay</button><button class="btn ghost" id="mX">Để sau</button>`, (m) => {
     m.querySelector('#mX').onclick = closeModal;
     m.querySelector('#mEq').onclick = async () => { closeModal(); try { setProfile(await post('/equip', { item: id })); } catch (e) { toast(e.message); } };
@@ -203,10 +203,10 @@ function abbotGiftModal(id) {
 }
 
 const honorChip = (u) => (u?.honor ? `<span class="honor">${ic('spark')} ${esc(u.honor)}</span>` : '');
-const legendText = (a) => (a.title ? `có duyên nhận danh hiệu <b>${esc(a.title)}</b>` : `có duyên nhận <b>${esc(a.label)}</b>`);
+const legendText = (a) => (a.title ? `vừa nhận danh hiệu VIP <b>${esc(a.title)}</b>` : `vừa nhận <b>${esc(a.label)}</b>`);
 const shareLegend = (a) => {
   const what = a.title ? `danh hiệu ${a.title}` : a.label;
-  openShare(`Có duyên nhận ${what}`, { url: `${location.origin}/s/${a.uid}/a/${a.id}`, text: `${S.profile.user.name} có duyên nhận ${what} (${a.story}) tại Niệm Phật Online. Cùng lên chùa với mình nhé!` });
+  openShare(`Vừa nhận ${what}`, { url: `${location.origin}/s/${a.uid}/a/${a.id}`, text: `${S.profile.user.name} vừa nhận ${what} (${a.story}) tại Katinat Coffee 3D Online. Cùng ghé quán chill với mình nhé!` });
 };
 // Người nhận thấy thẻ chúc mừng có nút Khoe; người khác thấy dải thông báo, không che màn hình
 function onLegend(a) {
@@ -304,14 +304,14 @@ async function showAdminGifts(gifts) {
     if (shownGifts.has(g.id)) continue;
     shownGifts.add(g.id);
     const it = g.item && Object.values(S.items).find((i) => i.name === g.item); // hiện đúng hình vật phẩm, giống cửa hàng
-    const lines = [g.sen && `${ic('sen')} ${fmt(g.sen)} Sen`, g.ngoc && `${ic('ngoc')} ${fmt(g.ngoc)} Ngọc`, g.item && `<b>${g.qty} ${esc(g.item)}</b>`].filter(Boolean);
-    giftPopup('Bạn nhận được quà!', ['Niệm Phật Online vừa tặng bạn:', ...lines, 'Quà đã vào tài khoản của bạn.'], g.note, `
+    const lines = [g.sen && `${ic('sen')} ${fmt(g.sen)} Hạt Cafe`, g.ngoc && `${ic('ngoc')} ${fmt(g.ngoc)} Đá Lạnh`, g.item && `<b>${g.qty} ${esc(g.item)}</b>`].filter(Boolean);
+    giftPopup('Bạn nhận được quà!', ['Katinat Coffee 3D vừa tặng bạn:', ...lines, 'Quà đã vào tài khoản của bạn.'], g.note, `
       <button class="btn gold" id="mShare">Khoe ngay ${ic('spark')}</button>
-      <button class="btn ghost" id="mClose">Tiếp tục tu tập</button>`, (el) => {
+      <button class="btn ghost" id="mClose">Tiếp tục Chill ☕</button>`, (el) => {
       sendWs({ t: 'giftSeen', id: g.id });
       if (it) paintThumbs(el, S.items, S.profile.user.appearance);
       el.querySelector('#mClose').onclick = closeModal;
-      el.querySelector('#mShare').onclick = () => { closeModal(); openShare('Vừa nhận quà từ Niệm Phật Online!'); };
+      el.querySelector('#mShare').onclick = () => { closeModal(); openShare('Vừa nhận quà từ Katinat Coffee 3D!'); };
     }, it && `<div class="gift-pic">${itemIcon(it)}</div>`);
   }
 }
@@ -362,13 +362,13 @@ async function wheelResult(r, label) {
   refreshWheel(true);
   leaveWheel();
   const it = r.item && S.items[r.item];
-  const lines = [r.rare ? 'Bạn quay trúng đồ quý:' : 'Vòng quay lộc tặng bạn:', it ? `<b>${esc(it.name)}</b>` : `${ic('sen')} ${esc(label)}`, 'Quà đã vào tài khoản của bạn.'];
-  giftPopup(r.rare ? 'Đại cát đại lợi!' : 'Chúc mừng bạn!', lines, null, `
+  const lines = [r.rare ? 'Bạn quay trúng đồ quý:' : 'Vòng quay may mắn tặng bạn:', it ? `<b>${esc(it.name)}</b>` : `${ic('sen')} ${esc(label)}`, 'Quà đã vào tài khoản của bạn.'];
+  giftPopup(r.rare ? 'Quá đỉnh!' : 'Chúc mừng bạn!', lines, null, `
     <button class="btn gold" id="mShare">Khoe ngay ${ic('spark')}</button>
-    <button class="btn ghost" id="mClose">Tiếp tục tu tập</button>`, (el) => {
+    <button class="btn ghost" id="mClose">Tiếp tục Chill ☕</button>`, (el) => {
     if (it) paintThumbs(el, S.items, S.profile.user.appearance);
     el.querySelector('#mClose').onclick = closeModal;
-    el.querySelector('#mShare').onclick = () => { closeModal(); openShare(it ? `Vừa quay trúng ${it.name}!` : 'Vừa quay lộc ở Niệm Phật Online!'); };
+    el.querySelector('#mShare').onclick = () => { closeModal(); openShare(it ? `Vừa quay trúng ${it.name}!` : 'Vừa quay thưởng tại Katinat Coffee 3D!'); };
   }, it && `<div class="gift-pic">${itemIcon(it)}</div>`);
 }
 function mailGiftPopup(lines, note) {
@@ -399,7 +399,7 @@ function renderHud() {
   $$('[data-qty]').forEach((b) => (b.textContent = '×' + qty(b.dataset.qty)));
   const buff = u.buffUntil - Date.now();
   show('buffBadge', buff > 0);
-  if (buff > 0) $('buffBadge').innerHTML = `<svg class="i"><use href="#i-incense"/></svg> Hương trầm +20% · ${Math.ceil(buff / 60000)} phút`;
+  if (buff > 0) $('buffBadge').innerHTML = `☕ Espresso Boost +20% · ${Math.ceil(buff / 60000)} phút`;
 }
 setInterval(() => { if (S.profile && S.view === 'hall') renderHud(); }, 30000);
 
@@ -462,7 +462,7 @@ async function boot() {
 /* =====================================================================
    TẠO / SỬA NHÂN VẬT
    ===================================================================== */
-const setup = { step: 1, mode: 'new', ap: { gender: 'nam', hair: 'troc', skin: '#d98b5f' }, robe: 'ao_lam', sect: 'tinhdo', temple: null };
+const setup = { step: 1, mode: 'new', ap: { gender: 'nam', hair: 'ngan', skin: '#d98b5f' }, robe: 'ao_lam', sect: 'tinhdo', temple: null };
 let preview;
 
 function initPreview() {
@@ -655,7 +655,7 @@ function renderSetupStep() {
   $('btnPrev').textContent = setup.step === 1 ? (setup.mode === 'edit' ? 'Huỷ' : 'Quay lại') : 'Quay lại';
   $('btnPrev').style.visibility = setup.mode === 'new' && setup.step === 2 && new URLSearchParams(location.search).has('sv') ? 'hidden' : 'visible';
   show($$('.setup-nav')[0], setup.step === 2);
-  $('btnNext').innerHTML = setup.mode === 'edit' ? 'Lưu' : '<svg class="i"><use href="#i-pray"/></svg> Vào chùa';
+  $('btnNext').innerHTML = setup.mode === 'edit' ? 'Lưu' : '☕ Vào quán Katinat';
   if (setup.step === 1) renderServers();
   if (setup.step === 2) {
     warmTemple(setup.temple || S.meta.temples[0].id);
@@ -669,7 +669,7 @@ function renderSetupStep() {
 }
 // Máy chủ đang mở. Bấm máy chủ khác thì sang trang đó, giữ nguyên link giới thiệu và nguồn đến.
 const SERVERS = [
-  { host: location.host || 'localhost:3000', also: ['localhost', '127.0.0.1', 'localhost:3000', location.hostname], name: 'Chánh Điện Trực Tuyến', desc: 'Máy chủ Phật tử đang kết nối' },
+  { host: location.host || 'localhost:3000', also: ['localhost', '127.0.0.1', 'localhost:3000', location.hostname], name: 'Katinat Lounge Trực Tuyến', desc: 'Máy chủ Quán Cafe 3D đang kết nối' },
   { host: 's1.niemphat.online', also: [], name: 'Máy chủ S1', desc: 'Máy chủ dự phòng' }
 ];
 const serverHere = (s) => s.host === location.hostname || s.also.includes(location.hostname);
@@ -734,7 +734,7 @@ $('btnNext').onclick = async () => {
     catch (e) { toast(e.message); }
     return;
   }
-  if (!$('fConsent').checked) { toast('Bạn hãy tick đồng ý Điều khoản & Chính sách để vào chùa'); $('consentWrap').classList.add('shake'); setTimeout(() => $('consentWrap').classList.remove('shake'), 600); return; }
+  if (!$('fConsent').checked) { toast('Bạn hãy tick đồng ý Điều khoản & Chính sách để vào quán'); $('consentWrap').classList.add('shake'); setTimeout(() => $('consentWrap').classList.remove('shake'), 600); return; }
   Sound.init();
   $('btnNext').disabled = true;
   try {
@@ -745,10 +745,10 @@ $('btnNext').onclick = async () => {
     await enterTemple(setup.temple || S.meta.temples[0].id);
     const sect = sectOf(r.user.sect);
     modal(`<div class="big">${sect.icon}</div><h3>Chào mừng ${esc(r.user.name)}</h3>
-      <p>Bạn đã gia nhập <b>${sect.name}</b>.<br>Quà nhập môn: <svg class="i"><use href="#i-sen"/></svg> 100 Sen, 3 nén hương trầm, 2 cây nến và 1 đèn hoa đăng.
-      ${r.referral ? `<br><br><svg class="i"><use href="#i-users"/></svg> Kết duyên cùng <b>${esc(r.referral.refName)}</b>: +${r.referral.reward.sen} Sen` : ''}</p>
-      <p class="muted">Đến một bồ đoàn trống, bấm <b>Ngồi xuống</b> rồi <b>Lạy Phật</b> nhé.</p>
-      <button class="btn gold" id="mOk">Nam mô A Di Đà Phật <svg class="i"><use href="#i-pray"/></svg></button>`, (el) => (el.querySelector('#mOk').onclick = () => { closeModal(); const ask = () => setTimeout(() => accountModal({ first: true }), 300); if (S.coaching) S.afterCoach = ask; else ask(); }));
+      <p>Bạn đã chọn phong cách <b>${sect.name}</b>.<br>Quà chào mừng Katinat: <svg class="i"><use href="#i-sen"/></svg> 100 Hạt Cafe, 3 Phin Sữa Đá, 2 Matcha Latte và 1 Thiệp Lời Chúc.
+      ${r.referral ? `<br><br><svg class="i"><use href="#i-users"/></svg> Đi cafe cùng <b>${esc(r.referral.refName)}</b>: +${r.referral.reward.sen} Hạt Cafe` : ''}</p>
+      <p class="muted">Đến một bàn trống trong quán, bấm <b>Ngồi vào bàn ☕</b> rồi <b>Thưởng thức Cafe</b> nhé.</p>
+      <button class="btn gold" id="mOk">Vào Quán Chill Ngay ☕</button>`, (el) => (el.querySelector('#mOk').onclick = () => { closeModal(); const ask = () => setTimeout(() => accountModal({ first: true }), 300); if (S.coaching) S.afterCoach = ask; else ask(); }));
     local.set('ref', null);
   } catch (e) { toast(e.message); }
   $('btnNext').disabled = false;
@@ -837,20 +837,20 @@ async function renderTempleList(el, { pick, selected }) {
         <span class="thumb" style="background:${TEMPLE_BG[t.id] || '#efe5d3'}">${ic('temple')}</span>
         <span><b>${esc(t.name)}</b><div class="meta">${esc(t.place)} · cảm hứng ${esc(t.inspired)}</div>
         <p>${esc(t.description)}</p>
-        <span class="tags">${online[t.id] >= per && S.temple?.id !== t.id ? `<span class="tag red">Đã đủ ${per} người</span>` : online[t.id] ? `<span class="tag green">● ${online[t.id]}/${per} đang online</span>` : ''}${visited.has(t.id) ? '<span class="tag">✓ Đã viếng</span>' : '<span class="tag gold">Chưa viếng · +10 công đức</span>'}${S.temple?.id === t.id ? '<span class="tag gold">Bạn đang ở đây</span>' : ''}</span></span>
+        <span class="tags">${online[t.id] >= per && S.temple?.id !== t.id ? `<span class="tag red">Đã đủ ${per} người</span>` : online[t.id] ? `<span class="tag green">● ${online[t.id]}/${per} đang online</span>` : ''}${visited.has(t.id) ? '<span class="tag">✓ Đã ghé</span>' : '<span class="tag gold">Chưa ghé · +10 Vibe Chill</span>'}${S.temple?.id === t.id ? '<span class="tag gold">Bạn đang ở đây</span>' : ''}</span></span>
       </button>`).join('');
   }).join('');
   $$('.temple', el).forEach((b) => (b.onclick = () => {
-    if (online[b.dataset.id] >= per && S.temple?.id !== b.dataset.id) return toast(`${ic('temple')} Chùa này đã đủ ${per} người, mời bạn chọn chùa khác hoặc quay lại sau`);
+    if (online[b.dataset.id] >= per && S.temple?.id !== b.dataset.id) return toast(`${ic('temple')} Chi nhánh này đã đủ ${per} người, mời bạn chọn chi nhánh khác`);
     pick(b.dataset.id);
   }));
 }
-// Chùa đã đủ người: gợi ý các chùa còn chỗ (ít người trước), hoặc thử lại
+// Quán đã đủ người: gợi ý các chi nhánh còn chỗ (ít người trước), hoặc thử lại
 function showTempleFull(m) {
-  const name = S.meta.temples.find((t) => t.id === m.temple)?.name || 'Chùa';
+  const name = S.meta.temples.find((t) => t.id === m.temple)?.name || 'Quán';
   const free = S.meta.temples.filter((t) => t.id !== m.temple && (m.counts[t.id] || 0) < m.max).sort((a, b) => (m.counts[a.id] || 0) - (m.counts[b.id] || 0)).slice(0, 4);
-  modal(`<div class="big">${ic('temple')}</div><h3>${esc(name)} đã đủ ${m.max} người</h3>
-    <p>Mỗi chùa đón tối đa ${m.max} người cùng lúc để ai cũng được tu tập an lành. Mời bạn viếng chùa khác:</p>
+  modal(`<div class="big">${ic('temple')}</div><h3>${esc(name)} đã đủ ${m.max} khách</h3>
+    <p>Mỗi chi nhánh đón tối đa ${m.max} khách cùng lúc để không gian luôn mượt mà. Mời bạn ghé chi nhánh khác:</p>
     ${free.map((t) => `<button class="btn ghost" data-go="${t.id}">${esc(t.name)} · ${m.counts[t.id] || 0} người</button>`).join('')}
     <button class="btn ghost" id="mRetry">Thử vào lại ${esc(name)}</button><div class="full-fund">${serverSwitch()}</div>`, (el) => {
     el.querySelectorAll('[data-go]').forEach((b) => (b.onclick = () => { closeModal(); enterTemple(b.dataset.go); }));
@@ -964,7 +964,7 @@ function visitNotes(x = {}) {
 // Nhân vật hư cấu cho các ngôi chùa trong game (không phải người thật)
 const ABBOTS = { nhattru: 'Barista Tâm Liên', tranho: 'Barista Quảng Hồ', huongson: 'Barista Diệu Sơn', dinhmay: 'Barista Trúc Vân', baison: 'Barista Bảo Sơn', thienmau: 'Barista Hương Giang', vinhan: 'Barista Vĩnh Tâm', doivang: 'Barista Kim Tâm', linhson: 'Barista Huyền Không', kimson: 'Barista Kim Đỉnh', linhung: 'Barista Minh Ứng', nuisam: 'Barista Thanh Sam', cuuphong: 'Barista Tịnh Phong', hoangoc: 'Barista Ngọc Liên' };
 // Lão Hành Khất: cảm hứng từ ông lão bán bí kiếp cho cậu bé trong phim Tuyệt Đỉnh Kungfu. Cậu bé dốc tiền mua sách, bị đánh vì cứu cô bé bán kẹo, về sau mới hiểu tài năng thật ở trong mình.
-const HERMIT_LESSONS = ['Thức thứ nhất: Thở. Chưa thở được thì chưa làm được gì.', 'Thức thứ hai: Lắng. Nghe người khác nói hết câu.', 'Thức thứ ba: Nhịn. Lời nặng để qua đêm rồi hãy nói.', 'Thức thứ tư: Xả. Nắm chặt bao nhiêu, mỏi tay bấy nhiêu.', 'Thức thứ năm: Tha. Người đầu tiên được nhẹ lòng là mình.', 'Thức thứ sáu: Cho. Có cây kẹo cũng chia cho người khác một nửa.', 'Thức thứ bảy: Niệm. Một câu Phật hiệu, trăm mối lo tan.', 'Thức cuối: Vạn Phật quy tâm. Không tìm đâu xa, tuyệt học ở ngay trong lòng bạn.'];
+const HERMIT_LESSONS = ['Bản số 1: Rainy Saigon Lofi – Tiếng mưa rơi bên hiên quán Katinat.', 'Bản số 2: Espresso Morning – Giai điệu Piano Rhodes ấm áp đầu ngày.', 'Bản số 3: Bossa Nova Sunset – Tiếng đàn Guitar Nylon thư thái chiều hoàng hôn.', 'Bản số 4: Midnight Study Session – Nhịp Beat Lofi giúp tập trung học bài & làm việc.', 'Bản số 5: Katinat Signature – Hương vị trà sữa và cà phê phin đậm đà.', 'Bản số 6: Parisian Corner – Góc phố Đồng Khởi lãng mạn.', 'Bản số 7: Chill With Friends – Ngồi cùng bạn bè nghe nhạc Acoustic.', 'Bản cuối: Golden Vinyl – Tuyệt phẩm Lofi Jazz dành riêng cho khách VIP Katinat.'];
 async function talkHermit() {
   const head = `<div class="abbot-head"><span class="ava" style="background:#7a6a52">${ic('book')}</span><div><b>DJ Lofi & Acoustic</b><small>Chuyên phối bản nhạc Lofi hiếm cho quán</small></div></div>`;
   const say = (html, opts, bind) => modal(`${head}<div class="abbot-say">${html}</div><div class="abbot-opts">${opts}</div>`, (el) => {
@@ -1042,7 +1042,7 @@ async function talkTeller(i) {
   }, { replace: true });
   const others = (c.tales[t.id] || []).length - 1;
   const menu = () => p.tales.map((x, k) => `<button class="btn ghost" data-a="t${k}">${ic(heard[`${t.id}:${i}:${k}`] === day ? 'check' : 'scroll')} ${esc(x.title)}</button>`).join('')
-    + `<button class="btn ghost" data-a="full">${ic('story')} Đọc sự tích chùa</button><button class="btn gold" data-a="bye">${ic('pray')} Cảm ơn ${esc(p.name.split(' ')[0].toLowerCase())}</button>`;
+    + `<button class="btn ghost" data-a="full">${ic('story')} Xem câu chuyện quán</button><button class="btn gold" data-a="bye">${ic('pray')} Cảm ơn ${esc(p.name.split(' ')[0].toLowerCase())}</button>`;
   const go = (a) => {
     Sound.chime?.();
     if (a === 'bye') return closeModal();
@@ -1083,9 +1083,9 @@ async function enterTemple(id) {
     if (ph === 'stop') return toast(`${ic('map')} ${esc(text)}`, 8000);
     if (say && ph === 'up') return toast(`${ic('map')} ${esc(say.up)}`, 7000);
     if (say && ph === 'top') { Sound.bell(Sound.now + 0.05, 220, 0.3, 6); return toast(`${ic('lotus')} ${esc(say.top)}`, 7000); }
-    if (ph === 'up') toast(`${ic('map')} Cáp treo đang đưa bạn lên đỉnh núi Bà Huyền – ngọn núi cao nhất Nam Bộ…`, 5000);
-    else if (ph === 'top') { Sound.bell(Sound.now + 0.05, 220, 0.3, 6); toast(`${ic('lotus')} Đỉnh núi: tượng Phật Bà Linh Phong bằng đồng hướng về đồng bằng. Nam mô Quán Thế Âm Bồ Tát.`, 6000); }
-    else if (ph === 'down') toast('Cáp treo đưa bạn về lại ga Chùa Bà…', 3500);
+    if (ph === 'up') toast(`${ic('map')} Cáp treo đang đưa bạn lên Đài Ngắm Cảnh Katinat…`, 5000);
+    else if (ph === 'top') { Sound.bell(Sound.now + 0.05, 220, 0.3, 6); toast(`${ic('lotus')} Đỉnh đồi: Đài Ngắm Cảnh Katinat lộng gió nhìn toàn cảnh thành phố.`, 6000); }
+    else if (ph === 'down') toast('Cáp treo đưa bạn về lại sân hiên Katinat…', 3500);
   };
     S.world.onToast = toast;
     S.world.onTalk = () => talkAbbot();
@@ -1184,15 +1184,15 @@ async function dailyCheckin() {
     setTimeout(() => {
       Sound.chime();
       modal(`<div class="big"><svg class="i"><use href="#i-fire"/></svg></div><h3>Ngày thứ ${c.streak} liên tiếp</h3>
-        <p>Cảm ơn bạn đã lên chùa hôm nay. Quà điểm danh:<br><b><svg class="i"><use href="#i-sen"/></svg> ${c.reward.sen} Sen${c.reward.ngoc ? ` · <svg class="i"><use href="#i-ngoc"/></svg> ${c.reward.ngoc} Ngọc` : ''}${c.reward.items ? ' · ' + Object.entries(c.reward.items).map(([k, n]) => `${n} ${S.items[k]?.name || k}`).join(', ') : ''}</b></p>
+        <p>Cảm ơn bạn đã ghé Katinat hôm nay. Quà điểm danh:<br><b><svg class="i"><use href="#i-sen"/></svg> ${c.reward.sen} Hạt Cafe${c.reward.ngoc ? ` · <svg class="i"><use href="#i-ngoc"/></svg> ${c.reward.ngoc} Đá Lạnh` : ''}${c.reward.items ? ' · ' + Object.entries(c.reward.items).map(([k, n]) => `${n} ${S.items[k]?.name || k}`).join(', ') : ''}</b></p>
         <div style="display:flex;gap:4px;margin:6px 0">${days}</div>
-        ${c.shieldUsed ? `<p class="checkin-note">${ic('incense')} Bạn lỡ ${c.shieldUsed} ngày, ${c.shieldUsed} nén hương giữ chuỗi đã giữ lại hành trình cho bạn.</p>` : ''}
-        ${c.shieldEarned ? `<p class="checkin-note">${ic('incense')} Tròn 7 ngày: thêm 1 nén hương giữ chuỗi.</p>` : ''}
-        <p class="muted">Giữ chuỗi 7 ngày để nhận quà lớn <svg class="i"><use href="#i-gift"/></svg> · Hương giữ chuỗi: ${c.shield}</p>
+        ${c.shieldUsed ? `<p class="checkin-note">${ic('incense')} Bạn lỡ ${c.shieldUsed} ngày, ${c.shieldUsed} thẻ giữ chuỗi đã giữ lại chuỗi ngày cho bạn.</p>` : ''}
+        ${c.shieldEarned ? `<p class="checkin-note">${ic('incense')} Tròn 7 ngày: thêm 1 thẻ giữ chuỗi.</p>` : ''}
+        <p class="muted">Giữ chuỗi 7 ngày để nhận quà lớn <svg class="i"><use href="#i-gift"/></svg> · Thẻ giữ chuỗi: ${c.shield}</p>
         ${c.today ? `<blockquote class="teaching">“${esc(c.today.teaching.text)}”<small>${esc(c.today.teaching.src)}</small></blockquote>
-        <p class="checkin-note">${ic('lotus')} Chùa duyên hôm nay: <b>${esc(templeName(c.today.duyen.id))}</b> · ${rewardText(c.today.duyen.reward)}${c.today.lunar.holy ? `<br>${ic('spark')} ${esc(c.today.lunar.holy.name)}: ×${c.today.lunar.holy.mult} công đức` : ''}</p>` : ''}
-        <button class="btn gold" id="mOk">Nhận quà <svg class="i"><use href="#i-pray"/></svg></button>
-        ${c.today && c.today.duyen.id !== S.temple?.id ? `<button class="btn ghost" id="mDuyen">${ic('map')} Nhận quà và về chùa duyên</button>` : ''}`, (el) => {
+        <p class="checkin-note">${ic('lotus')} Chi nhánh Hot hôm nay: <b>${esc(templeName(c.today.duyen.id))}</b> · ${rewardText(c.today.duyen.reward)}${c.today.lunar.holy ? `<br>${ic('spark')} ${esc(c.today.lunar.holy.name)}: ×${c.today.lunar.holy.mult} Vibe Chill` : ''}</p>` : ''}
+        <button class="btn gold" id="mOk">Nhận quà ☕</button>
+        ${c.today && c.today.duyen.id !== S.temple?.id ? `<button class="btn ghost" id="mDuyen">${ic('map')} Nhận quà và ghé chi nhánh Hot</button>` : ''}`, (el) => {
         el.querySelector('#mOk').onclick = () => { closeModal(); petalShower(20); };
         el.querySelector('#mDuyen')?.addEventListener('click', () => { closeModal(); petalShower(20); openMapView({ focus: c.today.duyen.id }); });
       });
@@ -1453,24 +1453,24 @@ function renderCtx(ctx) {
 $('btnOut').onclick = () => { Sound.chime?.(); S.world.goThroughDoor(); };
 // Công quả: ra sân quét lá, trồng cây
 function doChore(kind) {
-  if (!S.world?.od) return toast('Chùa này không có sân để làm công quả');
-  if (!S.world.outside) { S.world.goThroughDoor(); return toast(`${ic('map')} Ra tới sân rồi bấm <b>Công quả</b> để ${CHORE_NAME[kind].toLowerCase()}`, 5000); }
+  if (!S.world?.od) return toast('Chi nhánh này không có sân vườn ngoài trời');
+  if (!S.world.outside) { S.world.goThroughDoor(); return toast(`${ic('map')} Ra tới sân rồi bấm <b>Chăm vườn</b> để ${CHORE_NAME[kind].toLowerCase()}`, 5000); }
   if (S.chore) return;
   toast(choreHint(kind), 3000);
   sendWs({ t: 'chore', k: kind });
   S.chore = runChore(S.world, kind, {
-    onCancel: () => { S.chore = null; toast('Đã dừng công quả vì bạn đi chỗ khác'); },
+    onCancel: () => { S.chore = null; toast('Đã dừng chăm vườn vì bạn đi chỗ khác'); },
     onDone: async () => {
       S.chore = null;
       try {
         const r = await post('/practice', { type: kind, temple: S.temple.id });
-        Sound.success(); petalShower(10); toast(`${ic('lotus')} ${CHORE_NAME[kind]} xong, công đức +${r.gained}`);
+        Sound.success(); petalShower(10); toast(`${ic('lotus')} ${CHORE_NAME[kind]} xong, Vibe Chill +${r.gained}`);
         handleResult(r, { silent: true });
       } catch (e) { toast(e.message); }
     },
   });
 }
-// Vườn Phật: trồng cây mua ở Cửa hàng, hái quả quý đổi Ngọc
+// Vườn Cafe: trồng cây mua ở Cửa hàng, hái quả đổi Đá Lạnh
 const nameOfPlant = (id) => S.items[id]?.name || 'Cây';
 function refreshPlants(templeId) {
   api(`/plants/${templeId}`).then((g) => {
@@ -1488,18 +1488,18 @@ async function openGarden() {
     const here = p.temple === S.temple?.id;
     const next = p.nextAt ? new Date(p.nextAt).toLocaleDateString('vi-VN') : '';
     return `<div class="card"><div class="body"><b>${esc(nameOfPlant(p.item))}</b> <small>${esc(p.templeName)}</small><p>Đã hái ${p.fruits}/${p.max} lần${p.ripe ? ` · <b>${p.ripe * p.per} quả chín</b>` : next ? ` · chín ngày ${next}` : ' · đã hái hết'}</p></div>
-      <div class="side">${p.ripe ? (here ? `<button class="btn small gold" data-harvest="${p.id}">Hái</button>` : '<small>Đến chùa này để hái</small>') : ''}</div></div>`;
+      <div class="side">${p.ripe ? (here ? `<button class="btn small gold" data-harvest="${p.id}">Hái</button>` : '<small>Đến quán này để hái</small>') : ''}</div></div>`;
   };
-  modal(`<h3>Vườn Phật</h3><p class="muted">Vườn chùa này có ${n}/${cap} cây. Mỗi người trồng tối đa ${g.perUser} cây ở một chùa. Cây trồng ngay chỗ bạn đang đứng ngoài sân.</p>
+  modal(`<h3>Vườn Cây Katinat</h3><p class="muted">Sân vườn quán này có ${n}/${cap} cây. Mỗi người trồng tối đa ${g.perUser} cây ở một chi nhánh. Cây trồng ngay chỗ bạn đang đứng ngoài sân.</p>
     ${stock.map((i) => `<div class="card"><div class="body"><b>${esc(i.name)}</b> <small>có ${qty(i.id)}</small></div><div class="side">${qty(i.id) ? `<button class="btn small gold" data-plant="${i.id}">Trồng</button>` : S.meta.shopOff ? '<small>Chưa có</small>' : `<button class="btn small ghost" data-toshop="1">${ic('ngoc')} ${i.price_ngoc}</button>`}</div></div>`).join('')}
     ${g.mine.length ? `<h4 style="margin:12px 0 6px">Cây của bạn</h4>${g.mine.map(treeRow).join('')}` : ''}
-    <p style="margin:12px 0 8px">Quả quý: <b>${fmt(g.fruit)}</b> · 1 quả đổi 1 Ngọc</p>
-    ${g.fruit ? `<button class="btn gold" id="mEx">Đổi ${fmt(g.fruit)} quả lấy ${fmt(g.fruit)} Ngọc</button>` : ''}<button class="btn ghost" id="mX">Đóng</button>`, (el) => {
+    <p style="margin:12px 0 8px">Quả chín: <b>${fmt(g.fruit)}</b> · 1 quả đổi 1 Đá Lạnh</p>
+    ${g.fruit ? `<button class="btn gold" id="mEx">Đổi ${fmt(g.fruit)} quả lấy ${fmt(g.fruit)} Đá Lạnh</button>` : ''}<button class="btn ghost" id="mX">Đóng</button>`, (el) => {
     el.querySelector('#mX').onclick = closeModal;
     const ex = el.querySelector('#mEx');
     if (ex) ex.onclick = async () => {
       ex.disabled = true;
-      try { const r = await post('/plants/exchange', { qty: g.fruit }); setProfile(r); Sound.success(); toast(`${ic('ngoc')} Nhận ${r.ngoc} Ngọc`); closeModal(); } catch (e) { ex.disabled = false; toast(e.message); }
+      try { const r = await post('/plants/exchange', { qty: g.fruit }); setProfile(r); Sound.success(); toast(`${ic('ngoc')} Nhận ${r.ngoc} Đá Lạnh`); closeModal(); } catch (e) { ex.disabled = false; toast(e.message); }
     };
     el.querySelectorAll('[data-toshop]').forEach((b) => (b.onclick = () => { closeModal(); openSheet('shop', 'plant'); }));
     el.querySelectorAll('[data-plant]').forEach((b) => (b.onclick = async () => {
@@ -1514,12 +1514,12 @@ async function openGarden() {
     }));
     el.querySelectorAll('[data-harvest]').forEach((b) => (b.onclick = async () => {
       b.disabled = true;
-      try { const r = await post('/plants/harvest', { id: Number(b.dataset.harvest) }); setProfile(r); Sound.success(); toast(`${ic('lotus')} Hái được ${r.got} quả quý`); closeModal(); setTimeout(openGarden, 300); } catch (e) { b.disabled = false; toast(e.message); }
+      try { const r = await post('/plants/harvest', { id: Number(b.dataset.harvest) }); setProfile(r); Sound.success(); toast(`${ic('lotus')} Hái được ${r.got} quả chín`); closeModal(); setTimeout(openGarden, 300); } catch (e) { b.disabled = false; toast(e.message); }
     }));
   });
 }
 
-// Hứng hoa sala: lớp vẽ trong suốt nằm trên cảnh chùa, cảnh vẫn chạy phía sau
+// Hứng hoa bơ & trà: minigame sân vườn
 const salaSprite = (gold) => {
   const c = document.createElement('canvas'); c.width = c.height = 64;
   const x = c.getContext('2d'); x.translate(32, 32);
@@ -1531,9 +1531,9 @@ async function openSala() {
   let b;
   try { b = await api('/sala/board'); } catch (e) { return toast(e.message); }
   const when = new Date(b.nextAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-  modal(`<div class="big">${ic('lotus')}</div><h3>Hứng hoa sala</h3>
-    <p>Kinh Đại Bát Niết Bàn kể đôi cây sala ở Câu Thi Na nở hoa trái mùa, rắc lên thân Đức Phật để cúng dường. Kéo khay hứng hoa sala vàng trắng 45 giây, hoa mạn-đà-la hồng từ trời tính 3 bông.</p>
-    <p class="muted">Hôm nay còn ${b.left}/${b.daily} lượt · Tuần này ${fmt(b.me)} hoa · Đủ ${fmt(b.robeAt)} hoa (đang có ${fmt(b.total)}) nhận Áo Hoa Sala.</p>
+  modal(`<div class="big">${ic('lotus')}</div><h3>Hứng Hoa Trà Katinat</h3>
+    <p>Kéo khay hứng những cánh hoa trà trắng vàng rơi trong 45 giây, hoa trà hồng đặc biệt tính 3 điểm.</p>
+    <p class="muted">Hôm nay còn ${b.left}/${b.daily} lượt · Tuần này ${fmt(b.me)} hoa · Đủ ${fmt(b.robeAt)} hoa (đang có ${fmt(b.total)}) nhận Áo Katinat Limited.</p>
     <h4 style="margin:10px 0 6px">Bảng tuần này <small class="muted">cập nhật mỗi 3 tiếng, lần tới ${when}</small></h4>
     <div style="max-height:170px;overflow:auto;margin-bottom:10px">${b.rows.map((r, i) => `<div style="display:flex;justify-content:space-between;padding:3px 2px"><span>${i + 1}. ${esc(r.name)}</span><b>${fmt(r.flowers)}</b></div>`).join('') || '<div class="empty" style="padding:10px">Chưa có ai trên bảng, bảng sẽ có ở lần cập nhật tới</div>'}</div>
     ${b.left ? '<button class="btn gold" id="mGo">Bắt đầu</button>' : ''}<button class="btn ghost" id="mX">Để sau</button>`, (el) => {
@@ -1584,7 +1584,7 @@ function runSala(s) {
     try {
       const r = await post('/sala/claim', { temple: templeId, flowers: score });
       setProfile(r); Sound.success(); petalShower(16);
-      modal(`<div class="big">${ic('lotus')}</div><h3>Hứng được ${r.flowers} hoa</h3><p>Nhận ${ic('sen')} ${r.sen} Sen. Tổng cộng ${fmt(r.total)}/${fmt(r.robeAt)} hoa, hôm nay còn ${r.left} lượt.</p>${r.robe ? '<p><b>Bạn nhận được Áo Hoa Sala, mở Túi đồ để mặc.</b></p>' : ''}<button class="btn gold" id="mX">Nam mô A Di Đà Phật</button>`, (m) => { m.querySelector('#mX').onclick = closeModal; });
+      modal(`<div class="big">${ic('lotus')}</div><h3>Hứng được ${r.flowers} hoa trà</h3><p>Nhận ${ic('sen')} ${r.sen} Hạt Cafe. Tổng cộng ${fmt(r.total)}/${fmt(r.robeAt)} hoa, hôm nay còn ${r.left} lượt.</p>${r.robe ? '<p><b>Bạn nhận được Áo Katinat Limited, mở Túi đồ để mặc.</b></p>' : ''}<button class="btn gold" id="mX">Tuyệt vời ☕</button>`, (m) => { m.querySelector('#mX').onclick = closeModal; });
     } catch (e) { toast(e.message); }
   };
   let lastT = start;
@@ -1623,8 +1623,8 @@ function runSala(s) {
 }
 
 function choreMenu() {
-  modal(`<div class="big">${ic('spark')}</div><h3>Công quả</h3><p>Đứng yên tại chỗ trong lúc làm. Mỗi ngày mỗi chùa được quét sân 3 lượt và trồng 1 cây. Cây bạn trồng ở lại sân cho mọi người cùng ngắm.</p>
-    <button class="btn gold" data-c="sweep">Quét sân</button><button class="btn gold" data-c="plant">Trồng cây</button><button class="btn gold" id="mGarden">Vườn Phật</button><button class="btn gold" id="mSala">Hứng hoa sala</button><button class="btn ghost" id="mX">Để sau</button>`, (el) => {
+  modal(`<div class="big">${ic('spark')}</div><h3>Chăm Sóc Sân Vườn Katinat</h3><p>Đứng yên tại chỗ trong lúc làm. Mỗi ngày mỗi chi nhánh được dọn sân 3 lượt và trồng 1 cây xanh. Cây bạn trồng ở lại sân cho mọi người cùng ngắm.</p>
+    <button class="btn gold" data-c="sweep">Dọn sân hiên</button><button class="btn gold" data-c="plant">Trồng cây xanh</button><button class="btn gold" id="mGarden">Vườn Cây Katinat</button><button class="btn gold" id="mSala">Hứng Hoa Trà</button><button class="btn ghost" id="mX">Để sau</button>`, (el) => {
     el.querySelector('#mX').onclick = closeModal;
     el.querySelector('#mGarden').onclick = () => { closeModal(); setTimeout(openGarden, 260); };
     el.querySelector('#mSala').onclick = () => { closeModal(); setTimeout(openSala, 260); };
@@ -1702,7 +1702,7 @@ function stopBowing(immediate) {
 }
 $('btnBow').onclick = () => {
   if (S.bow === 'idle') {
-    if (!S.world.seated && !S.world.sit()) { toast('Hãy đến gần một bồ đoàn trống để ngồi lạy'); return; }
+    if (!S.world.seated && !S.world.sit()) { toast('Hãy đến gần một chiếc ghế trống để ngồi thưởng thức cafe ☕'); return; }
     S.world.player.meditating = false;
     S.world.setBowing(true);
     S.bow = 'bowing';
@@ -1796,9 +1796,9 @@ let beadWaitSeat = 0;
 $('btnBeads').onclick = () => {
   stopBowing(true);
   if (!S.world.seated && !S.world.sit()) {
-    if (!S.world.walkToSeat()) { toast('Hãy vào chánh điện, ngồi lên bồ đoàn để lần hạt'); return; }
+    if (!S.world.walkToSeat()) { toast('Hãy vào trong quán, ngồi vào bàn để pha cafe'); return; }
     beadWaitSeat = Date.now() + 20000;
-    toast(`${ic('cushion')} Đang đến bồ đoàn…`);
+    toast(`${ic('cushion')} Đang đến bàn trống…`);
     return;
   }
   beadWaitSeat = 0;
@@ -2408,9 +2408,9 @@ async function refreshQue() {
 }
 async function openQue() {
   await refreshQue();
-  if (S.que) return modal(`<h3>Quẻ hôm nay</h3>${queCard(S.que)}<p class="muted">Mỗi ngày gieo một quẻ, ngày mai quay lại nhé.</p><button class="btn gold" id="mX">Nam mô A Di Đà Phật</button>`, (el) => (el.querySelector('#mX').onclick = closeModal));
-  modal(`<div class="big que-tube">${ic('story')}</div><h3>Gieo quẻ đầu ngày</h3><p>Thành tâm niệm một câu Phật hiệu rồi gieo. Mỗi ngày chỉ gieo một quẻ, quẻ là lời nhắc tu tập chứ không phải lời tiên đoán.</p>
-    <button class="btn gold" id="mCast">Gieo quẻ</button><button class="btn ghost" id="mX">Để sau</button>`, (el) => {
+  if (S.que) return modal(`<h3>Thông Điệp Tarot & Cafe Hôm Nay</h3>${queCard(S.que)}<p class="muted">Mỗi ngày rút một thông điệp, ngày mai quay lại nhé.</p><button class="btn gold" id="mX">Cảm ơn Katinat ☕</button>`, (el) => (el.querySelector('#mX').onclick = closeModal));
+  modal(`<div class="big que-tube">${ic('story')}</div><h3>Rút Thẻ Thông Điệp Đầu Ngày</h3><p>Nhấp một ngụm cà phê ấm và rút một thẻ thông điệp truyền cảm hứng cho ngày mới tại Katinat.</p>
+    <button class="btn gold" id="mCast">Rút thẻ ngay ✨</button><button class="btn ghost" id="mX">Để sau</button>`, (el) => {
     el.querySelector('#mX').onclick = closeModal;
     el.querySelector('#mCast').onclick = (e) => busy(e.target, async () => {
       el.querySelector('.que-tube').classList.add('shake-tube');
@@ -2421,7 +2421,7 @@ async function openQue() {
         S.que = r.que; show('queBadge', false);
         handleResult(r, { silent: true });
         Sound.success(); petalShower(14);
-        modal(`<h3>Quẻ hôm nay</h3>${queCard(r.que)}${r.already ? '' : `<p class="muted">Quà gieo quẻ: ${rewardText(r.reward)}</p>`}<button class="btn gold" id="mX">Nam mô A Di Đà Phật</button>`, (c) => (c.querySelector('#mX').onclick = closeModal), { replace: true });
+        modal(`<h3>Thông Điệp Hôm Nay</h3>${queCard(r.que)}${r.already ? '' : `<p class="muted">Quà tặng kèm: ${rewardText(r.reward)}</p>`}<button class="btn gold" id="mX">Cảm ơn Katinat ☕</button>`, (c) => (c.querySelector('#mX').onclick = closeModal), { replace: true });
       } catch (err) { toast(err.message); }
     });
   });
@@ -2432,7 +2432,7 @@ function rewardText(r = {}) {
   const parts = [];
   if (r.sen) parts.push(`<svg class="i"><use href="#i-sen"/></svg> ${r.sen}`);
   if (r.ngoc) parts.push(`<svg class="i"><use href="#i-ngoc"/></svg> ${r.ngoc}`);
-  if (r.exp) parts.push(`<svg class="i"><use href="#i-spark"/></svg> ${r.exp} công đức`);
+  if (r.exp) parts.push(`<svg class="i"><use href="#i-spark"/></svg> ${r.exp} Vibe Chill`);
   for (const [k, n] of Object.entries(r.items || {})) parts.push(`${ic(ITEM_ICON[k] || 'gift')} ${n} ${S.items[k]?.name || k}`);
   return parts.join(' · ');
 }
@@ -2468,13 +2468,13 @@ function pickAvatar() {
 }
 
 // Nhiệm vụ: bấm là tới đúng chỗ làm. Cấp độ và chuỗi ngày không có nơi nào để đi nên không có nút.
-const QUEST_TABS = { here: 'Chùa này', daily: 'Hằng ngày', weekly: 'Hằng tuần', achievement: 'Thành tựu' };
+const QUEST_TABS = { here: 'Quán này', daily: 'Hằng ngày', weekly: 'Hằng tuần', achievement: 'Thành tựu' };
 const QUEST_SEAT = { bow: 'btnBow', mo: 'btnChant', chant: 'btnChant', round: 'btnBeads', meditate_min: 'btnMeditate' };
 const questHasGo = (q) => {
   const m = q.metric.split(':')[0];
   return !!QUEST_SEAT[m] || ['incense', 'bell', 'visit', 'temples_all', 'route', 'share', 'rejoice', 'invite', 'loc', 'pet', 'sweep', 'plant'].includes(m);
 };
-// Chờ người chơi ở đúng phía cửa (trong chánh điện hoặc ngoài sân) rồi mới làm tiếp
+// Chờ người chơi ở đúng phía cửa (trong quán hoặc ngoài sân) rồi mới làm tiếp
 function questSide(outside, then, id = S.temple?.id) {
   const until = Date.now() + 25000;
   const step = () => {
@@ -2490,8 +2490,8 @@ function questSeat(btn) {
   questSide(false, (w) => {
     if (btn === 'btnBow' && S.bow !== 'idle') return;
     if (w.seated || w.sit()) return $(btn).click();
-    if (!w.walkToSeat()) return toast('Chưa có bồ đoàn trống, bạn đợi một lát nhé');
-    toast(`${ic('cushion')} Đang đến bồ đoàn…`);
+    if (!w.walkToSeat()) return toast('Chưa có bàn trống, bạn đợi một lát nhé');
+    toast(`${ic('cushion')} Đang đến bàn trống…`);
     const until = Date.now() + 20000;
     const wait = () => {
       if (S.view !== 'hall' || Date.now() > until) return;
@@ -2520,14 +2520,14 @@ async function questGo(q) {
     const list = m === 'route' ? p?.routes?.find((r) => r.id === arg)?.temples : S.meta.temples.map((t) => t.id);
     return openMapView({ focus: list?.find((id) => !S.profile.visited.includes(id)) });
   }
-  if (!S.world?.player || S.view !== 'hall') return toast('Hãy vào chùa trước nhé');
+  if (!S.world?.player || S.view !== 'hall') return toast('Hãy vào quán trước nhé');
   if (arg && ['loc', 'pet', 'bow'].includes(m) && arg !== S.temple?.id) await enterTemple(arg);
   if (QUEST_SEAT[m]) return questSeat(QUEST_SEAT[m]);
   if (m === 'sweep' || m === 'plant') return doChore(m);
   if (m === 'incense') return questOffer('huong_tram');
   if (m === 'bell') return questOffer('bell');
-  if (m === 'loc') questSide(true, () => toast(`${ic('lotus')} Đi tới gần hoa sen vàng phát sáng trong sân để nhận lộc`, 5000));
-  if (m === 'pet') questSide(true, () => toast(`${ic('pet')} Đi tới gần linh thú trong sân để kết duyên`, 5000));
+  if (m === 'loc') questSide(true, () => toast(`${ic('lotus')} Đi tới gần Ly Cafe Vàng phát sáng trong sân để nhận quà`, 5000));
+  if (m === 'pet') questSide(true, () => toast(`${ic('pet')} Đi tới gần thú cưng trong sân để làm quen`, 5000));
 }
 function openSheet(kind, initial) {
   if (kind === 'shop' && S.meta.shopOff) { toast('Cửa hàng đang tạm đóng'); return; }
@@ -2535,10 +2535,10 @@ function openSheet(kind, initial) {
   show('offerMenu', false);
   const u = () => S.profile.user;
   if (kind === 'quests') {
-    // Chùa này: gộp việc riêng của chùa đang ở với việc hằng ngày, hằng tuần làm được ngay tại đây; việc chưa xong lên trước
+    // Quán này: gộp việc riêng của quán đang ở với việc hằng ngày, hằng tuần làm được ngay tại đây; việc chưa xong lên trước
     const atTemple = (q) => { const [m, arg] = q.metric.split(':'); return arg ? arg === S.temple?.id && m !== 'route' : q.period !== 'achievement' && !!QUEST_SEAT[m] || ['incense', 'bell', 'loc', 'pet', 'sweep', 'plant'].includes(m) && q.period !== 'achievement'; };
     const inTab = (q, tab) => (tab === 'here' ? atTemple(q) : q.period === tab);
-    sheet('Nhiệm vụ', [['here', 'Chùa này'], ['daily', 'Hằng ngày'], ['weekly', 'Hằng tuần'], ['achievement', 'Thành tựu']], (el, tab) => {
+    sheet('Nhiệm vụ', [['here', 'Quán này'], ['daily', 'Hằng ngày'], ['weekly', 'Hằng tuần'], ['achievement', 'Thành tựu']], (el, tab) => {
       const rank = (q) => (q.done && !q.claimed ? 0 : q.claimed ? 2 : 1);
       const qs = S.profile.quests.filter((q) => inTab(q, tab)).sort((a, b) => (tab === 'here' ? rank(a) - rank(b) : 0));
       const gifts = S.profile.quests.filter((q) => q.done && !q.claimed);
@@ -2573,11 +2573,11 @@ function openSheet(kind, initial) {
   }
 
   if (kind === 'bag') {
-    sheet('Túi đồ', [['consumable', 'Lễ vật'], ['plant', 'Cây Phật'], ['robe', 'Áo tràng'], ['beads', 'Tràng hạt'], ['cushion', 'Bồ đoàn'], ['hat', 'Mũ'], ['staff', 'Pháp khí'], ['cloud', 'Mây'], ['pet', 'Linh thú']], (el, tab) => {
+    sheet('Túi đồ', [['consumable', 'Đồ uống & Bánh'], ['plant', 'Cây xanh'], ['robe', 'Trang phục'], ['beads', 'Phin & Dụng cụ'], ['cushion', 'Ghế ngồi'], ['hat', 'Mũ & Tai nghe'], ['staff', 'Phụ kiện cầm tay'], ['cloud', 'Hiệu ứng'], ['pet', 'Thú cưng']], (el, tab) => {
       if (tab === 'pet') return renderPetBook(el);
       if (tab === 'plant') {
         const own = S.meta.items.filter((i) => (i.type === 'plant' || i.type === 'fruit') && qty(i.id) > 0);
-        el.innerHTML = own.map((it) => `<div class="card">${itemIcon(it)}<div class="body"><b>${esc(it.name)}</b> <small>×${qty(it.id)}</small><p>${esc(it.description)}</p></div></div>`).join('') + '<p class="muted" style="padding:10px 2px">Ra sân chùa, bấm Công quả rồi chọn Vườn Phật để trồng cây, hái quả và đổi Ngọc.</p>';
+        el.innerHTML = own.map((it) => `<div class="card">${itemIcon(it)}<div class="body"><b>${esc(it.name)}</b> <small>×${qty(it.id)}</small><p>${esc(it.description)}</p></div></div>`).join('') + '<p class="muted" style="padding:10px 2px">Ra sân vườn Katinat, bấm Chăm vườn rồi chọn Vườn Cây để trồng cây, hái quả và đổi Đá Lạnh.</p>';
         return;
       }
       const list = S.meta.items.filter((i) => i.type === tab && (tab === 'consumable' ? qty(i.id) > 0 : owns(i.id)));
@@ -2600,7 +2600,7 @@ function openSheet(kind, initial) {
   }
 
   if (kind === 'shop') {
-    sheet('Cửa hàng', [['consumable', 'Lễ vật'], ['plant', 'Cây Phật'], ['robe', 'Áo tràng'], ['beads', 'Tràng hạt'], ['cushion', 'Bồ đoàn'], ['hat', 'Mũ'], ['staff', 'Pháp khí'], ['cloud', 'Mây'], ['pet', 'Linh thú'], ['ngoc', '<svg class="i"><use href="#i-ngoc"/></svg> Nạp Ngọc']], (el, tab) => {
+    sheet('Cửa hàng Katinat', [['consumable', 'Đồ uống & Bánh'], ['plant', 'Cây xanh'], ['robe', 'Trang phục'], ['beads', 'Phin & Dụng cụ'], ['cushion', 'Ghế ngồi'], ['hat', 'Mũ & Tai nghe'], ['staff', 'Phụ kiện'], ['cloud', 'Hiệu ứng'], ['pet', 'Thú cưng'], ['ngoc', '<svg class="i"><use href="#i-ngoc"/></svg> Nạp Đá Lạnh']], (el, tab) => {
       if (tab === 'ngoc') {
         el.innerHTML = `<p class="muted" style="margin-bottom:10px">Ngọc chỉ dùng mua đồ trang trí, <b>không</b> mua được công đức hay thứ hạng.${S.meta.paymentMode === 'mock' ? ' <br><svg class="i"><use href="#i-warn"/></svg> Đang ở chế độ thanh toán thử nghiệm.' : ' Thanh toán bằng chuyển khoản ngân hàng (quét mã QR), Ngọc tự cộng sau vài giây.'}</p>` +
           S.meta.packages.map((p) => `<div class="card${p.hot ? ' pack-hot' : ''}">${p.hot ? `<em class="pack-rib">${p.hot}</em>` : ''}<span class="ic"><svg class="i"><use href="#i-ngoc"/></svg></span><div class="body"><b>${p.label}</b> ${p.tag ? `<span class="tag gold">${p.tag}</span>` : ''}<p>${fmt(p.vnd)} đ</p></div>
@@ -2663,7 +2663,7 @@ function openSheet(kind, initial) {
 
   if (kind === 'rank') {
     const f = { period: 'week', sect: '', temple: '' };
-    sheet('Bảng xếp hạng tinh tấn', [['week', 'Tuần này'], ['month', 'Tháng này'], ['all', 'Tất cả']], async (el, tab, refresh) => {
+    sheet('Bảng Xếp Hạng Katinat', [['week', 'Tuần này'], ['month', 'Tháng này'], ['all', 'Tất cả']], async (el, tab, refresh) => {
       if (refresh) return;
       f.period = tab;
       const draw = async () => {
@@ -2674,14 +2674,14 @@ function openSheet(kind, initial) {
         const medal = (i) => (i <= 3 ? `<i class="medal m${i}">${i}</i>` : i);
         el.innerHTML = `
           <div class="filters">
-            <select id="fSect"><option value="">Mọi thiền phái</option>${Object.values(S.meta.sects).map((s) => `<option value="${s.id}" ${f.sect === s.id ? 'selected' : ''}>${s.name}</option>`).join('')}</select>
-            <select id="fTemple"><option value="">Mọi ngôi chùa</option>${S.meta.temples.map((t) => `<option value="${t.id}" ${f.temple === t.id ? 'selected' : ''}>${esc(t.name)}</option>`).join('')}</select>
+            <select id="fSect"><option value="">Mọi Gu Thưởng Thức</option>${Object.values(S.meta.sects).map((s) => `<option value="${s.id}" ${f.sect === s.id ? 'selected' : ''}>${s.name}</option>`).join('')}</select>
+            <select id="fTemple"><option value="">Mọi chi nhánh Katinat</option>${S.meta.temples.map((t) => `<option value="${t.id}" ${f.temple === t.id ? 'selected' : ''}>${esc(t.name)}</option>`).join('')}</select>
           </div>
-          ${!f.sect && d.sects.length ? `<div class="region">Thiền phái tinh tấn</div><div class="sect-bars">${d.sects.map((s) => `<div class="sect-bar"><span>${sectOf(s.sect).icon} ${sectOf(s.sect).name}</span><div class="bar"><i style="width:${(s.score / max) * 100}%;background:${sectOf(s.sect).color}"></i></div><span>${fmt(s.score)}</span></div>`).join('')}</div>` : ''}
-          <div class="region">Phật tử tinh tấn</div>
+          ${!f.sect && d.sects.length ? `<div class="region">Gu Thưởng Thức Nổi Bật</div><div class="sect-bars">${d.sects.map((s) => `<div class="sect-bar"><span>${sectOf(s.sect).icon} ${sectOf(s.sect).name}</span><div class="bar"><i style="width:${(s.score / max) * 100}%;background:${sectOf(s.sect).color}"></i></div><span>${fmt(s.score)}</span></div>`).join('')}</div>` : ''}
+          <div class="region">Khách Quen Nổi Bật</div>
           ${d.rows.length ? `<div class="podium">${[1, 0, 2].map((k) => { const r = d.rows[k]; if (!r) return '<div></div>'; return `<div class="pl p${k + 1}">${k === 0 ? `<svg class="crown"><use href="#i-trophy"/></svg>` : ''}${avaHtml(r)}<b>${esc(r.name)}</b><small>${fmt(r.score)} điểm</small><div class="pstep">${k + 1}</div></div>`; }).join('')}</div>` : ''}
           ${d.rows.slice(3).map((r) => `<div class="rank-row ${r.id === u().id ? 'me' : ''}"><span class="no">${medal(r.rank)}</span>${avaHtml(r)}<span><b>${esc(r.name)}</b><small>${sectOf(r.sect).icon} ${esc(r.title)}</small>${honorChip(r)}</span><span class="sc">${fmt(r.score)}</span></div>`).join('') || (d.rows.length ? '' : '<div class="empty">Chưa có ai. Hãy là người đầu tiên!</div>')}
-          <div class="me-rank">${d.me ? `<div class="rank-row me"><span class="no">${d.me.rank}</span>${avaHtml(u())}<span><b>Bạn</b><small>Điểm tinh tấn = công đức từ hành trì</small></span><span class="sc">${fmt(d.me.score)}</span></div>` : '<p class="muted">Bạn chưa có điểm trong giai đoạn này. Lạy Phật, lần hạt, thiền định để ghi danh nhé.</p>'}</div>`;
+          <div class="me-rank">${d.me ? `<div class="rank-row me"><span class="no">${d.me.rank}</span>${avaHtml(u())}<span><b>Bạn</b><small>Điểm Vibe Chill từ hoạt động tại quán</small></span><span class="sc">${fmt(d.me.score)}</span></div>` : '<p class="muted">Bạn chưa có điểm trong giai đoạn này. Thưởng thức cafe, pha chế, học bài Focus để ghi danh nhé.</p>'}</div>`;
         $('fSect').onchange = (e) => { f.sect = e.target.value; draw(); };
         $('fTemple').onchange = (e) => { f.temple = e.target.value; draw(); };
       };
@@ -2692,14 +2692,14 @@ function openSheet(kind, initial) {
   if (kind === 'map') { openMapView(); return; }
   if (kind === 'guide') { openGuide(); return; }
   if (kind === 'temples') {
-    sheet('Hành hương', null, (el) => renderTempleList(el, { selected: S.temple?.id, pick: (id) => { closeSheet(); if (id !== S.temple.id) enterTemple(id); } }));
+    sheet('Hệ Thống Chi Nhánh Katinat', null, (el) => renderTempleList(el, { selected: S.temple?.id, pick: (id) => { closeSheet(); if (id !== S.temple.id) enterTemple(id); } }));
   }
 
   if (kind === 'community') {
     let scope = 'all';
     const ago = (t) => { const m = Math.max(1, Math.round((Date.now() - t) / 6e4)); return m < 60 ? `${m} phút trước` : m < 1440 ? `${Math.round(m / 60)} giờ trước` : `${Math.round(m / 1440)} ngày trước`; };
-    const EMO_NAMES = { pray: 'Chắp tay', sen: 'Hoa sen', wheel: 'Pháp luân', smile: 'Hoan hỷ' };
-    sheet('Cộng đồng', [['wishes', 'Đèn nguyện'], ['friends', 'Đồng tu'], ['chat', `Tin nhắn${S.dm.unread ? ` <i class="tab-dot">${S.dm.unread > 9 ? '9+' : S.dm.unread}</i>` : ''}`], ['sangha', 'Đạo tràng'], ['invite', 'Mời bạn'], ['emote', 'Biểu cảm']], async (el, tab, refresh) => {
+    const EMO_NAMES = { pray: 'Thả tim', sen: 'Cà phê', wheel: 'Âm nhạc', smile: 'Vui vẻ' };
+    sheet('Cộng đồng Katinat', [['wishes', 'Bảng Lưu Bút'], ['friends', 'Bạn Cafe'], ['chat', `Tin nhắn${S.dm.unread ? ` <i class="tab-dot">${S.dm.unread > 9 ? '9+' : S.dm.unread}</i>` : ''}`], ['sangha', 'Câu Lạc Bộ'], ['invite', 'Mời bạn'], ['emote', 'Biểu cảm']], async (el, tab, refresh) => {
       if (tab === 'wishes' && !refresh) {
         const draw = async () => {
           const list = $('cmList', el);
@@ -2869,7 +2869,7 @@ function openSheet(kind, initial) {
   }
 
   if (kind === 'profile') {
-    sheet('Hồ sơ tu tập', [['me', 'Của tôi'], ['honor', 'Danh hiệu'], ['collection', 'Bộ sưu tập'], ['account', 'Tài khoản']], (el, tab, refresh) => {
+    sheet('Hồ sơ Katinat', [['me', 'Của tôi'], ['honor', 'Danh hiệu'], ['collection', 'Bộ sưu tập'], ['account', 'Tài khoản']], (el, tab, refresh) => {
       const us = u(), st = us.stats, sect = sectOf(us.sect);
       if (tab === 'honor') { if (!refresh) renderHonorBook(el); return; }
       if (tab === 'me') {
@@ -2879,19 +2879,19 @@ function openSheet(kind, initial) {
             <div class="row-btns" style="margin:0"><button class="btn small gold" id="pAva">${ic('camera')} ${us.avatar ? 'Đổi ảnh' : 'Tải ảnh đại diện'}</button>${us.avatar ? '<button class="btn small ghost" id="pAvaDel">Gỡ ảnh</button>' : ''}</div></div></div>
           <div class="my-char">
             <div class="my-char-stage"><canvas class="tryon" id="pChar"></canvas><small>Kéo để xoay nhân vật</small></div>
-            <div class="my-char-btns"><div class="wd-tabs my-pose"><button data-pose="sit" class="on">Ngồi thiền</button><button data-pose="stand">Đứng</button></div><button class="btn small ghost" id="pCharSave">${ic('camera')} Lưu ảnh</button></div>
+            <div class="my-char-btns"><div class="wd-tabs my-pose"><button data-pose="sit" class="on">Ngồi bàn</button><button data-pose="stand">Đứng</button></div><button class="btn small ghost" id="pCharSave">${ic('camera')} Lưu ảnh</button></div>
             <div class="my-char-items">${Object.keys(GEAR_LABEL).map((t) => S.items[us.equipped?.[t]]).filter(Boolean).map((it) => `<div class="pcard-item">${itemIcon(it)}<span><small>${GEAR_LABEL[it.type]}</small>${esc(it.name)}</span></div>`).join('')}</div>
           </div>
-          <div class="card"><div class="body"><div class="bar"><i style="width:${us.expNext ? (us.exp / us.expNext) * 100 : 100}%"></i></div><div class="rw">${fmt(us.exp)} / ${fmt(us.expNext)} công đức đến cấp tiếp theo</div></div></div>
+          <div class="card"><div class="body"><div class="bar"><i style="width:${us.expNext ? (us.exp / us.expNext) * 100 : 100}%"></i></div><div class="rw">${fmt(us.exp)} / ${fmt(us.expNext)} Vibe Chill đến cấp tiếp theo</div></div></div>
           <div class="stat-grid">
-            <div class="stat"><b>${fmt(st.bows)}</b><small><svg class="i"><use href="#i-bow"/></svg> Lạy Phật</small></div>
-            <div class="stat"><b>${fmt(st.rounds)}</b><small><svg class="i"><use href="#i-beads"/></svg> Chuỗi tràng hạt (${fmt(st.beads)} hạt)</small></div>
-            <div class="stat"><b>${fmt(st.meditateMin)}</b><small><svg class="i"><use href="#i-meditate"/></svg> Phút thiền</small></div>
+            <div class="stat"><b>${fmt(st.bows)}</b><small><svg class="i"><use href="#i-bow"/></svg> Ly Cafe đã uống</small></div>
+            <div class="stat"><b>${fmt(st.rounds)}</b><small><svg class="i"><use href="#i-beads"/></svg> Mẻ Pha Chế (${fmt(st.beads)} giọt)</small></div>
+            <div class="stat"><b>${fmt(st.meditateMin)}</b><small><svg class="i"><use href="#i-meditate"/></svg> Phút Học Bài Focus</small></div>
             <div class="stat"><b>${fmt(us.streak)} <svg class="i"><use href="#i-fire"/></svg></b><small>Ngày liên tiếp (kỷ lục ${fmt(us.bestStreak)})</small></div>
-            <div class="stat"><b>${S.profile.visited.length}/${S.meta.temples.length}</b><small><svg class="i"><use href="#i-temple"/></svg> Chùa đã viếng</small></div>
+            <div class="stat"><b>${S.profile.visited.length}/${S.meta.temples.length}</b><small><svg class="i"><use href="#i-temple"/></svg> Quán đã ghé</small></div>
             <div class="stat"><b>${fmt(days)}</b><small>Ngày đồng hành</small></div>
           </div>
-          <div class="row-btns"><button class="btn gold" id="pShare"><svg class="i"><use href="#i-spark"/></svg> Khoe thành tích</button><button class="btn gold hidden" id="pLegend">${ic('spark')} Khoe duyên lành</button><button class="btn ghost" id="pEdit">Sửa nhân vật</button><button class="btn ghost" id="pSect">Đổi phái (200 <svg class="i"><use href="#i-ngoc"/></svg>)</button></div>`;
+          <div class="row-btns"><button class="btn gold" id="pShare"><svg class="i"><use href="#i-spark"/></svg> Khoe thành tích</button><button class="btn gold hidden" id="pLegend">${ic('spark')} Khoe danh hiệu</button><button class="btn ghost" id="pEdit">Sửa nhân vật</button><button class="btn ghost" id="pSect">Đổi Gu (200 <svg class="i"><use href="#i-ngoc"/></svg>)</button></div>`;
         $('pShare').onclick = () => { closeSheet(); openShare(); };
         api('/legend/mine').then(({ award }) => { const b = $('pLegend'); if (!award || !b) return; show(b); b.onclick = () => { closeSheet(); shareLegend(award); }; }).catch(() => {});
         const worn = (t) => S.items[us.equipped?.[t]]?.data;
@@ -2975,27 +2975,27 @@ function openSheet(kind, initial) {
   }
 
   if (kind === 'settings') {
-    sheet('Cài đặt', null, (el) => {
+    sheet('Cài đặt Âm Thanh & Đồ Hoạ', null, (el) => {
       el.innerHTML = `
         ${canInstall() ? `<button class="btn gold" id="oInstall" style="width:100%;margin-bottom:8px">${ic('upload')} Cài ứng dụng lên màn hình chính</button>` : isStandalone() ? `<p class="muted" style="font-size:12px;margin-bottom:6px">${ic('check')} Đang chạy dạng ứng dụng</p>` : ''}
         <div class="setting-links"><button class="btn ghost small" id="oHelp">Cách chơi</button><button class="btn ghost small" id="oShare">${ic('share')} Chia sẻ</button></div>
-        <label class="setting"><svg class="i"><use href="#i-bell"/></svg> Âm thanh <input type="checkbox" id="oSound" ${Sound.enabled ? 'checked' : ''}></label>
-        <label class="setting"><svg class="i"><use href="#i-drum"/></svg> Tiếng mõ niệm Phật nền <input type="checkbox" id="oChant" ${Sound.chanting ? 'checked' : ''}></label>
-        <label class="setting"><svg class="i"><use href="#i-sound"/></svg> Tiếng niệm “Nam mô A Di Đà Phật” của đại chúng <input type="checkbox" id="oVoice" ${Sound.voice ? 'checked' : ''}></label>
-        <label class="setting">🦶 Chơi chan với mọi người <input type="checkbox" id="oChan" ${S.profile.user.noChan ? '' : 'checked'}></label>
-        <label class="setting"><svg class="i"><use href="#i-sound"/></svg> Nhạc nền riêng của từng chùa <input type="checkbox" id="oMusic" ${Sound.musicOn ? 'checked' : ''}></label>
+        <label class="setting"><svg class="i"><use href="#i-bell"/></svg> Bật toàn bộ âm thanh <input type="checkbox" id="oSound" ${Sound.enabled ? 'checked' : ''}></label>
+        <label class="setting"><svg class="i"><use href="#i-drum"/></svg> Nhịp Beat Lofi & Piano nền <input type="checkbox" id="oChant" ${Sound.chanting ? 'checked' : ''}></label>
+        <label class="setting"><svg class="i"><use href="#i-sound"/></svg> Âm thanh không gian quán & tiếng mưa <input type="checkbox" id="oVoice" ${Sound.voice ? 'checked' : ''}></label>
+        <label class="setting">✨ Tương tác vui với mọi người <input type="checkbox" id="oChan" ${S.profile.user.noChan ? '' : 'checked'}></label>
+        <label class="setting"><svg class="i"><use href="#i-sound"/></svg> Nhạc Lofi Jazz & Bossa Nova riêng từng quán <input type="checkbox" id="oMusic" ${Sound.musicOn ? 'checked' : ''}></label>
         <div class="vol-box">
-          ${[['master', 'sound', 'Âm lượng tổng'], ['music', 'sound', 'Nhạc nền chùa'], ['rhythm', 'drum', 'Mõ & chuông'], ['voice', 'pray', 'Tiếng niệm đại chúng'], ['sfx', 'bell', 'Hiệu ứng (chuông dâng lễ, lần hạt)']].map(([k, icn, label]) => `
+          ${[['master', 'sound', 'Âm lượng tổng'], ['music', 'sound', 'Nhạc Lofi & Jazz nền'], ['rhythm', 'drum', 'Nhịp Piano & Guitar'], ['voice', 'pray', 'Không gian Quán'], ['sfx', 'bell', 'Hiệu ứng (pha chế, nâng ly)']].map(([k, icn, label]) => `
           <label class="setting vol">${ic(icn)} <span>${label}</span><input type="range" min="0" max="100" data-vol="${k}" value="${Math.round(Sound.vol[k] * 100)}"><b>${Math.round(Sound.vol[k] * 100)}</b></label>`).join('')}
         </div>
-        <label class="setting">Nhịp mõ <input type="range" id="oTempo" min="50" max="120" value="${Sound.tempo}"><span id="oTempoV">${Sound.tempo}</span></label>
+        <label class="setting">Nhịp Beat Lofi (BPM) <input type="range" id="oTempo" min="50" max="120" value="${Sound.tempo}"><span id="oTempoV">${Sound.tempo}</span></label>
         <label class="setting"><svg class="i"><use href="#i-palette"/></svg> Đồ hoạ <select id="oQ"><option value="high" ${S.world.quality === 'high' ? 'selected' : ''}>Đẹp</option><option value="low" ${S.world.quality === 'low' ? 'selected' : ''}>Mượt (máy yếu)</option></select></label>
-        <label class="setting"><svg class="i"><use href="#i-tag"/></svg> Hiện tên người khác <input type="checkbox" id="oNames" ${S.world.showNames ? 'checked' : ''}></label>
+        <label class="setting"><svg class="i"><use href="#i-tag"/></svg> Hiện tên khách khác <input type="checkbox" id="oNames" ${S.world.showNames ? 'checked' : ''}></label>
         ${fsSupported() ? `<label class="setting">${ic('expand')} Toàn màn hình (nên dùng khi xoay ngang) <input type="checkbox" id="oFull" ${fsActive() ? 'checked' : ''}></label>` : '<p class="muted" style="font-size:12px;margin:6px 0">Mẹo: trên iPhone, bấm Chia sẻ → “Thêm vào MH chính” để chơi toàn màn hình, xoay ngang thoải mái.</p>'}
-        <label class="setting"><svg class="i"><use href="#i-child"/></svg> Hiện chú tiểu NPC (không tính vào số online) <input type="checkbox" id="oNpc" ${S.world.showNpc ? 'checked' : ''}></label>
+        <label class="setting"><svg class="i"><use href="#i-child"/></svg> Hiện khách NPC trong quán (không tính vào số online) <input type="checkbox" id="oNpc" ${S.world.showNpc ? 'checked' : ''}></label>
         <button class="btn ghost wide" id="oSupport" style="margin-top:8px">${ic('heart')} Góp ý & ủng hộ đội ngũ phát triển</button>
         <a class="btn ghost wide" href="/chinh-sach.html" target="_blank" rel="noopener" style="margin-top:8px">${ic('book')} Điều khoản & Chính sách</a>
-        <p class="muted" style="margin-top:8px">Phím tắt máy tính: W A S D đi lại · B lạy · T tràng hạt · E ngồi/đứng</p>`;
+        <p class="muted" style="margin-top:8px">Phím tắt máy tính: W A S D đi lại · B uống cafe · T pha chế · E ngồi/đứng</p>`;
       el.querySelector('#oHelp').onclick = () => { closeSheet(); openHelp(); };
       el.querySelector('#oShare').onclick = () => { closeSheet(); openShare(); };
       $('oSound').onchange = (e) => Sound.setEnabled(e.target.checked);
@@ -3436,12 +3436,12 @@ function showUpdate() {
 // tab ẩn / tắt màn hình: báo máy chủ tạm ngừng gửi vị trí người khác (tiết kiệm băng thông, pin)
 document.addEventListener('visibilitychange', () => sendWs({ t: 'vis', h: document.hidden }));
 
-/* ---------- Lộc chùa: hoa sen vàng quanh khuôn viên, đi tới gần để nhận vật phẩm / lời chúc ---------- */
+/* ---------- Quà Katinat: Ly Cafe Vàng quanh khuôn viên, đi tới gần để nhận vật phẩm / lời chúc ---------- */
 function loadLoc(templeId) {
   api(`/loc?temple=${encodeURIComponent(templeId)}`).then((r) => {
     if (S.temple?.id !== templeId) return;
     S.world?.setLoc(r.spawns || []);
-    if (r.spawns?.length) setTimeout(() => toast(`${ic('lotus')} Quanh khuôn viên chùa có hoa sen vàng phát sáng. Ra sân, đi tới gần để nhận lộc hoặc lời chúc!`, 6000), 4000);
+    if (r.spawns?.length) setTimeout(() => toast(`☕ Quanh khuôn viên quán có Ly Cafe Vàng Katinat phát sáng. Ra sân, đi tới gần để nhận quà hoặc lời chúc!`, 6000), 4000);
   }).catch(() => {});
 }
 let locBusy = false;
@@ -3453,11 +3453,11 @@ async function claimLocTap(id) {
     S.world?.removeLoc(id);
     handleResult(r);
     Sound.chime?.();
-    modal(`<div class="big">${ic('lotus')}</div><h3>Bạn vừa nhận được lộc chùa</h3>
+    modal(`<div class="big">☕</div><h3>Bạn vừa nhận được Quà Katinat</h3>
       <p class="loc-blessing">“${esc(r.blessing)}”</p>
-      <p>Quà: <b>${esc(r.label === 'lời chúc' ? '10 Sen kèm lời chúc' : r.label)}</b></p>
-      <p class="muted" style="font-size:13px">Hôm nay bạn còn nhận được ${r.left} lộc nữa. Hoa sen vàng sẽ hiện ở chỗ khác sau ít phút.</p>
-      <button class="btn gold" id="mOk">Nam mô A Di Đà Phật</button>`, (el) => { el.querySelector('#mOk').onclick = () => closeModal(); });
+      <p>Quà: <b>${esc(r.label === 'lời chúc' ? '10 Hạt Cafe kèm lời chúc' : r.label)}</b></p>
+      <p class="muted" style="font-size:13px">Hôm nay bạn còn nhận được ${r.left} phần quà nữa. Ly Cafe Vàng sẽ hiện ở chỗ khác sau ít phút.</p>
+      <button class="btn gold" id="mOk">Cảm ơn Katinat ☕</button>`, (el) => { el.querySelector('#mOk').onclick = () => closeModal(); });
   } catch (e) {
     if (/đã có người/.test(e.message)) S.world?.removeLoc(id);
     // vị trí chưa kịp báo lên máy chủ: 4 giây sau tự thử lại, không cần nhắc
@@ -3470,10 +3470,10 @@ const LEGEND_ART = { gong: '🐎', son: '⛰️', thuy: '🌊', lac: '🐉', auc
 function showNews() {
   if (S.meta.shopOff || local.get('news') === 'linhthu-ngoc' || !local.get('coached') || S.view !== 'hall') return;
   local.set('news', 'linhthu-ngoc');
-  modal(`<div class="news-card"><span class="news-tag">Mới trên Niệm Phật Online</span><h3>Có gì mới trên chùa?</h3>
-    <div class="news-item"><span class="ico">🦌</span><b>Linh thú đồng hành</b><p>Ra sân chùa kết duyên miễn phí mỗi ngày, hoặc mua bằng Ngọc trong Cửa hàng.</p><button class="btn gold" id="newsPet">Xem Sổ linh thú</button></div>
-    <div class="news-item"><span class="ico">${ic('wheel')}</span><b>Vòng quay lộc</b><p>Mỗi ngày 1 lượt quay miễn phí, có cơ hội nhận đồ quý.</p><button class="btn gold" id="newsWheel">Quay ngay</button></div>
-    <div class="news-support"><b>${ic('spark')} Chung tay cùng đội ngũ phát triển</b><p>Mua linh thú bằng Ngọc là cách đạo hữu ủng hộ đội ngũ duy trì và phát triển Niệm Phật Online. Hoàn toàn tự nguyện, không mua linh thú vẫn tu tập và kết duyên bình thường.</p><button class="btn gold" id="newsBuy">Xem linh thú trong Cửa hàng</button></div>
+  modal(`<div class="news-card"><span class="news-tag">Mới trên Katinat Coffee 3D</span><h3>Có gì mới tại quán?</h3>
+    <div class="news-item"><span class="ico">🐶</span><b>Thú cưng đồng hành</b><p>Ra sân vườn Katinat làm quen miễn phí mỗi ngày, hoặc nhận nuôi bằng Đá Lạnh trong Cửa hàng.</p><button class="btn gold" id="newsPet">Xem Sổ Thú Cưng</button></div>
+    <div class="news-item"><span class="ico">${ic('wheel')}</span><b>Vòng Quay May Mắn</b><p>Mỗi ngày 1 lượt quay miễn phí, có cơ hội nhận đồ uống và phụ kiện quý.</p><button class="btn gold" id="newsWheel">Quay ngay</button></div>
+    <div class="news-support"><b>${ic('spark')} Chung tay cùng đội ngũ phát triển</b><p>Nhận nuôi thú cưng bằng Đá Lạnh là cách bạn ủng hộ đội ngũ duy trì và phát triển Katinat Coffee 3D Online.</p><button class="btn gold" id="newsBuy">Xem thú cưng trong Cửa hàng</button></div>
     <button class="news-later" id="newsLater">Để sau</button></div>`, () => {
     $('newsPet').onclick = () => { closeModal(); openSheet('bag', 'pet'); };
     $('newsWheel').onclick = () => { closeModal(); openWheel(); };
@@ -3674,47 +3674,43 @@ async function sendMo() {
     if (tap) {
       const r = await post('/practice', { type: 'mo', count: tap, lite: true, temple: S.temple.id });
       handleResult(r, { silent: true });
-      $('chantGain').textContent = r.extra?.capped ? 'Hôm nay đã đủ công đức gõ mõ' : `+${r.gained} công đức`;
+      $('chantGain').textContent = r.extra?.capped ? 'Hôm nay đã đủ điểm nghe nhạc' : `+${r.gained} Vibe Chill`;
     }
   } catch (e) { if (e.status !== 429) toast(e.message); } finally { chant.sending = false; }
 }
-setInterval(sendMo, 10000); // gom tiếng mõ cho nhẹ máy chủ; rời buổi tụng hoặc tụng xong thì gửi nốt ngay
+setInterval(sendMo, 10000);
 async function finishChant() {
   const k = chant.kinh;
   chant.i = 0; chant.say = null; markChant();
   Sound.bigBell();
   petalShower(24);
   try {
-    // gửi nốt tiếng mõ còn lại rồi mới báo tụng xong
     while (chant.sending) await new Promise((r) => setTimeout(r, 100));
     await sendMo();
     while (chant.sending) await new Promise((r) => setTimeout(r, 100));
     const r = await post('/practice', { type: 'chant_done', sutra: k.id, temple: S.temple.id });
     handleResult(r, { silent: true });
-    toast(`${ic('lotus')} Đã tụng trọn ${esc(k.name)}${r.gained ? `: +${r.gained} công đức` : ''}. Nam mô A Di Đà Phật.`, 4500);
-  } catch (e) { toast(e.status === 429 ? `Đã tụng trọn ${esc(k.name)}. Nam mô A Di Đà Phật.` : e.message); }
+    toast(`🎶 Đã nghe trọn bản nhạc ${esc(k.name)}${r.gained ? `: +${r.gained} Vibe Chill` : ''}. Cực chill! ☕`, 4500);
+  } catch (e) { toast(e.status === 429 ? `🎶 Đã nghe trọn bản nhạc ${esc(k.name)}.` : e.message); }
 }
 function setChantAuto() {
   clearTimeout(chant.timer); chant.timer = null;
   const id = ++chant.autoId;
   if (!$('chantAuto').checked) return;
   const beat = () => 60000 / +$('chantTempo').value;
-  // nhịp là nhịp tối đa: câu dài thì đợi đọc xong mới gõ tiếng sau
   const step = async () => {
     const ms = (await hitMo(true)) || 0;
-    // hết bài thì để tiếng chuông ngân xong rồi mới tụng lại từ đầu
     if (id === chant.autoId) chant.timer = setTimeout(step, Math.max(beat(), ms ? ms + 250 : 0) + (chant.finishing ? 4000 : 0));
   };
   chant.timer = setTimeout(step, beat());
 }
-// Tụng ngay trên bồ đoàn: cảnh chùa vẫn chạy, chỉ có bảng kinh và mõ ở dưới màn hình
+// Nghe nhạc Lofi ngay tại bàn: cảnh quán vẫn chạy, mâm đĩa than Vinyl ở dưới màn hình
 $('btnChant').onclick = () => {
   stopBowing(true);
   if (!S.world.seated && !S.world.sit()) {
-    // chưa ngồi: tự đi tới bồ đoàn trống gần nhất, ngồi xuống rồi mới vào tụng
-    if (!S.world.walkToSeat()) { toast('Hãy vào chánh điện, ngồi lên bồ đoàn để tụng kinh'); return; }
+    if (!S.world.walkToSeat()) { toast('Hãy vào trong quán, ngồi vào bàn để bật Đĩa Than Lofi'); return; }
     chant.waitSeat = Date.now() + 20000;
-    toast(`${ic('cushion')} Đang đến bồ đoàn…`);
+    toast(`${ic('cushion')} Đang đến bàn trống…`);
     return;
   }
   chant.waitSeat = 0;

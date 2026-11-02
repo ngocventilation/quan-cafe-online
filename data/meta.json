@@ -78,11 +78,11 @@
   "temples": [
     {
       "id": "nhattru",
-      "name": "Tiệm Cà Phê Phố Cổ",
+      "name": "Katinat Hồ Gươm Flagship",
       "region": "Bắc",
       "place": "Hoàn Kiếm, Hà Nội",
-      "inspired": "Cà Phê Phố Cổ & Hồ Gươm",
-      "description": "Không gian gỗ trầm ấm áp giữa lòng Hà Nội, ban công nhìn xuống mặt hồ phẳng lặng và hương cà phê trứng thơm lừng.",
+      "inspired": "Katinat Saigon Kafe · Hồ Gươm",
+      "description": "Không gian Katinat xanh cổ vịt & vàng đồng sang trọng ngay góc phố cổ Hà Nội, ban công nhìn xuống mặt hồ phẳng lặng.",
       "theme": {
         "size": [
           28,
@@ -90,8 +90,8 @@
           9
         ],
         "wall": "wood",
-        "wallColor": "#5a3220",
-        "pillar": "#7a2a18",
+        "wallColor": "#f4efe6",
+        "pillar": "#143949",
         "floor": "wood",
         "view": "pond",
         "windowsAllSides": true,
@@ -136,7 +136,7 @@
     },
     {
       "id": "tranho",
-      "name": "Cà Phê Hoàng Hôn Hồ Tây",
+      "name": "Katinat Cà Phê Hoàng Hôn Hồ Tây",
       "region": "Bắc",
       "place": "Tây Hồ, Hà Nội",
       "inspired": "Santorini & Sunset Hồ Tây",
@@ -148,8 +148,8 @@
           10.3
         ],
         "wall": "wood",
-        "wallColor": "#6a3a22",
-        "pillar": "#6b2414",
+        "wallColor": "#f4efe6",
+        "pillar": "#143949",
         "floor": "wood",
         "view": "lake",
         "mural": {
@@ -198,7 +198,7 @@
     },
     {
       "id": "huongson",
-      "name": "Tiệm Cafe Hang Đá Rêu Phong",
+      "name": "Katinat Tiệm Cafe Hang Đá Rêu Phong",
       "region": "Bắc",
       "place": "Ninh Bình – Hương Sơn",
       "inspired": "Cave Specialty Coffee",
@@ -270,7 +270,7 @@
     },
     {
       "id": "dinhmay",
-      "name": "Cloud Cafe Đỉnh Mây",
+      "name": "Katinat Cloud Cafe Đỉnh Mây",
       "region": "Bắc",
       "place": "Uông Bí, Quảng Ninh",
       "inspired": "Săn Mây Yên Tử",
@@ -282,8 +282,8 @@
           9.6
         ],
         "wall": "bronze",
-        "wallColor": "#7a5a2e",
-        "pillar": "#8a6a34",
+        "wallColor": "#f4efe6",
+        "pillar": "#143949",
         "floor": "stone",
         "view": "clouds",
         "mural": null,
@@ -327,7 +327,7 @@
     },
     {
       "id": "baison",
-      "name": "Đại Sảnh Roastery Bái Sơn",
+      "name": "Katinat Đại Sảnh Roastery Bái Sơn",
       "region": "Bắc",
       "place": "Gia Viễn, Ninh Bình",
       "inspired": "Reserve Roastery & Lounge",
@@ -339,8 +339,8 @@
           13.8
         ],
         "wall": "wood",
-        "wallColor": "#5a2e1a",
-        "pillar": "#5e2010",
+        "wallColor": "#f4efe6",
+        "pillar": "#143949",
         "floor": "wood",
         "view": "mountain",
         "mural": {
@@ -403,7 +403,7 @@
     },
     {
       "id": "thienmau",
-      "name": "Cà Phê Bên Dòng Sông Hương",
+      "name": "Katinat Cà Phê Bên Dòng Sông Hương",
       "region": "Trung",
       "place": "Kim Long, TP. Huế",
       "inspired": "Tiệm Trà & Cà Phê Cố Đô",
@@ -415,8 +415,8 @@
           10.3
         ],
         "wall": "lacquer",
-        "wallColor": "#8a1e14",
-        "pillar": "#a3261a",
+        "wallColor": "#f4efe6",
+        "pillar": "#143949",
         "floor": "tile",
         "view": "river",
         "mural": {
@@ -465,7 +465,7 @@
     },
     {
       "id": "vinhan",
-      "name": "Sài Gòn Acoustic Lounge",
+      "name": "Katinat Sài Gòn Acoustic Lounge",
       "region": "Nam",
       "place": "Quận 1, TP. Hồ Chí Minh",
       "inspired": "Rooftop & Acoustic Sài Gòn",
@@ -477,8 +477,8 @@
           11.5
         ],
         "wall": "plaster",
-        "wallColor": "#e8dcc4",
-        "pillar": "#a8503a",
+        "wallColor": "#f4efe6",
+        "pillar": "#143949",
         "floor": "stone",
         "view": "palm",
         "mural": {
@@ -527,7 +527,7 @@
     },
     {
       "id": "doivang",
-      "name": "Tiệm Cà Phê Vườn Nhiệt Đới",
+      "name": "Katinat Vườn Nhiệt Đới",
       "region": "Nam",
       "place": "Sóc Trăng – Miền Tây",
       "inspired": "Tropical Garden Oasis",
@@ -539,8 +539,8 @@
           11.5
         ],
         "wall": "khmer",
-        "wallColor": "#e8a23a",
-        "pillar": "#f0c050",
+        "wallColor": "#f4efe6",
+        "pillar": "#143949",
         "floor": "tile",
         "view": "garden",
         "mural": {
@@ -587,7 +587,7 @@
     },
     {
       "id": "linhson",
-      "name": "Panorama Cafe Đỉnh Núi Bà",
+      "name": "Katinat Panorama Cafe Đỉnh Núi Bà",
       "region": "Nam",
       "place": "Tây Ninh",
       "inspired": "Cloud View Bistro Tây Ninh",
@@ -599,8 +599,8 @@
           10.8
         ],
         "wall": "plaster",
-        "wallColor": "#e9c46a",
-        "pillar": "#a3261a",
+        "wallColor": "#f4efe6",
+        "pillar": "#143949",
         "floor": "tile",
         "view": "baden",
         "hallStyle": {
@@ -664,11 +664,11 @@
     },
     {
       "id": "lamkinh",
-      "name": "Tiệm Cà Phê Gỗ Lam Kinh",
+      "name": "Katinat Lam Kinh Roastery",
       "region": "Trung",
       "place": "Thọ Xuân, Thanh Hoá",
-      "inspired": "Heritage Wood Cafe",
-      "description": "Kiến trúc gỗ lim cổ điển kết hợp ánh đèn vàng ấm, góc học bài và đọc sách cực kỳ tĩnh lặng.",
+      "inspired": "Katinat Specialty Roastery",
+      "description": "Không gian rang xay hạt Arabica thượng hạng kết hợp thiết kế Katinat tân cổ điển ấm cúng.",
       "theme": {
         "size": [
           36,
@@ -676,8 +676,8 @@
           12.6
         ],
         "wall": "lacquer",
-        "wallColor": "#7a1c10",
-        "pillar": "#8a2014",
+        "wallColor": "#f4efe6",
+        "pillar": "#143949",
         "floor": "tile",
         "view": "citadel",
         "hallStyle": {
@@ -733,11 +733,11 @@
     },
     {
       "id": "kimson",
-      "name": "Fansipan Cloud Roastery",
+      "name": "Katinat Sapa CloudView",
       "region": "Bắc",
-      "place": "Đỉnh Fansipan, Sa Pa, Lào Cai",
-      "inspired": "Cafe Trên Mây Sa Pa",
-      "description": "Tiệm cà phê sương mù trên nóc nhà Đông Dương, nhâm nhi Cacao nóng và Cà phê Arabica giữa biển mây.",
+      "place": "Sa Pa, Lào Cai",
+      "inspired": "Katinat Fansipan Peak",
+      "description": "Thưởng thức Cacao nóng và Trà Sữa Chôm Chôm Katinat giữa biển mây bồng bềnh vùng Tây Bắc.",
       "theme": {
         "size": [
           30,
@@ -745,8 +745,8 @@
           10
         ],
         "wall": "wood",
-        "wallColor": "#6a4428",
-        "pillar": "#6e2a18",
+        "wallColor": "#f4efe6",
+        "pillar": "#143949",
         "floor": "wood",
         "view": "fansipan",
         "hallStyle": {
@@ -811,11 +811,11 @@
     },
     {
       "id": "linhung",
-      "name": "Seaview Cafe Bán Đảo Sơn Trà",
+      "name": "Katinat Bán Đảo Sơn Trà",
       "region": "Trung",
-      "place": "Bãi Bụt, Sơn Trà, Đà Nẵng",
-      "inspired": "Ocean Breeze Cafe Đà Nẵng",
-      "description": "Quán cà phê hướng biển tuyệt đẹp trên bán đảo Sơn Trà, nghe tiếng sóng vỗ và ngắm vịnh Đà Nẵng.",
+      "place": "Sơn Trà, Đà Nẵng",
+      "inspired": "Katinat Ocean Breeze",
+      "description": "Chi nhánh Katinat hướng biển tuyệt đẹp tại Đà Nẵng, đón gió biển mát rượi và tiếng sóng vỗ.",
       "theme": {
         "size": [
           30,
@@ -823,8 +823,8 @@
           10
         ],
         "wall": "plaster",
-        "wallColor": "#ecd9a8",
-        "pillar": "#a3261a",
+        "wallColor": "#f4efe6",
+        "pillar": "#143949",
         "floor": "tile",
         "view": "sontra",
         "hallStyle": {
@@ -889,7 +889,7 @@
     },
     {
       "id": "nuisam",
-      "name": "Tiệm Cà Phê Đồi Thất Sơn",
+      "name": "Katinat Đồi Thất Sơn",
       "region": "Nam",
       "place": "Châu Đốc, An Giang",
       "inspired": "Sunset Hill Cafe An Giang",
@@ -901,8 +901,8 @@
           10.8
         ],
         "wall": "plaster",
-        "wallColor": "#e9c46a",
-        "pillar": "#a3261a",
+        "wallColor": "#f4efe6",
+        "pillar": "#143949",
         "floor": "tile",
         "view": "nuisam",
         "hallStyle": {
@@ -956,7 +956,7 @@
     },
     {
       "id": "cuuphong",
-      "name": "Lakeview Bistro Tam Chúc",
+      "name": "Katinat Lakeview Bistro Tam Chúc",
       "region": "Bắc",
       "place": "Kim Bảng, Hà Nam",
       "inspired": "Mountain & Lake Lounge",
@@ -968,8 +968,8 @@
           12
         ],
         "wall": "plaster",
-        "wallColor": "#8a857a",
-        "pillar": "#5c4a38",
+        "wallColor": "#f4efe6",
+        "pillar": "#143949",
         "floor": "stone",
         "view": "cuuphong",
         "hallStyle": {
@@ -1036,7 +1036,7 @@
     },
     {
       "id": "hoangoc",
-      "name": "Tiệm Cà Phê Mưa Đà Lạt",
+      "name": "Katinat Mưa Đà Lạt",
       "region": "Trung",
       "place": "Trại Mát, Đà Lạt, Lâm Đồng",
       "inspired": "Dalat Pine & Rain Lofi Cafe",
@@ -1048,8 +1048,8 @@
           11
         ],
         "wall": "plaster",
-        "wallColor": "#ecd28a",
-        "pillar": "#a8321f",
+        "wallColor": "#f4efe6",
+        "pillar": "#143949",
         "floor": "tile",
         "view": "hoangoc",
         "hallStyle": {
@@ -1114,7 +1114,7 @@
     },
     {
       "id": "tutue",
-      "name": "Tiệm Trà & Bánh Mộc Nhiên",
+      "name": "Katinat Tiệm Trà & Bánh Mộc Nhiên",
       "region": "Nam",
       "place": "TP. Hồ Chí Minh",
       "inspired": "Zen & Matcha Tearoom",
@@ -1126,8 +1126,8 @@
           11
         ],
         "wall": "plaster",
-        "wallColor": "#f0e2bc",
-        "pillar": "#9c2f20",
+        "wallColor": "#f4efe6",
+        "pillar": "#143949",
         "floor": "tile",
         "view": "tutue",
         "hallStyle": {
@@ -1192,7 +1192,7 @@
     },
     {
       "id": "bachlien",
-      "name": "Ocean Pearl Cafe Nha Trang",
+      "name": "Katinat Ocean Pearl Cafe Nha Trang",
       "region": "Trung",
       "place": "Nha Trang, Khánh Hoà",
       "inspired": "Coastal White Cafe",
@@ -1204,8 +1204,8 @@
           10
         ],
         "wall": "plaster",
-        "wallColor": "#efe0b8",
-        "pillar": "#a8321f",
+        "wallColor": "#f4efe6",
+        "pillar": "#143949",
         "floor": "tile",
         "view": "bachlien",
         "hallStyle": {
@@ -1326,15 +1326,15 @@
     },
     {
       "id": "ao_lam",
-      "name": "Outfit Denim Casual",
+      "name": "Outfit Katinat Signature Teal",
       "type": "robe",
       "price_sen": 0,
       "price_ngoc": 0,
       "unlock_level": 1,
-      "description": "Trang phục xanh Denim trẻ trung, năng động khi đi cafe.",
+      "description": "Áo Sweater xanh cổ vịt đặc trưng Katinat phối cổ sơ mi trắng & huy hiệu vàng đồng.",
       "data": {
-        "color": "#6f8fb8",
-        "sash": "#e6bd45",
+        "color": "#143949",
+        "sash": "#d4a853",
         "default": true
       },
       "enabled": true,
@@ -1551,8 +1551,7 @@
       "unlock_level": 1,
       "description": "Đệm ngồi xinh xắn cho góc sống ảo (+20% điểm Chill).",
       "data": {
-        "color": "#d97a95",
-        "lotus": true
+        "color": "#d97a95"
       },
       "enabled": true,
       "sort": 18
@@ -1788,8 +1787,6 @@
       "description": "Đệm lông cừu Đà Lạt ấm áp (+18% điểm Chill).",
       "data": {
         "color": "#ece6da",
-        "lotus": true,
-        "petal": "#ffffff",
         "rank": "quy"
       },
       "enabled": true,
@@ -1805,8 +1802,6 @@
       "description": "Sắc xanh bạc hà mát lành (+25% điểm Chill).",
       "data": {
         "color": "#2f7d6a",
-        "lotus": true,
-        "petal": "#8fe0c0",
         "rank": "hiem"
       },
       "enabled": true,
@@ -1822,8 +1817,6 @@
       "description": "Ghế ngồi phát sáng dành cho Top Chill (+35% điểm Chill).",
       "data": {
         "color": "#c8902f",
-        "lotus": true,
-        "petal": "#ffe08a",
         "metal": 0.6,
         "rank": "quy"
       },
@@ -2337,8 +2330,6 @@
       "description": "Đài sen hồng ngà nhiều cánh, gợi tích bọc trăm trứng.",
       "data": {
         "color": "#f0b6c2",
-        "lotus": true,
-        "petal": "#ff9fb4",
         "rank": "quy",
         "legend": true
       },

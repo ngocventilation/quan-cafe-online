@@ -1221,17 +1221,8 @@ function decodeFigure(buf) {
 }
 const baking = new Map();
 // Tải lưới tính sẵn. Lỗi mạng hay tệp hỏng cũng không sao: buildStatue tự tính như cũ.
-export function preloadFigures(kinds) {
-  return Promise.all([...new Set(kinds)].filter((k) => BAKED_KINDS.includes(k)).map((k) => {
-    const stop = new AbortController(); // không dùng AbortSignal.timeout: iPhone đời cũ chưa có
-    const timer = setTimeout(() => stop.abort(), 12000);
-    if (!baking.has(k)) baking.set(k, fetch(`/models/fig-${k}.bin.gz?v=${BAKE_V}`, { signal: stop.signal })
-      .then((r) => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
-      .then((b) => BAKED.set(k, decodeFigure(b)))
-      .catch((e) => { baking.delete(k); console.warn('Không tải được lưới tượng', k, e.message); })
-      .finally(() => clearTimeout(timer)));
-    return baking.get(k);
-  }));
+export function preloadFigures() {
+  return Promise.resolve([]);
 }
 function addMesh(g, geo, mat, cast = true) {
   const m = new THREE.Mesh(geo, mat);
@@ -1366,71 +1357,38 @@ function baPaint(geo) {
 }
 const AURA_DEFAULT = { bronze_dark: 'bodhi', wood_gold: 'bodhi' };
 const SEAT_DEF = { top: 3.5 };
-export function buildStatue(kind = 'shakya', matName = 'gold', { halo = true, aura } = {}) {
-  if (!KIND[kind] && kind !== 'quanam' && kind !== 'nietban') kind = 'shakya';
-  const mats = makeMats(matName);
-  const p = mats.p;
+export function buildStatue(_kind = 'shakya', _matName = 'gold', _opts = {}) {
   const g = new THREE.Group();
-  const fig = figureGeos(kind);
-  if (kind === 'quanam') return buildQuanAm(g, fig, mats, matName, halo);
-  if (kind === 'nietban') return buildReclining(g, fig, mats, matName);
+  const marbleM = new THREE.MeshStandardMaterial({ color: '#f7f3eb', roughness: 0.25, metalness: 0.08 });
+  const tealM = new THREE.MeshStandardMaterial({ color: '#143949', roughness: 0.38, metalness: 0.15 });
+  const goldM = new THREE.MeshStandardMaterial({ color: '#d4a853', metalness: 0.85, roughness: 0.25 });
+  const creamM = new THREE.MeshStandardMaterial({ color: '#fff9ee', roughness: 0.35 });
 
-  const K = KIND[kind], khmer = kind === 'khmer', oy = K.hy || HY;
-  const T = throneGeos(K.throne);
-  for (const part of T.parts) addMesh(g, colorize(part, p), mats.body);
-  const topY = K.topY || 5.3;
-  const FS = (topY - T.seat) / (K.top || SEAT_DEF.top);
-  const f = new THREE.Group();
-  f.scale.setScalar(FS); f.position.y = T.seat - 0.01;
-  g.add(f);
-  addMesh(f, colorize(fig.body, p, 0, K.red ? cached('bapaint', () => baPaint(fig.body)) : null), mats.body);
-  const fm = faceMat(mats, fig, kind, oy, HZ, matName);
-  const headPaint = fig.HP.ush ? cached('hairpaint:' + kind + ':' + matName, () => hairPaint(fig.head, oy, HZ, fig.HP.scale, fig.HP, p)) : null;
-  addMesh(f, colorize(fig.head, p, 0, headPaint), fm || mats.body);
-  addMesh(f, colorize(fig.ext, p), mats.body);
-  addCurls(f, fig, mats, oy, HZ);
-  if (!fig.HP.bald) addUrna(f, fig, p, oy, HZ);
-  g.userData.height = K.height || 5.3;
-  if (khmer) {
-    // ngọn lửa rasmi trên nhục kế
-    const rasmi = cached('rasmi', () => {
-      const pts = [];
-      for (let i = 0; i <= 20; i++) { const t = i / 20; pts.push(new THREE.Vector2(0.075 * pow(1 - t, 0.9) * (1 + 0.35 * sin(t * PI * 3) * (1 - t)) + 0.002, t * 0.5)); }
-      const g2 = new THREE.LatheGeometry(pts, 16);
-      const pos = g2.attributes.position;
-      for (let i = 0; i < pos.count; i++) {
-        const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i), a0 = atan2(z, x), a = a0 + y * 3.5, r = Math.hypot(x, z) * (1 + 0.25 * cos(3 * a0));
-        pos.setXYZ(i, cos(a) * r + 0.04 * sin(y * 7) * y, y, sin(a) * r);
-      }
-      g2.computeVertexNormals();
-      g2.setAttribute('ao', new THREE.BufferAttribute(new Float32Array(pos.count).fill(0.95), 1));
-      return g2;
-    });
-    addMesh(f, colorize(rasmi, p), mats.body).position.set(0, 3.48, HZ - 0.055);
-    const A = khmerArch();
-    const am = haloMesh(A.geo, A.tex, mats, 0.3);
-    am.position.set(0, 0, -1.05);
-    g.add(am);
-    return g;
-  }
-  if (!halo || K.noAura) return g;
-  const headY = f.position.y + oy * FS;
-  const style = aura || AURA_DEFAULT[matName] || 'classic';
-  if (style === 'none') return g;
-  if (style === 'bodhi') {
-    const au = bodhiAura(), goldHalo = { ...mats, halo: new THREE.MeshStandardMaterial({ color: '#d8a544', metalness: 0.75, roughness: 0.38, emissive: '#ffb347', emissiveIntensity: 0, envMapIntensity: 1 }) };
-    const am = haloMesh(au.geo, au.tex, goldHalo, 0.28);
-    am.position.set(0, 0, -0.92);
-    g.add(am);
-    return g;
-  }
-  const hh = headHalo(0.95);
-  const hm = haloMesh(hh.geo, hh.tex, mats, 0.45);
-  hm.position.set(0, headY + 0.06, -0.66);
-  g.add(hm);
-  const au = bodyAura();
-  const am = haloMesh(au.geo, au.tex, mats, 0.22);
-  am.position.set(0, 0, -0.9);
-  g.add(am);
+  // Bệ đá cẩm thạch trắng viền đồng Katinat
+  const base1 = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.55, 0.35, 24), marbleM);
+  base1.position.y = 0.175;
+  const base2 = new THREE.Mesh(new THREE.CylinderGeometry(1.15, 1.25, 0.45, 24), tealM);
+  base2.position.y = 0.575;
+  const rim = new THREE.Mesh(new THREE.CylinderGeometry(1.22, 1.22, 0.08, 24), goldM);
+  rim.position.y = 0.82;
+
+  // Biểu tượng Ly Katinat Signature 3D cỡ lớn ở trung tâm quảng trường
+  const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.78, 0.56, 1.95, 28), tealM);
+  cup.position.y = 1.82;
+  const sleeve = new THREE.Mesh(new THREE.CylinderGeometry(0.73, 0.65, 0.62, 28), goldM);
+  sleeve.position.y = 1.85;
+  const dome = new THREE.Mesh(new THREE.SphereGeometry(0.78, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.5), creamM);
+  dome.position.y = 2.80;
+  const straw = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 1.25, 12), goldM);
+  straw.position.set(0.18, 3.35, 0);
+  straw.rotation.z = -0.22;
+
+  // Vòng Halo Vàng Đồng Katinat phía sau
+  const arch = new THREE.Mesh(new THREE.TorusGeometry(1.65, 0.06, 12, 40), goldM);
+  arch.position.set(0, 2.25, -0.35);
+
+  g.add(base1, base2, rim, cup, sleeve, dome, straw, arch);
+  g.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  g.userData.height = 4.2;
   return g;
 }

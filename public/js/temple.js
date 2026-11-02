@@ -126,13 +126,15 @@ export function buildTemple(scene, theme, quality = 'high') {
     mouthLight.position.set(0, 4, hd - 1);
     g.add(mouthLight);
   } else {
-    const wm = WALL[theme.wall](theme.wallColor);
-    const outerM = sur.outerWallMaterial;
-    const frameCol = FRAME[theme.wall] || '#3a2416';
+    // Phong cách kiến trúc KATINAT COFFEE & TEA HOUSE: Tường Kem Paris + Lamri Xanh Cổ Vịt (Deep Teal #143949) + Chỉ Vàng Đồng (#d4a853)
+    const wm = new THREE.MeshStandardMaterial({ color: '#f4efe6', roughness: 0.75 });
+    const katinatTealM = new THREE.MeshStandardMaterial({ color: '#143949', roughness: 0.48, metalness: 0.08 });
+    const katinatGoldM = new THREE.MeshStandardMaterial({ color: '#d4a853', metalness: 0.78, roughness: 0.28 });
+    const outerM = new THREE.MeshStandardMaterial({ color: '#153a4a', roughness: 0.65 });
     const T = 0.4;
-    const winH = Math.min(3.8, H * 0.42), winY = Math.min(H * 0.5, 4.4);
+    const winH = Math.min(3.8, H * 0.44), winY = Math.min(H * 0.5, 4.4);
     const nWin = Math.max(2, Math.round(D / 7));
-    // các ô cửa thật (u: toạ độ dọc tường theo trục thế giới, v0: chân cửa)
+    // các ô cửa kính lớn kiểu Pháp (u: toạ độ dọc tường theo trục thế giới, v0: chân cửa)
     const walls = {
       back: { U: new THREE.Vector3(1, 0, 0), N: new THREE.Vector3(0, 0, -1), o: new THREE.Vector3(0, 0, -hd), len: W, holes: [] },
       front: { U: new THREE.Vector3(1, 0, 0), N: new THREE.Vector3(0, 0, 1), o: new THREE.Vector3(0, 0, hd), len: W, holes: [] },
@@ -178,7 +180,7 @@ export function buildTemple(scene, theme, quality = 'high') {
       gb.translate(c.x, c.y, c.z);
       return gb;
     };
-    const doorMat = new THREE.MeshStandardMaterial({ color: theme.wall === 'khmer' ? '#7a1e10' : theme.wall === 'plaster' ? '#7a3a1e' : '#5a160c', roughness: 0.5 });
+    const doorMat = new THREE.MeshStandardMaterial({ color: '#143949', roughness: 0.4, metalness: 0.15 });
     const doorLeaves = [];
     for (const wl of Object.values(walls)) {
       g.add(wallFace(wl, wl.N.clone().negate(), wl.len, H, wm, 0));
@@ -189,17 +191,13 @@ export function buildTemple(scene, theme, quality = 'high') {
         frameParts.push(box(wl, h.u, h.v0 + h.h + 0.08, h.w + 0.44, 0.22, d + 0.04));
         if (h.win) {
           frameParts.push(box(wl, h.u, h.v0 - 0.06, h.w + 0.5, 0.14, T + 0.34));
-          frameParts.push(box(wl, h.u, h.v0 + h.h * 0.78, h.w, 0.07, 0.08));
-          const nb = Math.max(3, Math.floor(h.w / 0.34));
-          for (let k = 1; k < nb; k++) {
-            const cb = new THREE.CylinderGeometry(0.035, 0.035, h.h, 6);
-            const c = wl.o.clone().addScaledVector(wl.U, h.u - h.w / 2 + (h.w * k) / nb).addScaledVector(wl.N, T / 2);
-            cb.translate(c.x, h.v0 + h.h / 2, c.z);
-            barParts.push(cb);
+          // Khung chia ô kính cửa sổ kiểu Pháp (French Bistro Mullions) thanh mảnh hiện đại
+          frameParts.push(box(wl, h.u, h.v0 + h.h * 0.52, h.w, 0.05, 0.08));
+          for (const k of [-h.w * 0.22, h.w * 0.22]) {
+            barParts.push(box(wl, h.u + k, h.v0 + h.h / 2, 0.045, h.h, 0.06));
           }
         }
         if (h.door) {
-          // hai cánh cửa mở toang ra hiên
           for (const s of [-1, 1]) {
             const lw = h.w / 2;
             const leaf = new THREE.Mesh(new THREE.BoxGeometry(0.08, h.h * 0.98, lw), doorMat);
@@ -209,87 +207,99 @@ export function buildTemple(scene, theme, quality = 'high') {
             doorLeaves.push(leaf);
           }
         }
-        if (theme.wall === 'khmer' && h.win) {
-          const tri = new THREE.Mesh(new THREE.ConeGeometry(1.4, 1.4, 3), new THREE.MeshStandardMaterial({ color: '#f0c050', metalness: 0.6, roughness: 0.35 }));
-          const c = wl.o.clone().addScaledVector(wl.U, h.u).addScaledVector(wl.N, -0.06);
-          tri.position.set(c.x, h.v0 + h.h + 0.7, c.z);
-          tri.rotation.set(0, wl.U.x ? 0 : Math.PI / 2, 0); tri.scale.set(1, 1, 0.05);
-          g.add(tri);
-        }
       }
     }
-    const fm = new THREE.MeshStandardMaterial({ color: theme.wall === 'khmer' ? '#c8901e' : frameCol, roughness: 0.6, metalness: theme.wall === 'khmer' || theme.wall === 'bronze' ? 0.5 : 0 });
+    const fm = new THREE.MeshStandardMaterial({ color: '#143949', roughness: 0.42, metalness: 0.18 });
     const frames = new THREE.Mesh(mergeGeometries(frameParts), fm);
     frames.castShadow = true; frames.receiveShadow = true;
     g.add(frames);
     if (barParts.length) {
-      const bars = new THREE.Mesh(mergeGeometries(barParts), fm);
-      bars.castShadow = true;
+      const bars = new THREE.Mesh(mergeGeometries(barParts), katinatGoldM);
+      bars.castShadow = false;
       g.add(bars);
     }
     frameParts.concat(barParts).forEach((x) => x.dispose());
     doorLeaves.forEach((l) => g.add(l));
-    // tranh vách
-    if (theme.mural) {
-      g.add(mk(new THREE.PlaneGeometry(W * 0.92, H * 0.8), new THREE.MeshStandardMaterial({ map: muralTex(theme.mural), roughness: 0.8 }), 0, H * 0.52, -hd + 0.05, { cast: false }));
+
+    // ốp chân tường Wainscoting Xanh Katinat (#143949) + phào chỉ vàng đồng (#d4a853) dọc hai bên và tường hậu
+    const wainscotH = Math.min(2.15, winY - winH / 2 - 0.12);
+    for (const s of [-1, 1]) {
+      g.add(mk(new THREE.BoxGeometry(0.06, wainscotH, D - 0.4), katinatTealM, s * (hw - 0.04), wainscotH / 2, 0, { cast: false }));
+      g.add(mk(new THREE.BoxGeometry(0.09, 0.08, D - 0.4), katinatGoldM, s * (hw - 0.05), wainscotH + 0.04, 0, { cast: false }));
+      g.add(mk(new THREE.BoxGeometry(0.08, 0.10, D - 0.4), katinatGoldM, s * (hw - 0.05), H - 0.65, 0, { cast: false }));
     }
-    // dầm ngang
-    const beamM = new THREE.MeshStandardMaterial({ color: theme.roof || '#3a2216', roughness: 0.8 });
-    if (theme.wall !== 'plaster') for (const s of [-1, 1]) for (const y of [winY - winH / 2 - 0.3, winY + winH / 2 + 0.3]) {
-      g.add(mk(new THREE.BoxGeometry(0.3, 0.35, D), beamM, s * (hw - 0.15), y, 0, { cast: false }));
+    g.add(mk(new THREE.BoxGeometry(W - 0.2, H * 0.88, 0.06), katinatTealM, 0, H * 0.44, -hd + 0.04, { cast: false }));
+    g.add(mk(new THREE.BoxGeometry(W - 0.2, 0.10, 0.09), katinatGoldM, 0, H - 0.65, -hd + 0.06, { cast: false }));
+
+    // Các khung vòm trang trí nghệ thuật (Parisian Arch Panels) trên tường hậu Katinat
+    for (const ax of [-W * 0.34, W * 0.34]) {
+      g.add(mk(new THREE.BoxGeometry(2.8, 3.8, 0.08), new THREE.MeshStandardMaterial({ color: '#1b4b5f', roughness: 0.5 }), ax, 2.9, -hd + 0.08, { cast: false }));
+      g.add(mk(new THREE.BoxGeometry(2.96, 3.96, 0.05), katinatGoldM, ax, 2.9, -hd + 0.06, { cast: false }));
     }
-    // trần
-    g.add(mk(new THREE.PlaneGeometry(W, D), beamM, 0, H, 0, { rot: [Math.PI / 2, 0, 0], cast: false }));
-    for (let z = -hd + 1; z < hd; z += 3) g.add(mk(new THREE.BoxGeometry(W, 0.5, 0.4), beamM, 0, H - 0.3, z, { cast: false }));
-    if (theme.wall === 'lacquer' || theme.wall === 'khmer') {
-      const trim = new THREE.MeshStandardMaterial({ color: '#e0b050', metalness: 0.7, roughness: 0.3 });
-      for (const s of [-1, 1]) g.add(mk(new THREE.BoxGeometry(0.1, 0.12, D), trim, s * (hw - 0.05), H - 0.9, 0, { cast: false }));
-      g.add(mk(new THREE.BoxGeometry(W, 0.12, 0.1), trim, 0, H - 0.9, -hd + 0.06, { cast: false }));
-    }
-    if (theme.wall === 'bronze') {
-      const relief = new THREE.MeshStandardMaterial({ color: '#a07a40', metalness: 0.75, roughness: 0.35 });
-      for (let i = -3; i <= 3; i++) g.add(mk(new THREE.BoxGeometry(1.4, 1.8, 0.12), relief, i * (W / 7), H * 0.78, -hd + 0.08, { cast: false }));
+
+    // Trần sáng màu kem Paris + hệ thống dầm gỗ óc chó hiện đại
+    const ceilM = new THREE.MeshStandardMaterial({ color: '#f8f4ec', roughness: 0.85 });
+    const beamM = new THREE.MeshStandardMaterial({ color: '#143949', roughness: 0.55 });
+    g.add(mk(new THREE.PlaneGeometry(W, D), ceilM, 0, H, 0, { rot: [Math.PI / 2, 0, 0], cast: false }));
+    for (let z = -hd + 2; z < hd; z += 4) {
+      g.add(mk(new THREE.BoxGeometry(W, 0.32, 0.28), beamM, 0, H - 0.18, z, { cast: false }));
+      g.add(mk(new THREE.BoxGeometry(W, 0.04, 0.32), katinatGoldM, 0, H - 0.35, z, { cast: false }));
     }
   }
 
-  /* ---------- cột ---------- */
+  /* ---------- CỘT VUÔNG KATINAT XANH CỔ VỊT & ĐÈN TƯỜNG PARIS (THAY CỘT TRÒN ĐỎ CHÙA) ---------- */
   if (theme.pillar) {
-    const pm = new THREE.MeshStandardMaterial({ color: theme.pillar, roughness: 0.5, metalness: theme.wall === 'bronze' ? 0.6 : 0 });
-    const bm = new THREE.MeshStandardMaterial({ color: '#9c6a22', metalness: 0.8, roughness: 0.4 });
-    const colGeo = new THREE.CylinderGeometry(0.42, 0.48, H, 24), baseGeo = new THREE.CylinderGeometry(0.62, 0.7, 0.35, 24);
+    const pm = new THREE.MeshStandardMaterial({ color: '#143949', roughness: 0.45, metalness: 0.1 });
+    const bm = new THREE.MeshStandardMaterial({ color: '#d4a853', metalness: 0.82, roughness: 0.28 });
+    const sconceGlow = new THREE.MeshStandardMaterial({ color: '#fff6de', emissive: '#ffcf78', emissiveIntensity: 1.4, roughness: 0.2 });
+    const colGeo = new THREE.BoxGeometry(0.68, H, 0.68);
+    const baseGeo = new THREE.BoxGeometry(0.84, 0.32, 0.84);
+    const trimGeo = new THREE.BoxGeometry(0.76, 0.08, 0.76);
+    const sconceGeo = new THREE.SphereGeometry(0.14, 14, 12);
     const xs = W > 14 ? [-(hw - 2.2), hw - 2.2] : [-(hw - 1.2), hw - 1.2];
     for (const x of xs) for (let z = -hd + 3; z < hd - 1; z += Math.max(5, D / 4)) {
-      g.add(mk(colGeo, pm, x, H / 2, z), mk(baseGeo, bm, x, 0.17, z));
+      const signX = x < 0 ? 1 : -1;
+      g.add(
+        mk(colGeo, pm, x, H / 2, z),
+        mk(baseGeo, bm, x, 0.16, z),
+        mk(trimGeo, bm, x, 2.2, z, { cast: false }),
+        mk(trimGeo, bm, x, H - 0.5, z, { cast: false }),
+        mk(sconceGeo, sconceGlow, x + signX * 0.42, 2.65, z, { cast: false })
+      );
     }
   }
 
-  /* ---------- đèn lồng / đèn dầu ---------- */
-  const lanternMat = new THREE.MeshStandardMaterial({ color: '#ffb36b', emissive: '#ff8a3a', emissiveIntensity: 1.2 });
+  /* ---------- ĐÈN CHÙM VÒNG ĐỒNG HALO HIỆN ĐẠI (THAY ĐÈN LỒNG ĐỎ) ---------- */
+  const haloRingMat = new THREE.MeshStandardMaterial({ color: '#d4a853', metalness: 0.85, roughness: 0.25 });
+  const haloGlowMat = new THREE.MeshStandardMaterial({ color: '#fff5d6', emissive: '#ffcf70', emissiveIntensity: 1.5 });
   if (!isCave) {
-    for (const [x, z] of [[-W * 0.22, -D * 0.12], [W * 0.22, -D * 0.12], [-W * 0.22, D * 0.2], [W * 0.22, D * 0.2]]) {
-      g.add(mk(new THREE.CylinderGeometry(0.35, 0.35, 0.7, 16), lanternMat, x, H - 2, z, { cast: false }));
-      g.add(mk(new THREE.CylinderGeometry(0.01, 0.01, 1.4), lanternMat, x, H - 0.9, z, { cast: false }));
+    for (const [x, z] of [[-W * 0.22, -D * 0.12], [W * 0.22, -D * 0.12], [-W * 0.22, D * 0.2], [W * 0.22, D * 0.2], [0, D * 0.04]]) {
+      g.add(
+        mk(new THREE.TorusGeometry(0.85, 0.045, 12, 36), haloRingMat, x, H - 1.75, z, { rot: [Math.PI / 2, 0, 0], cast: false }),
+        mk(new THREE.TorusGeometry(0.52, 0.035, 10, 28), haloGlowMat, x, H - 2.05, z, { rot: [Math.PI / 2, 0, 0], cast: false }),
+        mk(new THREE.CylinderGeometry(0.012, 0.012, 1.85), haloRingMat, x, H - 0.92, z, { cast: false })
+      );
     }
   } else {
     for (const [x, z] of [[-hw + 2, -2], [hw - 2, -2], [-hw + 2, 5], [hw - 2, 5]]) {
-      g.add(mk(new THREE.CylinderGeometry(0.2, 0.25, 0.4, 12), lanternMat, x, 0.2, z, { cast: false }));
+      g.add(mk(new THREE.SphereGeometry(0.22, 14, 12), haloGlowMat, x, 0.35, z, { cast: false }));
     }
   }
   for (const s of [-1, 1]) {
-    const fill = new THREE.PointLight(theme.light?.warm || '#ffa860', 8 * (W / 24), Math.max(W, D) * 0.7, 1.6);
-    fill.position.set(s * W * 0.22, H - 2.4, 0);
+    const fill = new THREE.PointLight('#ffe4b5', 9.5 * (W / 24), Math.max(W, D) * 0.75, 1.5);
+    fill.position.set(s * W * 0.22, H - 2.2, 0);
     g.add(fill);
   }
 
-  /* ---------- QUẦY BARISTA, BACK-BAR & GÓC ACOUSTIC LOFI ---------- */
+  /* ---------- QUẦY BARISTA KATINAT, BACK-BAR & GÓC ACOUSTIC LOFI ---------- */
   const statues = theme.statues || [];
   const span = Math.max(...statues.map((s) => Math.abs(s.x)), 0);
   const altarW = Math.min(W - 2, Math.max(8.5, span * 2 + 6.5)), altarH = isCave ? 1.05 : 1.15;
 
-  const woodDarkM = new THREE.MeshStandardMaterial({ color: '#3b2314', roughness: 0.65 });
-  const woodWarmM = new THREE.MeshStandardMaterial({ color: '#6e472b', roughness: 0.55 });
-  const marbleM = new THREE.MeshStandardMaterial({ color: '#f5efe6', roughness: 0.25, metalness: 0.08 });
-  const brassM = new THREE.MeshStandardMaterial({ color: '#d9a443', metalness: 0.82, roughness: 0.28 });
+  const woodDarkM = new THREE.MeshStandardMaterial({ color: '#143949', roughness: 0.45, metalness: 0.08 }); // Katinat Signature Deep Teal
+  const woodWarmM = new THREE.MeshStandardMaterial({ color: '#7a4b2a', roughness: 0.5 }); // Gỗ óc chó ấm
+  const marbleM = new THREE.MeshStandardMaterial({ color: '#faf7f2', roughness: 0.2, metalness: 0.08 }); // Đá cẩm thạch trắng Carrara
+  const brassM = new THREE.MeshStandardMaterial({ color: '#d4a853', metalness: 0.84, roughness: 0.25 }); // Đồng Champagne Katinat
   const chromeM = new THREE.MeshStandardMaterial({ color: '#e2e6ec', metalness: 0.9, roughness: 0.18 });
   const copperM = new THREE.MeshStandardMaterial({ color: '#c86d44', metalness: 0.78, roughness: 0.25 });
   const glassM = new THREE.MeshStandardMaterial({ color: '#dff4ff', transparent: true, opacity: 0.38, roughness: 0.1, metalness: 0.1 });
@@ -298,79 +308,78 @@ export function buildTemple(scene, theme, quality = 'high') {
   const backW = Math.min(W - 3, Math.max(7.6, altarW * 0.9));
   g.add(mk(new THREE.BoxGeometry(backW, altarH, 1.35), woodDarkM, 0, altarH / 2, altarZ));
   g.add(mk(new THREE.BoxGeometry(backW + 0.12, 0.08, 1.45), marbleM, 0, altarH + 0.04, altarZ));
-  // Khung kệ gỗ cao phía sau quầy
+  // Khung kệ Katinat cao phía sau quầy
   const shelfH = Math.min(H - 1.6, 4.6);
   g.add(mk(new THREE.BoxGeometry(backW, shelfH, 0.35), woodDarkM, 0, altarH + shelfH / 2, altarZ - 0.5));
   for (let sy = 1; sy <= 3; sy++) {
     const y = altarH + sy * (shelfH / 3.4);
-    g.add(mk(new THREE.BoxGeometry(backW - 0.4, 0.07, 0.45), woodWarmM, 0, y, altarZ - 0.38));
-    // Đèn LED thanh ấm dưới mỗi tầng kệ
-    const ledM = new THREE.MeshBasicMaterial({ color: '#ffd599' });
+    g.add(mk(new THREE.BoxGeometry(backW - 0.4, 0.07, 0.45), brassM, 0, y, altarZ - 0.38));
+    const ledM = new THREE.MeshBasicMaterial({ color: '#ffe2a8' });
     g.add(mk(new THREE.BoxGeometry(backW - 0.6, 0.025, 0.04), ledM, 0, y - 0.04, altarZ - 0.2, { cast: false }));
-    // Các hũ hạt cà phê, bình syphon, sách decor trên kệ
     for (let bx = -backW * 0.38; bx <= backW * 0.38; bx += 0.85) {
-      if (Math.abs(bx) < 1.8 && sy >= 2) continue; // chừa khoảng giữa cho bảng Neon
-      const jarCol = ((Math.round(bx * 10) + sy) % 3 === 0) ? '#b85d38' : ((Math.round(bx * 10) + sy) % 2 === 0) ? '#3d6b58' : '#d6a15c';
-      const jarM = new THREE.MeshStandardMaterial({ color: jarCol, roughness: 0.35, metalness: 0.2 });
+      if (Math.abs(bx) < 2.1 && sy >= 2) continue;
+      const jarCol = ((Math.round(bx * 10) + sy) % 3 === 0) ? '#143949' : ((Math.round(bx * 10) + sy) % 2 === 0) ? '#c89b55' : '#f4efe6';
+      const jarM = new THREE.MeshStandardMaterial({ color: jarCol, roughness: 0.32, metalness: 0.22 });
       g.add(mk(new THREE.CylinderGeometry(0.11, 0.11, 0.28, 12), jarM, bx, y + 0.18, altarZ - 0.36, { cast: false }));
       g.add(mk(new THREE.CylinderGeometry(0.115, 0.115, 0.05, 12), brassM, bx, y + 0.34, altarZ - 0.36, { cast: false }));
     }
   }
 
-  // Bảng hiệu Neon & Menu Cafe phát sáng ở chính giữa Back-Bar
+  // Bảng hiệu KATINAT COFFEE & TEA HOUSE phát sáng sang trọng ở chính giữa Back-Bar
   const neonCanvas = document.createElement('canvas');
   neonCanvas.width = 1024; neonCanvas.height = 512;
   const nctx = neonCanvas.getContext('2d');
   const nbg = nctx.createLinearGradient(0, 0, 0, 512);
-  nbg.addColorStop(0, '#1e120b'); nbg.addColorStop(1, '#120a06');
+  nbg.addColorStop(0, '#0f2d3a'); nbg.addColorStop(1, '#163f52');
   nctx.fillStyle = nbg; nctx.fillRect(0, 0, 1024, 512);
-  nctx.strokeStyle = '#f5b952'; nctx.lineWidth = 10; nctx.strokeRect(18, 18, 988, 476);
-  nctx.strokeStyle = '#ff7eb3'; nctx.lineWidth = 3; nctx.strokeRect(32, 32, 960, 448);
+  nctx.strokeStyle = '#d4a853'; nctx.lineWidth = 10; nctx.strokeRect(18, 18, 988, 476);
+  nctx.strokeStyle = '#f3e5c8'; nctx.lineWidth = 2; nctx.strokeRect(34, 34, 956, 444);
   nctx.textAlign = 'center';
-  nctx.shadowColor = '#ff9d3b'; nctx.shadowBlur = 24;
-  nctx.fillStyle = '#ffe599'; nctx.font = '800 64px system-ui, sans-serif';
-  nctx.fillText('☕ LOFI CHILL CAFE 3D', 512, 118);
-  nctx.shadowColor = '#ff4d94'; nctx.shadowBlur = 18;
-  nctx.fillStyle = '#ff9ec6'; nctx.font = '700 34px system-ui, sans-serif';
-  nctx.fillText('✨ TIKTOK LIVE · STUDY WITH ME · ACOUSTIC ✨', 512, 176);
+  nctx.shadowColor = '#ffd478'; nctx.shadowBlur = 22;
+  nctx.fillStyle = '#f5d27e'; nctx.font = '800 82px Georgia, serif';
+  nctx.fillText('K A T I N A T', 512, 118);
+  nctx.shadowBlur = 8;
+  nctx.fillStyle = '#f6efe2'; nctx.font = '600 30px system-ui, sans-serif';
+  nctx.fillText('COFFEE & TEA HOUSE  ·  TIKTOK LIVE STUDIO', 512, 172);
   nctx.shadowBlur = 0;
-  // Menu 4 món nổi bật
+  nctx.fillStyle = '#d4a853'; nctx.fillRect(140, 196, 744, 2);
+  // Menu Signature Katinat
   const menuItems = [
-    ['☕ Phin Sữa Đá', '29k'],
-    ['🍵 Matcha Latte', '39k'],
-    ['🧋 Trà Sữa Boba', '35k'],
-    ['🥐 Bánh Croissant', '32k']
+    ['🧋 Trà Sữa Chôm Chôm', '55k'],
+    ['🥑 Bơ Già Dừa Non', '59k'],
+    ['🍑 Trà Đào Hồng Đài', '52k'],
+    ['☕ Phin Sữa Đá Katinat', '39k']
   ];
   menuItems.forEach(([mName, mPrice], idx) => {
     const mx = idx < 2 ? 270 : 754;
-    const my = (idx % 2 === 0) ? 275 : 355;
-    nctx.fillStyle = '#fff3d6'; nctx.font = '600 34px system-ui, sans-serif';
-    nctx.textAlign = 'left'; nctx.fillText(mName, mx - 180, my);
-    nctx.fillStyle = '#ffd166'; nctx.textAlign = 'right'; nctx.fillText(mPrice, mx + 180, my);
+    const my = (idx % 2 === 0) ? 282 : 362;
+    nctx.fillStyle = '#f8f4ec'; nctx.font = '600 32px system-ui, sans-serif';
+    nctx.textAlign = 'left'; nctx.fillText(mName, mx - 200, my);
+    nctx.fillStyle = '#f5d27e'; nctx.textAlign = 'right'; nctx.fillText(mPrice, mx + 200, my);
   });
-  nctx.textAlign = 'center'; nctx.fillStyle = '#9fe3c0'; nctx.font = '500 26px system-ui, sans-serif';
-  nctx.fillText('🐾 Thú cưng Mèo Cam & Corgi · 🌧️ Mưa Đà Lạt ngoài hiên', 512, 442);
+  nctx.textAlign = 'center'; nctx.fillStyle = '#a8e6cf'; nctx.font = '500 25px system-ui, sans-serif';
+  nctx.fillText('✨ Chill Lofi · Study With Me · Thú Cưng Corgi & Mèo Cam ✨', 512, 444);
   const neonTex = new THREE.CanvasTexture(neonCanvas);
   neonTex.colorSpace = THREE.SRGBColorSpace;
   const neonSign = mk(
-    new THREE.PlaneGeometry(3.6, 1.8),
-    new THREE.MeshStandardMaterial({ map: neonTex, roughness: 0.4, emissive: '#ffffff', emissiveMap: neonTex, emissiveIntensity: 0.65 }),
+    new THREE.PlaneGeometry(4.0, 2.0),
+    new THREE.MeshStandardMaterial({ map: neonTex, roughness: 0.35, emissive: '#ffffff', emissiveMap: neonTex, emissiveIntensity: 0.72 }),
     0, altarH + shelfH * 0.58, altarZ - 0.18, { cast: false }
   );
   g.add(neonSign);
 
-  /* ---------- QUẦY PHA CHẾ CHÍNH (ESPRESSO BAR & TỦ BÁNH) ---------- */
+  /* ---------- QUẦY PHA CHẾ CHÍNH KATINAT (ESPRESSO BAR & TỦ BÁNH) ---------- */
   const tz = altarZ + 2.6;
-  const barW = 5.2, barH = 1.02, barD = 1.15;
-  // Thân quầy gỗ óc chó + mặt đá cẩm thạch + viền đồng
+  const barW = 5.4, barH = 1.02, barD = 1.15;
+  // Thân quầy xanh cổ vịt Katinat + mặt đá cẩm thạch trắng Carrara + lam đồng Champagne
   g.add(
     mk(new THREE.BoxGeometry(barW, barH, barD), woodDarkM, 0, barH / 2, tz),
-    mk(new THREE.BoxGeometry(barW + 0.14, 0.08, barD + 0.14), marbleM, 0, barH + 0.04, tz),
-    mk(new THREE.BoxGeometry(barW + 0.06, 0.06, barD + 0.06), brassM, 0, 0.04, tz)
+    mk(new THREE.BoxGeometry(barW + 0.16, 0.08, barD + 0.16), marbleM, 0, barH + 0.04, tz),
+    mk(new THREE.BoxGeometry(barW + 0.08, 0.06, barD + 0.08), brassM, 0, 0.04, tz)
   );
-  // Các lam gỗ trang trí mặt trước quầy bar
-  for (let sx = -barW / 2 + 0.22; sx <= barW / 2 - 0.22; sx += 0.28) {
-    g.add(mk(new THREE.BoxGeometry(0.08, barH - 0.12, 0.04), woodWarmM, sx, barH / 2, tz + barD / 2 + 0.02, { cast: false }));
+  // Các nan đồng sọc dọc (Fluted Brass & Teal Slats) mặt trước quầy Katinat
+  for (let sx = -barW / 2 + 0.20; sx <= barW / 2 - 0.20; sx += 0.24) {
+    g.add(mk(new THREE.BoxGeometry(0.05, barH - 0.12, 0.04), brassM, sx, barH / 2, tz + barD / 2 + 0.02, { cast: false }));
   }
 
   // Máy pha Espresso La Marzocco 2 Group ở giữa quầy (x = -0.35)
@@ -505,20 +514,26 @@ export function buildTemple(scene, theme, quality = 'high') {
   }
   if (extras.includes('haze')) scene.fog = new THREE.Fog(theme.fog, 8, Math.max(W, D) * 1.4);
 
-  /* ---------- BÀN GHẾ CAFE 3D & ĐỒ UỐNG / LAPTOP TRÊN BÀN ---------- */
+  /* ---------- BÀN ĐÁ CẨM THẠCH & GHẾ BỌC DA KATINAT 3D (KHÔNG NGỒI CHIẾU/ĐỆM SEN!) ---------- */
   const cushions = [];
   const c = theme.cushions;
-  const matGeo = new THREE.BoxGeometry(1.55, 0.025, 1.55), cuGeo = cushionGeo();
-  const matM = new THREE.MeshStandardMaterial({ map: rugTex(), roughness: 1 });
-  const matGeos = [];
-  const tableTopGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.045, 20);
-  const tableRimGeo = new THREE.CylinderGeometry(0.435, 0.435, 0.03, 20);
-  const tableLegGeo = new THREE.CylinderGeometry(0.04, 0.05, 0.48, 10);
-  const tableBaseGeo = new THREE.CylinderGeometry(0.22, 0.25, 0.03, 14);
+  // Đệm ghế bọc da/nhung cao 0.22m so với sàn (khớp vị trí nhân vật ngồi ghế)
+  const chairSeatGeo = new THREE.CylinderGeometry(0.28, 0.26, 0.08, 22);
+  const chairLegGeo = new THREE.CylinderGeometry(0.024, 0.018, 0.22, 8);
+  const chairBackPostGeo = new THREE.CylinderGeometry(0.02, 0.02, 0.34, 8);
+  const chairBackRestGeo = new THREE.BoxGeometry(0.48, 0.20, 0.07);
+  const chairLeatherM = new THREE.MeshStandardMaterial({ color: '#8f4d28', roughness: 0.42 }); // Da bò Cognac Katinat
+  const chairWoodM = new THREE.MeshStandardMaterial({ color: '#382214', roughness: 0.55 }); // Chân ghế gỗ óc chó
+
+  const tableTopGeo = new THREE.CylinderGeometry(0.44, 0.44, 0.045, 24);
+  const tableRimGeo = new THREE.CylinderGeometry(0.455, 0.455, 0.032, 24);
+  const tableLegGeo = new THREE.CylinderGeometry(0.042, 0.052, 0.48, 12);
+  const tableBaseGeo = new THREE.CylinderGeometry(0.24, 0.26, 0.03, 16);
   const lampBaseGeo = new THREE.CylinderGeometry(0.045, 0.06, 0.03, 10);
   const lampStemGeo = new THREE.CylinderGeometry(0.012, 0.012, 0.14, 8);
-  const lampShadeGeo = new THREE.ConeGeometry(0.075, 0.09, 12);
-  const tableGeosWood = [], tableGeosBrass = [], tableGeosLamp = [];
+  const lampShadeGeo = new THREE.ConeGeometry(0.08, 0.095, 14);
+  const tableGeosMarble = [], tableGeosBrass = [], tableGeosLamp = [];
+  const chairGeosWood = [], chairGeosBack = [];
 
   // Hàm tạo mô hình 3D đồ uống, bánh ngọt & Laptop học bài đặt trực tiếp lên bàn
   const ceramicM = new THREE.MeshStandardMaterial({ color: '#fffdf9', roughness: 0.25 });
@@ -536,7 +551,7 @@ export function buildTemple(scene, theme, quality = 'high') {
     const dz = hasLaptop ? 0.04 : 0;
 
     if (drinkKind === 'matcha') {
-      // Ly Matcha Latte 2 tầng + kem sữa + ống hút xanh
+      // Ly Matcha Latte / Bơ Già Dừa Non Katinat
       og.add(
         mk(new THREE.CylinderGeometry(0.065, 0.052, 0.06, 14), milkM, dx, 0.03, dz, { cast: false }),
         mk(new THREE.CylinderGeometry(0.072, 0.065, 0.09, 14), matchaM, dx, 0.105, dz, { cast: false }),
@@ -544,7 +559,7 @@ export function buildTemple(scene, theme, quality = 'high') {
         mk(new THREE.CylinderGeometry(0.008, 0.008, 0.22, 8), matchaM, dx + 0.02, 0.13, dz, { rot: [0, 0, -0.22], cast: false })
       );
     } else if (drinkKind === 'boba') {
-      // Ly Trà Sữa Trân Châu Đường Đen
+      // Ly Trà Sữa Chôm Chôm / Trân Châu Katinat
       og.add(
         mk(new THREE.CylinderGeometry(0.058, 0.05, 0.04, 14), pearlM, dx, 0.02, dz, { cast: false }),
         mk(new THREE.CylinderGeometry(0.074, 0.058, 0.12, 14), bobaTeaM, dx, 0.10, dz, { cast: false }),
@@ -568,16 +583,12 @@ export function buildTemple(scene, theme, quality = 'high') {
         mk(new THREE.CylinderGeometry(0.043, 0.043, 0.01, 12), coffeeDarkM, dx + 0.11, 0.068, dz - 0.04, { cast: false })
       );
     } else {
-      // Mặc định: Cà Phê Phin Sữa Đá Việt Nam chuẩn vị (ly sữa dưới, cà phê đen, phin nhôm trên đỉnh)
+      // Ly Katinat Signature Xanh Cổ Vịt (Teal Cup + Đai vàng đồng + Nắp cầu)
       og.add(
-        mk(new THREE.CylinderGeometry(0.08, 0.065, 0.014, 14), ceramicM, dx, 0.007, dz, { cast: false }),
-        mk(new THREE.CylinderGeometry(0.054, 0.046, 0.035, 14), milkM, dx, 0.028, dz, { cast: false }),
-        mk(new THREE.CylinderGeometry(0.060, 0.054, 0.085, 14), coffeeDarkM, dx, 0.088, dz, { cast: false }),
-        // Đĩa phin + thân phin + nắp phin nhôm
-        mk(new THREE.CylinderGeometry(0.072, 0.072, 0.01, 14), chromeM, dx, 0.135, dz, { cast: false }),
-        mk(new THREE.CylinderGeometry(0.058, 0.052, 0.065, 14), chromeM, dx, 0.172, dz, { cast: false }),
-        mk(new THREE.CylinderGeometry(0.062, 0.062, 0.012, 14), chromeM, dx, 0.208, dz, { cast: false }),
-        mk(new THREE.SphereGeometry(0.015, 8, 8), chromeM, dx, 0.22, dz, { cast: false })
+        mk(new THREE.CylinderGeometry(0.072, 0.054, 0.16, 16), woodDarkM, dx, 0.08, dz, { cast: false }),
+        mk(new THREE.CylinderGeometry(0.068, 0.062, 0.05, 16), brassM, dx, 0.085, dz, { cast: false }),
+        mk(new THREE.SphereGeometry(0.072, 14, 10, 0, Math.PI * 2, 0, Math.PI * 0.5), glassM, dx, 0.16, dz, { cast: false }),
+        mk(new THREE.CylinderGeometry(0.009, 0.009, 0.22, 8), brassM, dx + 0.015, 0.15, dz, { rot: [0, 0, -0.18], cast: false })
       );
     }
 
@@ -585,9 +596,7 @@ export function buildTemple(scene, theme, quality = 'high') {
       // Laptop 3D mở màn hình sáng + sổ tay ghi chép bên cạnh
       const lx = -0.11, lz = 0.02;
       og.add(
-        // Đế bàn phím Laptop xoay về phía người ngồi (+Z)
         mk(new THREE.BoxGeometry(0.28, 0.014, 0.20), laptopBodyM, lx, 0.008, lz, { cast: false }),
-        // Màn hình Laptop dựng nghiêng
         mk(new THREE.BoxGeometry(0.28, 0.19, 0.012), laptopBodyM, lx, 0.10, lz - 0.095, { rot: [-0.22, 0, 0], cast: false }),
         mk(new THREE.PlaneGeometry(0.255, 0.165), laptopScreenM, lx, 0.10, lz - 0.088, { rot: [-0.22, 0, 0], cast: false })
       );
@@ -596,25 +605,34 @@ export function buildTemple(scene, theme, quality = 'high') {
   }
 
   const defaultDrinks = ['phin', 'matcha', 'boba', 'cappuccino', 'croissant'];
+  const seatColors = ['#163d4d', '#94522c', '#1c4b5e', '#7d4425'];
   for (let r = 0; r < c.rows; r++) for (const x of c.cols) {
     const z = c.z0 + r * c.dz;
     const idx = cushions.length;
-    const cm = cushionMaterial();
-    const mesh = mk(cuGeo, cm, x, 0.095, z);
+    const cm = new THREE.MeshStandardMaterial({ color: seatColors[idx % seatColors.length], roughness: 0.45, metalness: 0.06 });
+    const mesh = mk(chairSeatGeo, cm, x, 0.22, z);
     const petals = new THREE.Group();
     petals.position.set(x, 0, z);
     petals.visible = false;
-    matGeos.push(matGeo.clone().translate(x, 0.015, z));
 
-    // Bàn Cafe 3D đặt ngay phía trước chỗ ngồi (z - 0.58)
+    // 4 chân ghế gỗ óc chó + tựa lưng ghế bọc da Katinat phía sau (z + 0.24)
+    for (const [lx, lz] of [[-0.17, -0.17], [0.17, -0.17], [-0.17, 0.17], [0.17, 0.17]]) {
+      chairGeosWood.push(chairLegGeo.clone().translate(x + lx, 0.11, z + lz));
+    }
+    for (const lx of [-0.16, 0.16]) {
+      chairGeosWood.push(chairBackPostGeo.clone().translate(x + lx, 0.39, z + 0.23));
+    }
+    chairGeosBack.push(chairBackRestGeo.clone().translate(x, 0.56, z + 0.25));
+
+    // Bàn Cafe Đá Cẩm Thạch Trắng & Chân Đồng Vàng đặt ngay phía trước ghế (z - 0.58)
     const tx = x, tzTable = z - 0.58, tyTop = 0.50;
-    tableGeosWood.push(
-      tableTopGeo.clone().translate(tx, tyTop, tzTable),
-      tableLegGeo.clone().translate(tx, tyTop / 2, tzTable),
-      tableBaseGeo.clone().translate(tx, 0.015, tzTable)
+    tableGeosMarble.push(
+      tableTopGeo.clone().translate(tx, tyTop, tzTable)
     );
     tableGeosBrass.push(
       tableRimGeo.clone().translate(tx, tyTop - 0.005, tzTable),
+      tableLegGeo.clone().translate(tx, tyTop / 2, tzTable),
+      tableBaseGeo.clone().translate(tx, 0.015, tzTable),
       lampBaseGeo.clone().translate(tx - 0.25, tyTop + 0.035, tzTable - 0.16),
       lampStemGeo.clone().translate(tx - 0.25, tyTop + 0.11, tzTable - 0.16)
     );
@@ -624,7 +642,6 @@ export function buildTemple(scene, theme, quality = 'high') {
 
     const orderGroup = new THREE.Group();
     orderGroup.position.set(tx, tyTop + 0.024, tzTable);
-    // Mặc định mỗi bàn đều có sẵn tách cà phê / trà bánh ấm cúng
     const initDrink = defaultDrinks[idx % defaultDrinks.length];
     const initStudy = (idx < 10) ? (idx % 2 === 0) : false;
     orderGroup.add(buildOrderMesh(initDrink, initStudy));
@@ -641,9 +658,10 @@ export function buildTemple(scene, theme, quality = 'high') {
       occupant: null
     });
   }
-  // Gộp toàn bộ bàn cafe & đèn bàn thành các batch Mesh duy nhất để mượt 60 FPS
-  if (matGeos.length) { g.add(mk(mergeGeometries(matGeos), matM, 0, 0, 0, { cast: false })); matGeos.forEach((x) => x.dispose()); }
-  if (tableGeosWood.length) { g.add(mk(mergeGeometries(tableGeosWood), woodWarmM, 0, 0, 0)); tableGeosWood.forEach((x) => x.dispose()); }
+  // Gộp toàn bộ bàn đá, khung ghế & đèn bàn thành các batch Mesh duy nhất để mượt 60 FPS
+  if (chairGeosWood.length) { g.add(mk(mergeGeometries(chairGeosWood), chairWoodM, 0, 0, 0)); chairGeosWood.forEach((x) => x.dispose()); }
+  if (chairGeosBack.length) { g.add(mk(mergeGeometries(chairGeosBack), chairLeatherM, 0, 0, 0)); chairGeosBack.forEach((x) => x.dispose()); }
+  if (tableGeosMarble.length) { g.add(mk(mergeGeometries(tableGeosMarble), marbleM, 0, 0, 0)); tableGeosMarble.forEach((x) => x.dispose()); }
   if (tableGeosBrass.length) { g.add(mk(mergeGeometries(tableGeosBrass), brassM, 0, 0, 0, { cast: false })); tableGeosBrass.forEach((x) => x.dispose()); }
   if (tableGeosLamp.length) { g.add(mk(mergeGeometries(tableGeosLamp), shadeM, 0, 0, 0, { cast: false })); tableGeosLamp.forEach((x) => x.dispose()); }
 
@@ -744,7 +762,7 @@ export function buildTemple(scene, theme, quality = 'high') {
     }
   });
 
-  /* ---------- BẢNG VÀNG KHÁCH QUEN (BÊN TRÁI QUẦY BAR) ---------- */
+  /* ---------- STANDEE KỸ THUẬT SỐ BẢNG VÀNG KATINAT (BÊN TRÁI QUẦY BAR) ---------- */
   const steleCanvas = document.createElement('canvas');
   steleCanvas.width = 512; steleCanvas.height = 768;
   const steleTex = new THREE.CanvasTexture(steleCanvas);
@@ -754,83 +772,86 @@ export function buildTemple(scene, theme, quality = 'high') {
   const sz = Math.min(altarZ + 2.4, (c.z0 ?? altarZ + 4) - 1.4);
   const stele = new THREE.Group();
   stele.position.set(sx, 0, sz);
-  stele.rotation.y = 0.45;
-  const stoneM = new THREE.MeshStandardMaterial({ color: '#3b2416', roughness: 0.65 });
-  const goldM = new THREE.MeshStandardMaterial({ color: '#d9a443', metalness: 0.8, roughness: 0.35 });
-  stele.add(mk(new THREE.BoxGeometry(2.9, 1.1, 1.1), stoneM, 0, 0.55, 0));
-  stele.add(mk(new THREE.BoxGeometry(3.1, 0.12, 1.2), goldM, 0, 1.12, 0));
-  stele.add(mk(new THREE.BoxGeometry(2.5, 3.6, 0.32), stoneM, 0, 2.95, 0));
-  stele.add(mk(new THREE.CylinderGeometry(1.25, 1.25, 0.32, 40, 1, false, -Math.PI / 2, Math.PI), stoneM, 0, 4.75, 0, { rot: [-Math.PI / 2, 0, 0] }));
-  const face = mk(new THREE.PlaneGeometry(2.25, 3.35), new THREE.MeshStandardMaterial({ map: steleTex, roughness: 0.5, emissive: '#ffffff', emissiveMap: steleTex, emissiveIntensity: 0.42 }), 0, 2.95, 0.17, { cast: false });
+  stele.rotation.y = 0.42;
+  const standeeTealM = new THREE.MeshStandardMaterial({ color: '#143949', roughness: 0.42, metalness: 0.15 });
+  const goldM = new THREE.MeshStandardMaterial({ color: '#d4a853', metalness: 0.85, roughness: 0.25 });
+  // Đế đá Marble & Khung đồng Standee Katinat hiện đại (thay bia đá cổ)
+  stele.add(mk(new THREE.BoxGeometry(2.4, 0.14, 0.9), marbleM, 0, 0.07, 0));
+  stele.add(mk(new THREE.CylinderGeometry(0.045, 0.045, 1.0, 12), goldM, -0.85, 0.55, 0));
+  stele.add(mk(new THREE.CylinderGeometry(0.045, 0.045, 1.0, 12), goldM, 0.85, 0.55, 0));
+  stele.add(mk(new THREE.BoxGeometry(2.52, 3.62, 0.14), goldM, 0, 2.75, 0));
+  stele.add(mk(new THREE.BoxGeometry(2.38, 3.48, 0.18), standeeTealM, 0, 2.75, 0));
+  const face = mk(new THREE.PlaneGeometry(2.24, 3.32), new THREE.MeshStandardMaterial({ map: steleTex, roughness: 0.35, emissive: '#ffffff', emissiveMap: steleTex, emissiveIntensity: 0.52 }), 0, 2.75, 0.10, { cast: false });
   stele.add(face);
-  const steleLight = new THREE.SpotLight('#ffd9a0', 6, 7, 0.6, 0.5, 1.5);
-  steleLight.position.set(0, 6, 2.6); steleLight.target = face; stele.add(steleLight);
+  const steleLight = new THREE.SpotLight('#ffe4ad', 6, 7, 0.6, 0.5, 1.5);
+  steleLight.position.set(0, 5.5, 2.4); steleLight.target = face; stele.add(steleLight);
   g.add(stele);
   function drawStele(rows = [], subtitle = 'Top Chill & Học Bài Tuần Này') {
     const list = Array.isArray(rows) ? rows : (rows?.rows || []);
     const sub = (!Array.isArray(rows) && rows?.subtitle) || subtitle || 'Top Chill & Study With Me';
     const c = steleCanvas.getContext('2d'), w = 512, h = 768;
-    const bg = c.createLinearGradient(0, 0, 0, h); bg.addColorStop(0, '#2c1b10'); bg.addColorStop(1, '#160d07');
+    const bg = c.createLinearGradient(0, 0, 0, h); bg.addColorStop(0, '#0f2d3a'); bg.addColorStop(1, '#163f52');
     c.fillStyle = bg; c.fillRect(0, 0, w, h);
-    c.strokeStyle = '#d9a645'; c.lineWidth = 10; c.strokeRect(14, 14, w - 28, h - 28);
+    c.strokeStyle = '#d4a853'; c.lineWidth = 10; c.strokeRect(14, 14, w - 28, h - 28);
     c.lineWidth = 2; c.strokeRect(30, 30, w - 60, h - 60);
-    c.fillStyle = '#f6d27e'; c.textAlign = 'center';
-    c.font = '700 40px system-ui, sans-serif'; c.fillText('☕ BẢNG VÀNG', w / 2, 98);
-    c.font = '700 28px system-ui, sans-serif'; c.fillText('KHÁCH QUEN QUÁN CAFE', w / 2, 144);
-    c.font = '400 21px system-ui, sans-serif'; c.fillStyle = '#c9a76a'; c.fillText(sub, w / 2, 180);
-    c.fillStyle = '#d9a645'; c.fillRect(100, 202, w - 200, 2);
-    if (!list.length) { c.fillStyle = '#c9a76a'; c.font = 'italic 25px system-ui, sans-serif'; c.fillText('Chưa có khách quen ghi danh.', w / 2, 330); c.fillText('Hãy ngồi bàn & gọi món ngay!', w / 2, 370); }
+    c.fillStyle = '#f5d27e'; c.textAlign = 'center';
+    c.font = '800 38px Georgia, serif'; c.fillText('KATINAT MEMBER', w / 2, 96);
+    c.font = '700 26px system-ui, sans-serif'; c.fillStyle = '#f8f4ec'; c.fillText('BẢNG VÀNG KHÁCH QUEN', w / 2, 140);
+    c.font = '400 20px system-ui, sans-serif'; c.fillStyle = '#a8e6cf'; c.fillText(sub, w / 2, 176);
+    c.fillStyle = '#d4a853'; c.fillRect(90, 198, w - 180, 2);
+    if (!list.length) { c.fillStyle = '#e5dccb'; c.font = 'italic 24px system-ui, sans-serif'; c.fillText('Chưa có khách quen ghi danh.', w / 2, 330); c.fillText('Hãy ngồi bàn & gọi món ngay!', w / 2, 370); }
     list.slice(0, 5).forEach((r, i) => {
-      const y = 270 + i * 92;
-      const mc = ['#ffd36b', '#d9dde3', '#d89a62', '#8a6a3a', '#8a6a3a'][i];
+      const y = 268 + i * 92;
+      const mc = ['#ffd36b', '#d9dde3', '#d89a62', '#265c73', '#265c73'][i];
       c.beginPath(); c.arc(76, y - 4, 22, 0, Math.PI * 2); c.fillStyle = mc; c.fill();
-      c.textAlign = 'center'; c.font = '700 24px system-ui, sans-serif'; c.fillStyle = i < 3 ? '#3a2205' : '#f3e2bc'; c.fillText(String(i + 1), 76, y + 4);
+      c.textAlign = 'center'; c.font = '700 24px system-ui, sans-serif'; c.fillStyle = i < 3 ? '#102a36' : '#f8f4ec'; c.fillText(String(i + 1), 76, y + 4);
       c.textAlign = 'left';
-      c.font = `${i === 0 ? 700 : 600} ${i === 0 ? 32 : 28}px system-ui, sans-serif`; c.fillStyle = i === 0 ? '#ffe08a' : '#f3e2bc';
+      c.font = `${i === 0 ? 700 : 600} ${i === 0 ? 31 : 27}px system-ui, sans-serif`; c.fillStyle = i === 0 ? '#ffe08a' : '#f8f4ec';
       let name = r.name || 'Khách quen'; while (c.measureText(name).width > 260 && name.length > 3) name = name.slice(0, -2) + '…';
       c.fillText(name, 116, y);
-      c.font = '20px system-ui, sans-serif'; c.fillStyle = '#c9a76a'; c.fillText(r.title || '', 116, y + 30);
-      c.textAlign = 'right'; c.font = '700 26px system-ui, sans-serif'; c.fillStyle = '#f6d27e'; c.fillText(String(r.score ?? ''), w - 54, y + 8);
+      c.font = '20px system-ui, sans-serif'; c.fillStyle = '#a8e6cf'; c.fillText(r.title || '', 116, y + 30);
+      c.textAlign = 'right'; c.font = '700 26px system-ui, sans-serif'; c.fillStyle = '#f5d27e'; c.fillText(String(r.score ?? ''), w - 54, y + 8);
     });
     steleTex.needsUpdate = true;
   }
   drawStele();
 
-  /* ---------- BẢNG TOP DONATE TIKTOK LIVE (BÊN PHẢI QUẦY BAR) ---------- */
+  /* ---------- STANDEE KỸ THUẬT SỐ TOP DONATE TIKTOK LIVE (BÊN PHẢI QUẦY BAR) ---------- */
   const meritCanvas = document.createElement('canvas');
   meritCanvas.width = 512; meritCanvas.height = 768;
   const meritTex = new THREE.CanvasTexture(meritCanvas);
   meritTex.colorSpace = THREE.SRGBColorSpace;
   const merit = new THREE.Group();
   merit.position.set(-sx, 0, sz);
-  merit.rotation.y = -0.45;
-  merit.add(mk(new THREE.BoxGeometry(2.9, 1.1, 1.1), stoneM, 0, 0.55, 0));
-  merit.add(mk(new THREE.BoxGeometry(3.1, 0.12, 1.2), goldM, 0, 1.12, 0));
-  merit.add(mk(new THREE.BoxGeometry(2.5, 3.6, 0.32), stoneM, 0, 2.95, 0));
-  merit.add(mk(new THREE.CylinderGeometry(1.25, 1.25, 0.32, 40, 1, false, -Math.PI / 2, Math.PI), stoneM, 0, 4.75, 0, { rot: [-Math.PI / 2, 0, 0] }));
-  merit.add(mk(new THREE.PlaneGeometry(2.25, 3.35), new THREE.MeshStandardMaterial({ map: meritTex, roughness: 0.5, emissive: '#ffffff', emissiveMap: meritTex, emissiveIntensity: 0.65 }), 0, 2.95, 0.17, { cast: false }));
+  merit.rotation.y = -0.42;
+  merit.add(mk(new THREE.BoxGeometry(2.4, 0.14, 0.9), marbleM, 0, 0.07, 0));
+  merit.add(mk(new THREE.CylinderGeometry(0.045, 0.045, 1.0, 12), goldM, -0.85, 0.55, 0));
+  merit.add(mk(new THREE.CylinderGeometry(0.045, 0.045, 1.0, 12), goldM, 0.85, 0.55, 0));
+  merit.add(mk(new THREE.BoxGeometry(2.52, 3.62, 0.14), goldM, 0, 2.75, 0));
+  merit.add(mk(new THREE.BoxGeometry(2.38, 3.48, 0.18), standeeTealM, 0, 2.75, 0));
+  merit.add(mk(new THREE.PlaneGeometry(2.24, 3.32), new THREE.MeshStandardMaterial({ map: meritTex, roughness: 0.35, emissive: '#ffffff', emissiveMap: meritTex, emissiveIntensity: 0.65 }), 0, 2.75, 0.10, { cast: false }));
   g.add(merit);
   function drawMerit(rows = []) {
     const list = Array.isArray(rows) ? rows : (rows?.rows || []);
     const c = meritCanvas.getContext('2d'), w = 512, h = 768;
-    const bg = c.createLinearGradient(0, 0, 0, h); bg.addColorStop(0, '#3d1522'); bg.addColorStop(1, '#1c0a11');
+    const bg = c.createLinearGradient(0, 0, 0, h); bg.addColorStop(0, '#102e3c'); bg.addColorStop(1, '#1d4c60');
     c.fillStyle = bg; c.fillRect(0, 0, w, h);
-    c.strokeStyle = '#ff7eb3'; c.lineWidth = 10; c.strokeRect(14, 14, w - 28, h - 28);
-    c.strokeStyle = '#ffd166'; c.lineWidth = 2; c.strokeRect(30, 30, w - 60, h - 60);
-    c.fillStyle = '#ffe08a'; c.textAlign = 'center';
-    c.font = '700 40px system-ui, sans-serif'; c.fillText('🎁 TOP DONATE LIVE', w / 2, 98);
-    c.font = '500 23px system-ui, sans-serif'; c.fillStyle = '#ff9ec6'; c.fillText('Vinh danh người xem tặng quà TikTok', w / 2, 144);
-    c.fillStyle = '#ff7eb3'; c.fillRect(100, 170, w - 200, 2);
-    if (!list.length) { c.fillStyle = '#f3d1dc'; c.font = 'italic 25px system-ui, sans-serif'; c.fillText('Chưa có ai thả quà.', w / 2, 330); c.fillText('Bấm nút Quà TikTok để bắn pháo hoa!', w / 2, 370); }
+    c.strokeStyle = '#d4a853'; c.lineWidth = 10; c.strokeRect(14, 14, w - 28, h - 28);
+    c.strokeStyle = '#ff9ec6'; c.lineWidth = 2; c.strokeRect(30, 30, w - 60, h - 60);
+    c.fillStyle = '#f5d27e'; c.textAlign = 'center';
+    c.font = '800 38px Georgia, serif'; c.fillText('🎁 TIKTOK LIVE VIP', w / 2, 96);
+    c.font = '500 22px system-ui, sans-serif'; c.fillStyle = '#ff9ec6'; c.fillText('Vinh danh Top Donate tại Katinat', w / 2, 140);
+    c.fillStyle = '#d4a853'; c.fillRect(90, 168, w - 180, 2);
+    if (!list.length) { c.fillStyle = '#f8f4ec'; c.font = 'italic 24px system-ui, sans-serif'; c.fillText('Chưa có ai thả quà.', w / 2, 330); c.fillText('Bấm nút Quà TikTok để bắn pháo hoa!', w / 2, 370); }
     list.slice(0, 9).forEach((r, i) => {
-      c.font = `600 ${i === 0 ? 32 : 28}px system-ui, sans-serif`; c.fillStyle = i === 0 ? '#ffe08a' : '#fff0f5';
+      c.font = `600 ${i === 0 ? 32 : 28}px system-ui, sans-serif`; c.fillStyle = i === 0 ? '#ffe08a' : '#f8f4ec';
       let name = (i === 0 ? '👑 ' : '💖 ') + (r.name || 'Viewer');
       while (c.measureText(name).width > 410 && name.length > 3) name = name.slice(0, -2) + '…';
       c.fillText(name, w / 2, 222 + i * 47);
     });
-    c.fillStyle = '#ff7eb3'; c.fillRect(100, 650, w - 200, 2);
-    c.font = '600 24px system-ui, sans-serif'; c.fillStyle = '#ffe08a'; c.fillText('Chạm vào bảng để xem & tặng quà', w / 2, 690);
-    c.font = '400 20px system-ui, sans-serif'; c.fillStyle = '#ff9ec6'; c.fillText('Quán Cafe Online 3D · TikTok Live', w / 2, 722);
+    c.fillStyle = '#d4a853'; c.fillRect(90, 650, w - 180, 2);
+    c.font = '600 24px system-ui, sans-serif'; c.fillStyle = '#f5d27e'; c.fillText('Chạm vào màn hình để tặng quà', w / 2, 690);
+    c.font = '400 20px system-ui, sans-serif'; c.fillStyle = '#a8e6cf'; c.fillText('Katinat Coffee & Tea House · 3D Live', w / 2, 722);
     meritTex.needsUpdate = true;
   }
   drawMerit();
@@ -853,21 +874,15 @@ export function buildTemple(scene, theme, quality = 'high') {
     // dữ liệu để đi ra ngoài: cảnh quan, cửa chính, nền đất
     outdoor: !isCave ? { group: sur.group, groundY: sur.groundY ?? 0, doorW: Math.min(6, W * 0.3), hw, hd, W, D, H, cable: sur.cable || null, walkR: sur.walkR || 0, blocks: sur.blocks, noGarden: sur.noGarden, forest: sur.forest } : null,
     setCushionLook(cu, look) {
-      const lotus = !!look?.lotus;
-      cu.mesh.geometry = lotus ? lotusPad() : cuGeo;
-      setCushionFabric(cu.mesh.material, !lotus);
-      if (!lotus && cu.mesh.material.map !== cushionMap(look)) { cu.mesh.material.map = cushionMap(look); cu.mesh.material.needsUpdate = true; }
-      if (lotus) cu.mesh.material.color.copy(lotusPadColor(look));
-      else cu.mesh.material.color.set(cushionColor(look));
-      cu.mesh.material.metalness = look?.metal || 0;
-      cu.mesh.material.roughness = look?.metal ? 0.45 : 0.95;
-      cu.petals.visible = lotus;
-      if (lotus) {
-        if (!cu.petals.children.length) cu.petals.add(makeLotusPetals(look.petal || '#d97a95'));
-        const pm = cu.petals.children[0].material;
-        pm.color.set(look.petal || look.color || '#d97a95');
-        pm.metalness = (look.metal || 0) * 0.4;
-      }
+      // Giữ nguyên đệm ghế bọc da/nhung Katinat hiện đại (tuyệt đối không đổi sang đài sen!)
+      cu.mesh.geometry = chairSeatGeo;
+      cu.mesh.material.map = null;
+      const col = look?.color || '#163d4d';
+      cu.mesh.material.color.set(col);
+      cu.mesh.material.metalness = (look?.metal || 0) * 0.35;
+      cu.mesh.material.roughness = 0.42;
+      cu.mesh.material.needsUpdate = true;
+      cu.petals.visible = false;
     },
     addIncense() { spawnSmoke(6); },
     brightenCandles() { candleBoost = 600; },

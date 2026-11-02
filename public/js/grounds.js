@@ -10,24 +10,30 @@ export const GROUND_R = { nhattru: 85, tranho: 110, baison: 85, thienmau: 85, vi
 const TREE_KIND = { vinhan: ['palm', 'flower'], doivang: ['palm', 'broad'], thienmau: ['pine', 'broad'], linhung: ['bodhi', 'flower'], nuisam: ['palm', 'bodhi'], cuuphong: ['bodhi', 'broad'], hoangoc: ['pine', 'flower'] };
 const at = (g, x, y, z) => g.translate(x, y, z);
 function lanternParts() {
-  const stone = mergeGeometries([
-    at(new THREE.CylinderGeometry(0.34, 0.42, 0.22, 8), 0, 0.11, 0), at(new THREE.CylinderGeometry(0.11, 0.15, 0.85, 8), 0, 0.64, 0),
-    at(new THREE.CylinderGeometry(0.3, 0.2, 0.12, 6), 0, 1.12, 0), at(new THREE.ConeGeometry(0.46, 0.34, 6), 0, 1.68, 0), at(new THREE.SphereGeometry(0.08, 8, 6), 0, 1.9, 0),
+  // Đèn đường phong cách Paris cổ điển (chân trụ xanh cổ vịt Katinat + bóng cầu thuỷ tinh vàng ấm)
+  const post = mergeGeometries([
+    at(new THREE.CylinderGeometry(0.24, 0.30, 0.28, 12), 0, 0.14, 0),
+    at(new THREE.CylinderGeometry(0.06, 0.08, 2.2, 10), 0, 1.24, 0),
+    at(new THREE.CylinderGeometry(0.18, 0.08, 0.12, 10), 0, 2.38, 0),
   ]);
-  const glow = at(new THREE.CylinderGeometry(0.2, 0.2, 0.34, 6), 0, 1.34, 0);
-  return [[stone, { color: '#9a958a', roughness: 0.95 }], [glow, { color: '#ffd98a', emissive: '#ffb648', emissiveIntensity: 0.9 }]];
+  const glow = at(new THREE.SphereGeometry(0.24, 14, 12), 0, 2.62, 0);
+  return [[post, { color: '#143949', roughness: 0.45, metalness: 0.35 }], [glow, { color: '#fff5d6', emissive: '#ffcf70', emissiveIntensity: 1.2 }]];
 }
 function stupaParts() {
-  const tiers = [[1.5, 0.5], [1.15, 0.9], [0.95, 0.75], [0.75, 0.65], [0.55, 0.55]];
-  let y = 0;
-  const stone = mergeGeometries(tiers.flatMap(([r, h]) => {
-    const body = at(new THREE.CylinderGeometry(r * 0.86, r * 0.92, h, 8), 0, y + h / 2, 0);
-    const eave = at(new THREE.CylinderGeometry(r * 1.08, r * 0.92, 0.14, 8), 0, y + h + 0.07, 0);
-    y += h + 0.14;
-    return [body, eave];
-  }));
-  const tip = at(new THREE.ConeGeometry(0.28, 0.9, 8), 0, y + 0.45, 0);
-  return [[stone, { color: '#a89f8e', roughness: 0.95 }], [tip, { color: '#c8963e', roughness: 0.4, metalness: 0.75 }]];
+  // Dù che nắng Katinat ngoài trời & Bàn tròn đá cẩm thạch (thay cho tháp chùa!)
+  const umbrellaAndPost = mergeGeometries([
+    at(new THREE.CylinderGeometry(0.38, 0.42, 0.08, 16), 0, 0.04, 0),
+    at(new THREE.CylinderGeometry(0.05, 0.05, 2.6, 12), 0, 1.3, 0),
+    at(new THREE.ConeGeometry(1.85, 0.65, 16), 0, 2.75, 0),
+  ]);
+  const bistroTable = mergeGeometries([
+    at(new THREE.CylinderGeometry(0.75, 0.75, 0.06, 20), 0, 0.74, 0),
+    at(new THREE.CylinderGeometry(0.22, 0.22, 0.08, 12), 0, 3.10, 0),
+  ]);
+  return [
+    [umbrellaAndPost, { color: '#143949', roughness: 0.55 }],
+    [bistroTable, { color: '#d4a853', roughness: 0.35, metalness: 0.65 }]
+  ];
 }
 function benchParts() {
   const stone = mergeGeometries([

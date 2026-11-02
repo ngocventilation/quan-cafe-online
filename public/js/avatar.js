@@ -321,77 +321,104 @@ function m(geo, material, x = 0, y = 0, z = 0, o = {}) {
  * opts: { appearance:{gender,hair,skin}, robe:{color,sash,pattern?,accent?,shine?,aura?}, beads:{c1,gloss?,metal?}, npc }
  */
 export function makeAvatar(opts = {}) {
-  const ap = { gender: 'nam', hair: 'troc', skin: '#d98b5f', ...(opts.appearance || {}) };
-  const robe = opts.robe || { color: '#b8c0c8', sash: '#e6bd45' };
-  const skin = mat(ap.skin, { roughness: 0.55 });
+  const ap = { gender: 'nam', hair: 'ngan', skin: '#e6b89c', ...(opts.appearance || {}) };
+  // Không để đầu trọc kiểu chú tiểu: tự động chuyển 'troc' thành tóc layer Hàn Quốc trẻ trung
+  if (ap.hair === 'troc') ap.hair = ap.gender === 'nu' ? 'dai' : 'ngan';
+  const robe = opts.robe || { color: '#163d4d', sash: '#d4a853' };
+  const skin = mat(ap.skin, { roughness: 0.52 });
   const fancy = robe.pattern && robe.accent;
   const robeM = fancy ? fancyCloth(robe, 1, THREE.FrontSide) : cloth(robe.color, 'fold');
   const robeIn = fancy ? fancyCloth(robe, 1, THREE.DoubleSide) : cloth(robe.color, 'foldD');
   const darkC = new THREE.Color(robe.color).multiplyScalar(0.72).getStyle();
   const robeDark = fancy ? fancyCloth(robe, 0.78, THREE.FrontSide) : cloth(darkC, 'fold');
-  const trimM = fancy ? fancyTrim(robe, robe.accent) : cloth(darkC, 'in');
-  const sashM = fancy ? fancyTrim(robe, robe.sash, fieldTex()) : cloth(robe.sash, 'field');
+  const trimM = fancy ? fancyTrim(robe, robe.accent) : cloth(robe.sash || '#d4a853', 'in');
+  const pantsM = mat('#24303f', { roughness: 0.75 }); // Quần Jeans / Chinos tối màu hiện đại
+  const shirtInnerM = mat('#f7f3eb', { roughness: 0.7, side: THREE.DoubleSide });
 
   const root = new THREE.Group();
   const upper = new THREE.Group();
   root.add(upper);
-  upper.add(m(G.torso, robeM, 0, -0.05, 0, { scale: [1, 1, 0.88] }));
-  // cổ giao lĩnh (áo lót trắng lộ ở cổ) + y ca-sa vắt vai trái
+  // Thân áo Hoodie / Sweater / Jacket Katinat hiện đại
+  upper.add(m(G.torso, robeM, 0, -0.05, 0, { scale: [0.95, 1, 0.84] }));
+  // Cổ áo sơ mi trắng / áo thun bên trong + viền cổ áo thời trang (không dùng y ca-sa)
   upper.add(m(G.collarL, trimM, 0, -0.05, 0, { cast: false }), m(G.collarR, trimM, 0, -0.05, 0, { cast: false }));
-  upper.add(m(G.collarL, mat('#f2ece0', { roughness: 0.8, side: THREE.DoubleSide }), 0, -0.035, -0.012, { scale: [0.82, 1, 0.9], cast: false }));
-  upper.add(m(KASAYA, sashM, 0, -0.05, 0, { cast: false }));
+  upper.add(m(G.collarL, shirtInnerM, 0, -0.035, -0.012, { scale: [0.82, 1, 0.9], cast: false }));
+  // Thẻ tên / huy hiệu Katinat nhỏ màu vàng đồng trên ngực trái
+  upper.add(m(new THREE.BoxGeometry(0.11, 0.045, 0.02), mat('#d4a853', { metalness: 0.7, roughness: 0.3 }), 0.14, 0.44, -0.34, { cast: false }));
+
   const arms = [], hands = [];
   for (const s of [-1, 1]) {
-    const a = m(G.arm, robeM, s * 0.3, 0.38, -0.12, { rot: [1.0, 0, s * 0.5] });
-    // tay áo rộng (ống loe về phía bàn tay) + viền tay
-    const sl = m(G.sleeve, robeIn, 0, 0.01, 0);
-    sl.add(m(G.cuff, trimM, 0, -0.18, 0, { rot: [Math.PI / 2, 0, 0], cast: false }));
-    sl.add(m(G.sleeveIn, mat('#1e140e', { roughness: 1 }), 0, -0.165, 0, { rot: [Math.PI / 2, 0, 0], cast: false }));
+    const a = m(G.arm, robeM, s * 0.31, 0.38, -0.08, { rot: [0.65, 0, s * 0.25] });
+    // Tay áo gọn gàng bo cổ tay Sweater/Jacket
+    const sl = m(G.sleeve, robeIn, 0, 0.01, 0, { scale: [0.78, 0.92, 0.78] });
+    sl.add(m(G.cuff, trimM, 0, -0.17, 0, { rot: [Math.PI / 2, 0, 0], scale: [0.78, 0.78, 1], cast: false }));
     a.add(sl);
-    const h = m(G.hand, skin, s * 0.05, 0.5, -0.36);
+    const h = m(G.hand, skin, s * 0.18, 0.36, -0.28);
+    if (s === 1) {
+      // Ly Katinat cầm ở tay phải (ly xanh cổ vịt đặc trưng Katinat + đai vàng đồng + nắp cầu + ống hút)
+      const cupG = new THREE.Group();
+      cupG.position.set(-0.02, 0.04, -0.05);
+      cupG.rotation.set(0.15, 0, -0.1);
+      cupG.add(m(new THREE.CylinderGeometry(0.052, 0.038, 0.14, 14), mat('#153a4a', { roughness: 0.35 }), 0, 0, 0, { cast: false }));
+      cupG.add(m(new THREE.CylinderGeometry(0.049, 0.044, 0.045, 14), mat('#d4a853', { metalness: 0.3, roughness: 0.4 }), 0, 0.005, 0, { cast: false }));
+      cupG.add(m(new THREE.SphereGeometry(0.052, 14, 10, 0, Math.PI * 2, 0, Math.PI * 0.52), mat('#f8fafc', { transparent: true, opacity: 0.65, roughness: 0.15 }), 0, 0.07, 0, { cast: false }));
+      cupG.add(m(new THREE.CylinderGeometry(0.007, 0.007, 0.11, 8), mat('#c89b55', { roughness: 0.3 }), 0.012, 0.10, -0.01, { rot: [0.22, 0, -0.15], cast: false }));
+      h.add(cupG);
+    }
     arms.push(a); hands.push(h);
     upper.add(a, h);
   }
-  // tràng hạt đeo cổ
-  if (opts.beads) {
-    const bm = opts.beads.rank ? beadMaterial(opts.beads) : mat(opts.beads.c1, { roughness: opts.beads.metal ? 0.3 : opts.beads.gloss ? 0.15 : 0.4, metalness: opts.beads.metal || 0 });
-    const neck = m(neckBeads(), bm, 0, 0.6, -0.02, { cast: false });
-    neck.rotation.x = 0;
-    upper.add(neck);
+  // Tai nghe chụp tai Lofi (Headphones) đeo quanh cổ
+  const hpColor = opts.beads?.c1 || '#d4a853';
+  const hpMat = mat(hpColor, { metalness: 0.45, roughness: 0.35 });
+  const hpPadMat = mat('#1e293b', { roughness: 0.5 });
+  const hpNeck = m(new THREE.TorusGeometry(0.22, 0.022, 8, 24, Math.PI * 1.35), hpMat, 0, 0.63, 0.02, { rot: [Math.PI / 2 + 0.25, 0, -Math.PI * 0.67], cast: false });
+  upper.add(hpNeck);
+  for (const s of [-1, 1]) {
+    upper.add(m(new THREE.CylinderGeometry(0.065, 0.065, 0.045, 14), hpMat, s * 0.17, 0.57, -0.21, { rot: [0.3, s * 0.4, Math.PI / 2], cast: false }));
+    upper.add(m(new THREE.CylinderGeometry(0.055, 0.055, 0.02, 12), hpPadMat, s * 0.15, 0.57, -0.22, { rot: [0.3, s * 0.4, Math.PI / 2], cast: false }));
   }
 
   const head = new THREE.Group();
   head.position.y = 0.95;
   head.add(m(G.head, skin));
   for (const s of [-1, 1]) head.add(m(G.ear, skin, s * 0.41, -0.02, 0.02, { scale: [0.6, 1, 0.8] }));
-  // mặt (nhìn về -z)
-  const eyeM = mat('#2a1a12', { roughness: 0.3 });
+  // Mặt (nhìn về -z)
+  const eyeM = mat('#1e140e', { roughness: 0.25 });
   const eyes = [];
   for (const s of [-1, 1]) {
     const e = m(G.eye, eyeM, s * 0.13, 0.0, -0.39, { scale: [1, 1.25, 0.6], cast: false });
     eyes.push(e); head.add(e);
-    const c = m(G.cheek, mat('#f08a8a', { transparent: true, opacity: ap.gender === 'nu' ? 0.55 : 0.3 }), s * 0.22, -0.1, -0.37, { rot: [0, Math.PI + s * 0.5, 0], cast: false });
+    const c = m(G.cheek, mat('#f48fb1', { transparent: true, opacity: ap.gender === 'nu' ? 0.55 : 0.32 }), s * 0.22, -0.1, -0.37, { rot: [0, Math.PI + s * 0.5, 0], cast: false });
     head.add(c);
   }
-  // tóc
-  const hairM = mat(HAIR, { roughness: 0.6 });
-  if (ap.hair !== 'troc') {
-    head.add(m(G.hairCap, hairM, 0, 0.02, 0.02, { rot: [0.45, 0, 0] }));
-    if (ap.hair === 'bui') head.add(m(G.bun, hairM, 0, 0.32, 0.25));
-    if (ap.hair === 'dai') head.add(m(G.longHair, hairM, 0, -0.22, 0.2, { scale: [1.1, 1, 0.55] }));
+  // Mái tóc thời trang Hàn Quốc (luôn có tóc dày bồng bềnh + mái trước trán)
+  const hairM = mat(HAIR, { roughness: 0.55 });
+  head.add(m(G.hairCap, hairM, 0, 0.03, 0.01, { rot: [0.32, 0, 0], scale: [1.03, 1.04, 1.03] }));
+  // Phần tóc mái phía trước trán (bangs)
+  head.add(m(new THREE.SphereGeometry(0.26, 18, 12), hairM, -0.08, 0.22, -0.27, { scale: [1.15, 0.52, 0.55], rot: [0.35, 0.2, -0.15], cast: false }));
+  head.add(m(new THREE.SphereGeometry(0.24, 18, 12), hairM, 0.11, 0.23, -0.26, { scale: [1.05, 0.48, 0.52], rot: [0.35, -0.2, 0.15], cast: false }));
+  // Tóc mai hai bên thái dương
+  for (const s of [-1, 1]) {
+    head.add(m(new THREE.CapsuleGeometry(0.065, 0.16, 5, 8), hairM, s * 0.37, 0.02, -0.14, { rot: [0.15, 0, -s * 0.12], cast: false }));
+  }
+  if (ap.hair === 'bui') {
+    head.add(m(G.bun, hairM, 0, 0.36, 0.24, { scale: [1.1, 1.1, 1.1] }));
+  } else if (ap.hair === 'dai' || ap.gender === 'nu') {
+    head.add(m(G.longHair, hairM, 0, -0.20, 0.19, { scale: [1.14, 1.05, 0.58] }));
   }
   upper.add(head);
 
-  const lap = m(G.lap, robeDark, 0, 0.12, -0.06, { scale: [0.52, 0.17, 0.42] });
+  // Khi ngồi ghế Cafe: đùi & chân quần Jeans + giày Sneaker trắng
+  const lap = m(G.lap, pantsM, 0, 0.14, -0.08, { scale: [0.46, 0.15, 0.38] });
   const legs = new THREE.Group();
-  const legL = m(G.leg, robeDark, -0.13, 0.2, 0), legR = m(G.leg, robeDark, 0.13, 0.2, 0);
-  const shoe = mat('#3a2a20', { roughness: 0.7 });
-  for (const l of [legL, legR]) l.add(m(G.foot, shoe, 0, -0.19, -0.05, { scale: [0.9, 0.6, 1.4] }));
+  const legL = m(G.leg, pantsM, -0.13, 0.2, 0), legR = m(G.leg, pantsM, 0.13, 0.2, 0);
+  const sneakerM = mat('#f8fafc', { roughness: 0.45 });
+  for (const l of [legL, legR]) l.add(m(G.foot, sneakerM, 0, -0.19, -0.05, { scale: [0.95, 0.65, 1.45] }));
   legs.add(legL, legR);
-  // vạt áo dài phủ gần tới chân + viền gấu
-  const skirt = m(G.skirt, robeM, 0, 0, 0, { scale: [1, 1, 0.88] });
+  // Gấu áo Jacket/Sweater ngắn gọn trẻ trung (không mặc áo tràng dài tới chân)
+  const skirt = m(G.skirt, robeM, 0, 0.24, 0, { scale: [0.92, 0.45, 0.82] });
   skirt.material = robeIn;
-  skirt.add(m(G.hem, trimM, 0, 0.065, 0, { rot: [Math.PI / 2, 0, 0], cast: false }));
   legs.add(skirt);
   root.add(lap, legs);
 
@@ -399,7 +426,6 @@ export function makeAvatar(opts = {}) {
     root, upper, head, lap, legs, legL, legR, skirt, arms, hands, eyes,
     pose: 'sit', bowing: false, bowT: 0, walk: 0, meditate: 0, onBow: null, phase: Math.random() * 10,
   };
-  if (robe.aura) { av.aura = auraDisc(robe.aura); root.add(av.aura); }
   addGear(av, opts);
   setSeated(av, true);
   return av;
@@ -409,9 +435,9 @@ export function setSeated(av, on) {
   if (av.cloud) av.cloud.visible = !on;
   av.seated = on;
   av.lap.visible = on;
-  av.legs.visible = !on;
-  av.upper.position.y = on ? 0.3 : 0.4;
-  av.baseY = on ? 0.17 : 0;
+  av.legs.visible = true; // Luôn hiện chân khi ngồi trên ghế Katinat
+  av.upper.position.y = on ? 0.42 : 0.4;
+  av.baseY = on ? 0.14 : 0;
   av.root.position.y = av.baseY;
 }
 
@@ -472,17 +498,31 @@ export function animateAvatar(av, dt, time, moving = false) {
   if (f) { f.t += dt; if (f.t >= f.dur) av.fight = null; }
   const p = av.bowT;
   const amt = p < 0.45 ? ss(p, 0, 0.45) : p < 0.6 ? 1 : 1 - ss(p, 0.6, 1);
-  av.upper.rotation.x = -1.15 * amt;
-  av.upper.position.z = -0.12 * amt;
-  av.head.rotation.x = -0.3 * amt;
+  // Nhâm nhi cafe Katinat: hơi nghiêng đầu thưởng thức và nâng tay phải cầm ly lên miệng
+  av.upper.rotation.x = -0.08 * amt;
+  av.upper.position.z = -0.02 * amt;
+  av.head.rotation.x = 0.14 * amt + Math.sin(time * 2.8 + av.phase) * 0.04;
+  av.head.rotation.z = Math.sin(time * 1.9 + av.phase) * 0.045;
 
-  // thiền: tay đặt trên đùi, mắt nhắm
+  // Chill Lofi / Ngồi bàn cafe: tay đặt thoải mái trên bàn/đùi, tay phải nâng ly khi nhâm nhi
   const target = av.meditating ? 1 : 0;
   av.meditate += (target - av.meditate) * Math.min(1, dt * 4);
   const k = av.meditate;
-  av.hands.forEach((h, i) => { const s = i ? 1 : -1; h.position.set(s * (0.05 + k * 0.05), 0.5 - k * 0.32, -0.36 + k * 0.02); });
+  av.hands.forEach((h, i) => {
+    const s = i ? 1 : -1;
+    if (i === 1 && amt > 0.01) {
+      // Tay phải nâng ly Katinat lên miệng nhâm nhi
+      h.position.set(
+        0.22 * (1 - amt) + 0.08 * amt,
+        (0.32 - k * 0.08) * (1 - amt) + 0.78 * amt,
+        (-0.22 - k * 0.10) * (1 - amt) - 0.34 * amt
+      );
+    } else {
+      // Tay thả lỏng tự nhiên hai bên hoặc đặt lên mặt bàn cafe
+      h.position.set(s * (0.24 - k * 0.04), 0.28 - k * 0.06, -0.18 - k * 0.14);
+    }
+  });
   av.arms.forEach((a, i) => {
-    // cánh tay nối từ vai tới bàn tay → tay áo rộng rủ đúng hướng chắp tay / đặt trên đùi
     const s = i ? 1 : -1, h = av.hands[i].position;
     _sh.set(s * 0.27, 0.58, -0.04);
     _d.subVectors(h, _sh); const len = _d.length();
@@ -491,8 +531,8 @@ export function animateAvatar(av, dt, time, moving = false) {
     a.scale.set(1, len / 0.44, 1);
   });
   if (av.fight?.kind === 'hit') fightArms(av, av.fight.t);
-  av.eyes.forEach((e) => { e.scale.y = 1.25 * (1 - k * 0.8) + 0.05; });
-  if (k > 0.01) av.head.rotation.x = Math.min(av.head.rotation.x, -0.15 * k);
+  av.eyes.forEach((e) => { e.scale.y = 1.25 * (1 - k * 0.65 - amt * 0.4) + 0.12; });
+  if (k > 0.01) av.head.rotation.z = Math.sin(time * 2.4 + av.phase) * 0.08 * k;
 
   // đi
   if (moving) {
