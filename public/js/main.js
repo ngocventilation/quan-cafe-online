@@ -1111,10 +1111,14 @@ async function enterTemple(id) {
   stopBowing(true);
   showLoader(`Đang vào ${t.name}`);
   await nextFrames(3); // cho màn chờ hiện ra trước khi dựng cảnh (việc dựng chạy đồng bộ)
-  await Promise.all([loadContent().catch(() => null), preloadFigures(statueKinds(t))]);
+  await Promise.all([loadContent().catch(() => null), preloadFigures(statueKinds(t)).catch(() => null)]);
   setLoader(55, 'Bày biện quầy Barista & bàn Cafe 3D');
   await nextFrames(1);
-  S.world.enterTemple(t, S.profile.user);
+  try {
+    S.world.enterTemple(t, S.profile.user);
+  } catch (err) {
+    console.error('enterTemple error:', err);
+  }
   loadLoc(t.id);
   loadBeasts(t.id);
   refreshQue();

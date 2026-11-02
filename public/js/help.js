@@ -6,16 +6,15 @@ const touch = matchMedia('(pointer: coarse)').matches;
 
 /* ---------- Màn chờ ---------- */
 export const QUOTES = [
-  '“Tâm an thì cảnh an.”',
-  '“Một niệm thanh tịnh là một niệm Phật.”',
-  '“Gieo nhân lành, gặt quả lành.”',
-  '“Hạnh phúc không có đường đi, hạnh phúc chính là con đường.”',
-  '“Mỗi bước chân là một bước an lạc.”',
-  '“Không làm các điều ác, siêng làm các việc lành, giữ tâm ý trong sạch – đó là lời chư Phật dạy.” (Kinh Pháp Cú)',
-  '“Lời nói dịu dàng như hoa sen nở.”',
-  '“Hơn ngàn lời vô nghĩa, một lời có ích hơn, nghe xong được an tịnh.” (Kinh Pháp Cú)',
+  '“Một tách cà phê ấm, một bản nhạc Lofi êm – tâm hồn tự khắc bình yên.”',
+  '“Ngồi bên hiên quán nghe tiếng mưa rơi, mọi mệt mỏi đều tan biến.”',
+  '“Học bài chăm chỉ hôm nay, gặt hái thành quả ngọt ngào ngày mai.”',
+  '“Hạnh phúc đôi khi chỉ là ly Cà Phê Phin Sữa Đá cùng những người bạn đồng điệu.”',
+  '“Mỗi phút giây tập trung là một bước tiến gần hơn tới ước mơ.”',
+  '“Thả tim trên Livestream, lan tỏa năng lượng tích cực đến mọi người.”',
+  '“Hương cà phê rang xay đánh thức nguồn cảm hứng sáng tạo.”',
 ];
-const STEPS = ['Thắp đèn chánh điện', 'Dựng điện thờ', 'An vị tượng Phật', 'Trải bồ đoàn', 'Mời đại chúng vào lễ', 'Thỉnh chuông'];
+const STEPS = ['Bật đèn Neon & nhạc Lofi Chill', 'Khởi động máy pha Espresso', 'Sắp xếp bàn gỗ & đèn bàn ấm áp', 'Pha Cà Phê Phin, Matcha & Croissant', 'Mời khách quen & thú cưng vào quán', 'Bắt đầu không gian Chill & Live'];
 let ldTimer = null;
 let ldBusyT;
 export function showLoader(title) {

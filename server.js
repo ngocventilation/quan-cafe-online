@@ -147,7 +147,7 @@ app.get('/api/meta', (req, res) => {
 });
 
 app.get('/api/build', (req, res) => {
-  res.json({ build: 'cafe3d-v2' });
+  res.json({ build: 'cafe3d-v3' });
 });
 
 app.get('/api/challenge', (req, res) => {
@@ -685,7 +685,7 @@ wss.on('connection', (ws, req) => {
       const m = JSON.parse(data.toString());
       if (m.t === 'join') {
         ws.temple = m.temple || 'nhattru';
-        ws.send(JSON.stringify({ t: 'joined', build: 'cafe3d-v2' }));
+        ws.send(JSON.stringify({ t: 'joined', build: 'cafe3d-v3' }));
 
         const activeProfiles = [...simulatedDevotees];
         if (ws.userId && db.users[ws.userId]) {

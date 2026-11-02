@@ -531,81 +531,64 @@ export function beastTag(name, rank) {
 // ---------- MÈO CAM HOÀNG THƯỢNG (CAFE CAT) ----------
 const CAT = { fur: '#f2923d', stripe: '#d46b1a', cream: '#fff6e8', pink: '#f6a5b0', red: '#d83a2e', gold: '#ffd24c' };
 function buildCat() {
-  const body = [
-    o(CAT.fur, [0, 0.23, 0], [0.16, 0.14, 0.22]),
-    o(CAT.cream, [0, 0.21, 0.11], [0.12, 0.11, 0.13]),
+  const b = [
+    O(CAT.fur, [0, 0.29, -0.03], [0.22, 0.20, 0.26]),
+    O(CAT.cream, [0, 0.25, 0.11], [0.14, 0.13, 0.12]),
     // sọc lưng mèo cam
-    o(CAT.stripe, [0, 0.35, -0.02], [0.11, 0.025, 0.035]),
-    o(CAT.stripe, [0, 0.34, -0.10], [0.10, 0.025, 0.035]),
-    // vòng cổ đỏ + chuông vàng
-    c(CAT.red, [0, 0.30, 0.17], 0.115, 0.12, 0.03, [0.45, 0, 0]),
-    o(CAT.gold, [0, 0.24, 0.27], 0.035),
-    // đầu tròn phúng phính
-    o(CAT.fur, [0, 0.42, 0.20], [0.165, 0.15, 0.155]),
-    o(CAT.cream, [-0.07, 0.38, 0.28], [0.075, 0.06, 0.06]),
-    o(CAT.cream, [0.07, 0.38, 0.28], [0.075, 0.06, 0.06]),
-    o(CAT.cream, [0, 0.38, 0.32], [0.065, 0.05, 0.055]),
-    // trán chữ M đặc trưng mèo cam
-    o(CAT.stripe, [0, 0.52, 0.32], [0.055, 0.02, 0.02]),
-    // tai nhọn
-    cone(CAT.fur, [-0.11, 0.57, 0.19], 0.062, 0.13, [0.12, 0, 0.28]),
-    cone(CAT.fur, [0.11, 0.57, 0.19], 0.062, 0.13, [0.12, 0, -0.28]),
-    cone(CAT.pink, [-0.105, 0.56, 0.215], 0.035, 0.08, [0.12, 0, 0.28]),
-    cone(CAT.pink, [0.105, 0.56, 0.215], 0.035, 0.08, [0.12, 0, -0.28]),
-    ...face(0.42, 0.20, 0.15, 0.155, CAT.pink, { bigEye: 1.15 }),
+    O(CAT.stripe, [0, 0.46, -0.04], [0.13, 0.03, 0.045]),
+    O(CAT.stripe, [0, 0.45, -0.14], [0.12, 0.03, 0.045]),
   ];
-  const leg = (s) => [
-    c(CAT.fur, [0, -0.05, 0], 0.036, 0.032, 0.11),
-    o(CAT.cream, [0, -0.11, 0.01], [0.042, 0.028, 0.048]),
-  ];
-  const tail = [
-    c(CAT.fur, [0, 0.08, -0.05], 0.028, 0.032, 0.18, [-0.7, 0, 0]),
-    o(CAT.cream, [0, 0.16, -0.11], 0.034),
-  ];
-  return { body: merged(body), legs: [merged(leg(-1)), merged(leg(1)), merged(leg(-1)), merged(leg(1))], tail: merged(tail) };
+  face(b, CAT.fur, { muzzle: CAT.cream, blush: CAT.pink });
+  // trán chữ M đặc trưng mèo cam
+  b.push(O(CAT.stripe, [0, HEAD.y + 0.18, HEAD.z + 0.28], [0.07, 0.025, 0.025]));
+  // hai tai mèo nhọn
+  for (const s of [-1, 1]) {
+    b.push(piece(spike, CAT.fur, [s * 0.19, HEAD.y + 0.30, HEAD.z - 0.02], [0.11, 0.20, 0.09], [0.12, 0, -s * 0.32]));
+    b.push(piece(spike, CAT.pink, [s * 0.185, HEAD.y + 0.28, HEAD.z + 0.02], [0.065, 0.12, 0.05], [0.12, 0, -s * 0.32]));
+  }
+  collar(b, CAT.red, CAT.gold);
+  const tail = merged([
+    lock([[0, 0, 0], [0, 0.12, -0.08], [0, 0.26, -0.14]], 0.036, 0.030, CAT.fur, { seg: 6, rad: 5, color2: CAT.cream }),
+    o(CAT.cream, [0, 0.28, -0.14], 0.038),
+  ]);
+  return { body: merged(b), leg: stub(CAT.fur, CAT.cream), tail };
 }
 function makeCat() {
   return quad('meo_cam', buildCat, {
-    legs: [[-0.085, 0.13, 0.12], [0.085, 0.13, 0.12], [-0.09, 0.13, -0.13], [0.09, 0.13, -0.13]],
-    tailAt: [0, 0.28, -0.20], keep: 1.25, speed: 3.1, gait: 12,
+    legs: STUB_LEGS,
+    tailAt: [0, 0.32, -0.28], keep: 1.25, speed: 3.4, gait: 12,
   });
 }
 
 // ---------- CÚN CORGI MÔNG TRÒN (CAFE CORGI) ----------
-const CORGI = { fawn: '#e59a48', cream: '#fff8ee', nose: '#2b1d16', pink: '#f598a4', collar: '#3b82f6' };
+const CORGI = { fawn: '#e59a48', cream: '#fff8ee', nose: '#2b1d16', pink: '#f598a4', collar: '#3b82f6', gold: '#ffd24c' };
 function buildCorgi() {
-  const body = [
+  const b = [
     // thân dài mũm mĩm + mông trái tim trắng
-    o(CORGI.fawn, [0, 0.22, -0.01], [0.165, 0.135, 0.26]),
-    o(CORGI.cream, [0, 0.20, 0.14], [0.135, 0.115, 0.14]),
-    o(CORGI.cream, [-0.06, 0.22, -0.22], [0.08, 0.09, 0.07]),
-    o(CORGI.cream, [0.06, 0.22, -0.22], [0.08, 0.09, 0.07]),
-    // vòng cổ xanh
-    c(CORGI.collar, [0, 0.29, 0.18], 0.125, 0.13, 0.032, [0.5, 0, 0]),
-    // đầu Corgi + sống mũi trắng
-    o(CORGI.fawn, [0, 0.40, 0.22], [0.16, 0.145, 0.16]),
-    o(CORGI.cream, [0, 0.43, 0.34], [0.032, 0.08, 0.05]),
-    o(CORGI.cream, [0, 0.35, 0.35], [0.085, 0.06, 0.085]),
-    // lưỡi hồng nhỏ cười tươi
-    o(CORGI.pink, [0, 0.31, 0.41], [0.028, 0.018, 0.025]),
-    // đôi tai Corgi to vểnh
-    cone(CORGI.fawn, [-0.115, 0.56, 0.20], 0.068, 0.16, [0.18, 0, 0.24]),
-    cone(CORGI.fawn, [0.115, 0.56, 0.20], 0.068, 0.16, [0.18, 0, -0.24]),
-    cone(CORGI.pink, [-0.11, 0.55, 0.225], 0.038, 0.10, [0.18, 0, 0.24]),
-    cone(CORGI.pink, [0.11, 0.55, 0.225], 0.038, 0.10, [0.18, 0, -0.24]),
-    ...face(0.40, 0.22, 0.145, 0.16, CORGI.nose, { snout: 0.03, bigEye: 1.1 }),
+    O(CORGI.fawn, [0, 0.28, -0.04], [0.23, 0.19, 0.29]),
+    O(CORGI.cream, [0, 0.24, 0.12], [0.15, 0.13, 0.13]),
+    O(CORGI.cream, [-0.08, 0.28, -0.26], [0.10, 0.11, 0.09]),
+    O(CORGI.cream, [0.08, 0.28, -0.26], [0.10, 0.11, 0.09]),
   ];
-  const leg = () => [
-    c(CORGI.fawn, [0, -0.03, 0], 0.04, 0.035, 0.08),
-    o(CORGI.cream, [0, -0.085, 0.01], [0.044, 0.03, 0.05]),
-  ];
-  const tail = [o(CORGI.cream, [0, 0.03, -0.02], [0.045, 0.045, 0.055])];
-  return { body: merged(body), legs: [merged(leg()), merged(leg()), merged(leg()), merged(leg())], tail: merged(tail) };
+  face(b, CORGI.fawn, { muzzle: CORGI.cream, blush: CORGI.pink });
+  // vệt trắng sống mũi & lưỡi hồng nhỏ cười tươi
+  b.push(
+    O(CORGI.cream, [0, HEAD.y + 0.06, HEAD.z + 0.30], [0.045, 0.11, 0.05]),
+    o(CORGI.pink, [0, HEAD.y - 0.16, HEAD.z + 0.33], [0.038, 0.024, 0.032])
+  );
+  // đôi tai Corgi to vểnh
+  for (const s of [-1, 1]) {
+    b.push(piece(spike, CORGI.fawn, [s * 0.20, HEAD.y + 0.32, HEAD.z - 0.02], [0.12, 0.24, 0.09], [0.16, 0, -s * 0.26]));
+    b.push(piece(spike, CORGI.pink, [s * 0.195, HEAD.y + 0.30, HEAD.z + 0.02], [0.07, 0.15, 0.05], [0.16, 0, -s * 0.26]));
+  }
+  collar(b, CORGI.collar, CORGI.gold);
+  const tail = O(CORGI.cream, [0, 0.03, -0.02], [0.065, 0.065, 0.075]);
+  return { body: merged(b), leg: stub(CORGI.fawn, CORGI.cream), tail };
 }
 function makeCorgi() {
   return quad('cun_corgi', buildCorgi, {
-    legs: [[-0.095, 0.11, 0.13], [0.095, 0.11, 0.13], [-0.10, 0.11, -0.15], [0.10, 0.11, -0.15]],
-    tailAt: [0, 0.27, -0.25], keep: 1.3, speed: 3.2, gait: 14, swing: 0.55,
+    legs: STUB_LEGS,
+    tailAt: [0, 0.31, -0.31], keep: 1.3, speed: 3.5, gait: 13, swing: 0.55,
   });
 }
 

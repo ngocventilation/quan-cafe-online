@@ -194,11 +194,11 @@
         "id": "light_incense",
         "title": "Gọi 1 ly Cà Phê Phin Sữa Đá lên bàn",
         "goal": 1,
-        "progress": 1,
+        "progress": 0,
         "reward": {
           "sen": 40
         },
-        "done": true,
+        "done": false,
         "claimed": false
       },
       {
@@ -390,7 +390,7 @@
       "name": "Minh Anh",
       "text": "Chúc mọi người đang xem Live một buổi tối thật bình yên và học tập hiệu quả nhé! ☕💻",
       "temple": "nhattru",
-      "created_at": 1793636274862,
+      "created_at": 1793637441004,
       "rejoices": 38
     },
     {
@@ -399,7 +399,7 @@
       "name": "Bảo Ngọc",
       "text": "Mèo cam và Corgi trong quán dễ thương xỉu, ai rảnh qua bàn số 2 uống Matcha Latte nha! 🍵🐱",
       "temple": "nhattru",
-      "created_at": 1793634474862,
+      "created_at": 1793635641004,
       "rejoices": 45
     },
     {
@@ -408,7 +408,7 @@
       "name": "Tuấn Kiệt",
       "text": "Tiếng mưa rơi ngoài cửa sổ kết hợp nhạc Lofi làm việc cực kỳ vào việc luôn 🌧️🎧",
       "temple": "nhattru",
-      "created_at": 1793630874862,
+      "created_at": 1793632041004,
       "rejoices": 72
     },
     {
@@ -417,17 +417,12 @@
       "name": "Lan Hương",
       "text": "Thả tim cho buổi Live tối nay! Chúc cả nhà luôn vui vẻ và vượt mọi deadline ✨💖",
       "temple": "nhattru",
-      "created_at": 1793627274862,
+      "created_at": 1793628441004,
       "rejoices": 29
     }
   ],
   "steles": {},
   "donations": [
-    {
-      "name": "Streamer Cafe",
-      "amount": "+100 Hạt Cafe",
-      "title": "Tặng Pháo Hoa Đại Tiệc 🎆 trên Live"
-    },
     {
       "name": "Minh Anh Lofi",
       "amount": "500.000đ",
