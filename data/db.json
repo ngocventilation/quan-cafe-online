@@ -44,7 +44,7 @@
       },
       "sect": "tinhdo",
       "level": 1,
-      "exp": 10,
+      "exp": 15,
       "currencies": {
         "sen": 200,
         "ngoc": 15
@@ -60,7 +60,7 @@
         "beads": 0,
         "rounds": 0,
         "mo": 0,
-        "visits": 3,
+        "visits": 4,
         "meditateMin": 0,
         "donated": 0
       },
