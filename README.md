@@ -1,6 +1,6 @@
 # ☕ Quán Cafe Online 3D – Lofi Chill, Học Bài & TikTok Live
 
-Game mô phỏng không gian **Quán Cafe 3D trực tuyến** kết hợp học bài (*Study With Me*), nghe nhạc Lofi/Acoustic và tương tác **TikTok Live** thời gian thực. Người chơi có thể tùy biến nhân vật Chibi, dạo bước vào 17 không gian quán cafe 3D nổi tiếng khắp Việt Nam, ngồi bàn gọi đồ uống 3D, mở Laptop học bài, vuốt ve thú cưng (Mèo Cam, Cún Corgi) và kích hoạt pháo hoa / mưa tim khi có người tặng quà trên Livestream.
+Game mô phỏng không gian **Quán Cafe 3D trực tuyến** kết hợp học bài (*Study With Me*), nghe nhạc Lofi/Acoustic và tương tác **TikTok Live** thời gian thực. Người chơi có thể tùy biến nhân vật Chibi, dạo bước vào 17 không gian quán cafe 3D nổi tiếng khắp Việt Nam (cùng khu thứ 18 – Trại Cải Tạo Bình Minh), ngồi bàn gọi đồ uống 3D, mở Laptop học bài, vuốt ve thú cưng (Mèo Cam, Cún Corgi) và kích hoạt pháo hoa / mưa tim khi có người tặng quà trên Livestream.
 
 ---
 
@@ -37,6 +37,17 @@ Game mô phỏng không gian **Quán Cafe 3D trực tuyến** kết hợp học 
   - **☕ Gọi Đồ Uống 3D**: Chọn nhanh đồ uống, bánh ngọt và Laptop 3D bày lên bàn.
   - **🎥 Cam Live**: Chế độ Camera Cinema tự động xoay góc rộng mượt mà quanh quán để treo máy phát trực tiếp TikTok Live.
   - **🎁 Quà TikTok**: Kích hoạt **Pháo Hoa 3D rực sáng trong quán**, **Mưa Tim bay lên**, **Banner Vinh Danh Người Tặng Quà** và cập nhật trực tiếp lên **Bảng Vàng Top Donate Live 3D**.
+
+### 4. 🚔 Khu Nhà Tù – Trại Cải Tạo Bình Minh
+- **Khu thứ 18 trên Bản đồ** (`nhatu`): dãy 8 phòng giam có song sắt, giường tầng, cửa sổ nhỏ và **sân lao động** có tường rào, dây thép gai, chòi canh, cổng trại sắt xanh. Cán bộ công an (quân phục ô-liu, mũ kê-pi) và phạm nhân (áo sọc) dựng từ chính hệ nhân vật chibi của game.
+- **Thăm trại hoặc Nhập trại cải tạo**: nhập trại thì nhân vật mặc áo phạm nhân, được xếp một phòng giam, **Bản đồ bị khoá** và máy chủ luôn đưa về trại cho đến khi cải tạo xong.
+- **4 việc lao động = 4 mini-game 45 giây** (`public/js/rehab.js`, canvas 2D + emoji, chơi bằng chạm hoặc chuột):
+  - 🥬 **Trồng rau** – cuốc đất, gieo hạt, tưới nước, thu hoạch; luống không tưới sẽ héo, nhớ bắt sâu.
+  - 🐷 **Nuôi lợn** – bấm/kéo xô cám cho lợn ăn đúng lúc đói, dọn phân giữ chuồng sạch.
+  - 🐟 **Nuôi cá** – rắc cám cho cá lớn, chỉ vớt cá có vòng vàng (vớt cá nhỏ bị trừ điểm).
+  - ⛏️ **Đào đá** – canh kim lực vào vùng xanh để bổ, 3 nhát vỡ tảng, chất đá lên xe cút kít.
+- Mỗi việc cần **2 buổi đạt**; theo dõi ở thanh tiến độ và **📋 Sổ cải tạo**, trò chuyện với cán bộ để nghe lời khuyên. Xong cả 4 việc là **ra trại**: cổng mở, cán bộ chào, thưởng 200 Hạt + 5 Sao, rồi đi tiếp tới các khu khác. Khách tham quan được làm thử (không ghi sổ).
+- API: `GET /api/prison`, `POST /api/prison/enter | visit | start | finish`; WebSocket `{t:'jailed'}`, `{t:'prison'}`.
 
 ---
 

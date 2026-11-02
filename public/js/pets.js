@@ -592,7 +592,80 @@ function makeCorgi() {
   });
 }
 
-const MODELS = { meo_cam: makeCat, cun_corgi: makeCorgi, su_tu_xanh: makeLion, thanh_long: makeDragon, huou: makeDeer, tho_ngoc: makeRabbit, nghe: makeNghe, chu_tuoc: makePhoenix, huyen_vu: makeXuanwu, bach_tuong: makeElephant, trau_vang: makeOx };
+// ---------- LỢN HỒNG (CHUỒNG LỢN TRẠI CẢI TẠO) ----------
+const PIG = { body: '#f4a6b4', light: '#ffd4dc', snout: '#f9bdc8', inner: '#e57b93', nostril: '#8a3446', hoof: '#9a6257', spot: '#e892a4' };
+function buildPig() {
+  const r = 0.3, y = 0.5, z = 0.27;
+  const b = [
+    O(PIG.body, [0, 0.31, -0.08], [0.27, 0.24, 0.35]),
+    O(PIG.light, [0, 0.23, 0.05], [0.19, 0.14, 0.2]),
+    O(PIG.spot, [0.11, 0.48, -0.2], [0.1, 0.035, 0.09], [0, 0.4, 0]),
+  ];
+  face(b, PIG.body, { r, y, z, blush: '#ff7f9a' });
+  // mõm tròn dẹt hướng +z, hai lỗ mũi
+  b.push(piece(new THREE.CylinderGeometry(1, 1, 1, 22), PIG.snout, [0, y - r * 0.32, z + r * 0.98], [r * 0.36, r * 0.26, r * 0.29], [Math.PI / 2, 0, 0]));
+  for (const s of [-1, 1]) b.push(O(PIG.nostril, [s * r * 0.13, y - r * 0.32, z + r * 1.11], [r * 0.05, r * 0.085, r * 0.03]));
+  // tai tam giác cụp về trước
+  for (const s of [-1, 1]) {
+    b.push(piece(spike, PIG.body, [s * 0.2, y + 0.27, z + 0.02], [0.11, 0.17, 0.05], [0.55, 0, -s * 0.45]));
+    b.push(piece(spike, PIG.inner, [s * 0.2, y + 0.26, z + 0.045], [0.065, 0.11, 0.03], [0.55, 0, -s * 0.45]));
+  }
+  // đuôi xoắn tít
+  const tail = lock([[0, 0, 0], [0, 0.04, -0.05], [0.045, 0.075, -0.07], [0.06, 0.04, -0.105], [0.02, 0.012, -0.11], [-0.005, 0.05, -0.085], [0.015, 0.1, -0.095]], 0.02, 0.012, PIG.body, { seg: 20, rad: 6 });
+  return { body: merged(b), leg: stub(PIG.body, PIG.hoof), tail };
+}
+const makePig = () => quad('lon', buildPig, { legs: [[-0.15, 0.15, 0.1], [0.15, 0.15, 0.1], [-0.15, 0.15, -0.24], [0.15, 0.15, -0.24]], tailAt: [0, 0.4, -0.42], keep: 1.4, speed: 2.4, gait: 10, swing: 0.5 });
+
+// ---------- CÁ CHÉP KOI (AO CÁ TRẠI CẢI TẠO) ----------
+const fishGeos = new Map();
+function fishParts(color) {
+  if (fishGeos.has(color)) return fishGeos.get(color);
+  const c = new THREE.Color(color), hex = (k, to) => '#' + c.clone().lerp(new THREE.Color(to), k).getHexString();
+  const light = hex(0.55, '#ffffff'), fin = hex(0.3, '#fff1dc'), white = '#fbf6ee', ink = '#161212';
+  const body = merged([
+    O(color, [0, 0, 0.03], [0.085, 0.09, 0.19]),
+    O(light, [0, -0.04, 0.05], [0.07, 0.05, 0.15]),
+    // mảng trắng của cá koi
+    O(white, [0.032, 0.05, 0.1], [0.05, 0.045, 0.06], [0, 0.3, 0]), O(white, [-0.035, 0.045, -0.03], [0.052, 0.045, 0.07]),
+    ...mirror((s) => [
+      O(ink, [s * 0.058, 0.025, 0.15], 0.017), o('#ffffff', [s * 0.066, 0.033, 0.159], 0.006),
+      lock([[s * 0.03, -0.025, 0.205], [s * 0.05, -0.045, 0.22], [s * 0.062, -0.065, 0.205]], 0.006, 0.003, fin, { seg: 4, rad: 4 }),
+      O(fin, [s * 0.08, -0.05, 0.085], [0.04, 0.006, 0.026], [0, s * 0.5, s * 0.5]),
+    ]),
+    O(light, [0, -0.015, 0.218], [0.03, 0.022, 0.02]),
+    O(fin, [0, 0.095, 0], [0.012, 0.045, 0.11], [0.15, 0, 0]),
+  ]);
+  const tail = merged([
+    O(color, [0, 0, -0.07], [0.065, 0.068, 0.11]),
+    O(white, [0, 0.032, -0.08], [0.045, 0.04, 0.06]),
+    O(fin, [0, 0.045, -0.2], [0.01, 0.07, 0.075], [0.6, 0, 0]),
+    O(fin, [0, -0.045, -0.2], [0.01, 0.07, 0.075], [-0.6, 0, 0]),
+  ]);
+  const g = { body, tail };
+  fishGeos.set(color, g);
+  return g;
+}
+// cá chép/koi bơi hướng +z, quẫy đuôi; hình dùng chung theo màu nên dispose không huỷ gì
+export function makeFish({ color = '#ff8a3d', scale = 1 } = {}) {
+  const g = fishParts(color), root = new THREE.Group(), body = new THREE.Group();
+  const front = new THREE.Mesh(g.body, GLAZE), tail = new THREE.Mesh(g.tail, GLAZE);
+  tail.position.z = -0.06;
+  body.add(front, tail); root.add(body);
+  root.scale.setScalar(scale);
+  const ph = Math.random() * Math.PI * 2;
+  return {
+    root,
+    anim(time) {
+      const w = Math.sin(time * 6 + ph);
+      tail.rotation.y = w * 0.42;
+      body.rotation.y = -w * 0.07;
+      body.position.y = Math.sin(time * 1.4 + ph) * 0.012;
+    },
+    dispose() {},
+  };
+}
+
+const MODELS = { lon: makePig, meo_cam: makeCat, cun_corgi: makeCorgi, su_tu_xanh: makeLion, thanh_long: makeDragon, huou: makeDeer, tho_ngoc: makeRabbit, nghe: makeNghe, chu_tuoc: makePhoenix, huyen_vu: makeXuanwu, bach_tuong: makeElephant, trau_vang: makeOx };
 export function makePet(data, hq = true) {
   const make = MODELS[data?.model];
   if (!make) return null;

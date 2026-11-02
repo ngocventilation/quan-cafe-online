@@ -7,8 +7,8 @@ const VN = [[102.14, 22.4], [102.6, 22.73], [103.3, 22.78], [103.96, 22.5], [104
   [107.4, 21.2], [106.8, 20.8], [106.5, 20.3], [106.0, 19.9], [105.8, 19.3], [105.7, 18.9], [106.2, 18.3], [106.5, 17.8], [107.1, 17.1], [107.8, 16.6], [108.3, 16.0], [108.8, 15.4], [109.1, 14.8], [109.3, 13.8], [109.3, 12.8], [109.2, 12.0], [108.8, 11.3], [108.0, 10.7], [107.2, 10.4], [106.8, 10.3], [106.6, 9.8], [106.2, 9.3], [105.4, 8.7], [104.8, 8.6], [104.8, 9.3], [105.0, 9.9], [104.5, 10.4],
   [105.1, 10.9], [105.8, 11.0], [106.2, 11.5], [106.4, 11.9], [107.5, 12.3], [107.6, 13.5], [107.5, 14.5], [107.6, 15.4], [107.2, 15.9], [106.8, 16.4], [106.3, 17.2], [105.6, 18.0], [105.1, 18.7], [104.4, 19.2], [104.0, 19.4], [104.4, 19.8], [104.6, 20.3], [104.0, 20.6], [103.2, 20.8], [102.9, 21.2], [102.6, 21.7]];
 // Vị trí hiển thị (đã giãn cụm Hà Nội cho dễ chạm) – [kinh độ, vĩ độ]
-const POS = { linhung: [108.15, 15.75], nuisam: [105.05, 10.75], kimson: [103.45, 22.15], lamkinh: [104.6, 19.4], tranho: [104.9, 22.45], nhattru: [104.2, 21.85], dinhmay: [107.3, 21.15], huongson: [104.0, 20.85], baison: [104.9, 20.25], thienmau: [107.7, 16.45], vinhan: [106.7, 10.85], doivang: [105.8, 9.45], linhson: [105.75, 11.55], cuuphong: [106.0, 20.75], hoangoc: [108.45, 12.0] };
-const REAL = { linhung: [108.277, 16.1], nuisam: [105.07, 10.68], kimson: [103.775, 22.303], lamkinh: [105.41, 19.93], nhattru: [105.834, 21.036], tranho: [105.837, 21.048], huongson: [105.75, 20.62], dinhmay: [106.72, 21.15], baison: [105.86, 20.27], thienmau: [107.545, 16.453], vinhan: [106.68, 10.79], doivang: [105.97, 9.59], linhson: [106.17, 11.38], cuuphong: [105.82, 20.56], hoangoc: [108.5, 11.87] };
+const POS = { linhung: [108.15, 15.75], nuisam: [105.05, 10.75], kimson: [103.45, 22.15], lamkinh: [104.6, 19.4], tranho: [104.9, 22.45], nhattru: [104.2, 21.85], dinhmay: [107.3, 21.15], huongson: [104.0, 20.85], baison: [104.9, 20.25], thienmau: [107.7, 16.45], vinhan: [106.7, 10.85], doivang: [105.8, 9.45], linhson: [105.75, 11.55], cuuphong: [106.0, 20.75], hoangoc: [108.45, 12.0], nhatu: [106.4, 21.95], tutue: [107.35, 11.25], bachlien: [109.25, 12.55] };
+const REAL = { nhatu: [106.2, 21.7], tutue: [106.7, 10.78], bachlien: [109.19, 12.24], linhung: [108.277, 16.1], nuisam: [105.07, 10.68], kimson: [103.775, 22.303], lamkinh: [105.41, 19.93], nhattru: [105.834, 21.036], tranho: [105.837, 21.048], huongson: [105.75, 20.62], dinhmay: [106.72, 21.15], baison: [105.86, 20.27], thienmau: [107.545, 16.453], vinhan: [106.68, 10.79], doivang: [105.97, 9.59], linhson: [106.17, 11.38], cuuphong: [105.82, 20.56], hoangoc: [108.5, 11.87] };
 
 const W = 640, H = 900, L0 = 101.8, L1 = 113.6, B0 = 8.1, B1 = 23.6;
 const px = ([lon, lat]) => [((lon - L0) / (L1 - L0)) * W, ((B1 - lat) / (B1 - B0)) * H];
@@ -24,7 +24,7 @@ function pinSvg(t, { visited, current, selected, route, duyenId, online, friends
   const col = here ? '#5fd47a' : v ? '#f2c46d' : '#e8743a';
   const ring = ['#2a1a0c', '#2a1a0c', '#b98149', '#dfe6ea', '#fff2b0'][stamps[t.id]?.level || 0];
   const lw = t.name.length * 10.6 + 14, n = online[t.id] || 0, fr = friends[t.id]?.length || 0;
-  const [x, y] = px(POS[t.id] || [106, 16]), [rx, ry] = px(REAL[t.id] || POS[t.id]);
+  const [x, y] = px(POS[t.id] || [106, 16]), [rx, ry] = px(REAL[t.id] || POS[t.id] || [106, 16]); // khu mới chưa có toạ độ: không làm hỏng bản đồ
   return `<g class="pinb${on ? ' on' : ''}${route && !route.temples.includes(t.id) ? ' dim' : ''}" data-id="${t.id}">
     <line x1="${rx.toFixed(1)}" y1="${ry.toFixed(1)}" x2="${x}" y2="${y}" stroke="rgba(255,240,200,.55)" stroke-width="1.5" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/>
     <circle class="real" data-r="3" cx="${rx.toFixed(1)}" cy="${ry.toFixed(1)}" r="3" fill="#fff"/>
@@ -141,7 +141,7 @@ function panZoom(svg, view, onTap) {
   return {
     zoom: (f) => { const r = svg.getBoundingClientRect(); zoomAt(r.left + r.width / 2, r.top + r.height / 2, view.w * f); },
     fit: (ids) => {
-      const ps = ids.map((id) => px(POS[id])).filter(Boolean);
+      const ps = ids.filter((id) => POS[id]).map((id) => px(POS[id]));
       if (!ps.length) return flyTo(0, 0, W);
       const xs = ps.map((p) => p[0]), ys = ps.map((p) => p[1]);
       const w = Math.max(W / 2.6, Math.min(W, Math.max(Math.max(...xs) - Math.min(...xs) + 280, (Math.max(...ys) - Math.min(...ys) + 200) * (W / H))));

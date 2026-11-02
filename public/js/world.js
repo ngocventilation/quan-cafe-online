@@ -4,7 +4,16 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { GROUND_R, buildGrounds } from './grounds.js';
 import { makePet, beastTag } from './pets.js';
 import { buildTemple } from './temple.js';
+import { buildPrison } from './prison.js';
 import { makeAvatar, animateAvatar, setSeated, disposeAvatar, setGhost, startFight } from './avatar.js';
+
+// Ngồi trên chỗ có độ cao (sạp, ghế băng trong khu Nhà Tù): nâng nhân vật lên theo seatY của chỗ ngồi
+function seatAv(av, cu) {
+  setSeated(av, !!cu);
+  if (cu?.seatY) { av.baseY = 0.17 + cu.seatY; av.root.position.y = av.baseY; }
+}
+// điểm đứng để bước tới chỗ ngồi (sạp/ghế băng có vật cản nên đứng phía trước rồi mới ngồi)
+const seatTarget = (cu) => (cu.approach || cu.pos).clone();
 
 // Cỡ nhân vật trong chùa: nhỏ lại cho chánh điện đỡ chật khi đông người; tên giữ nguyên cỡ để vẫn dễ đọc
 const AV_SCALE = 0.82;
@@ -131,15 +140,18 @@ export class World {
     this.clearCafePets();
     this.templeData = temple;
     this.templeId = temple.id;
-    this.temple = buildTemple(this.scene, temple.theme, this.quality);
+    // khu Nhà Tù (theme.prison) dựng riêng: dãy phòng giam + sân lao động; các khu khác là quán cafe
+    const prison = !!temple.theme.prison;
+    this.temple = prison ? buildPrison(this.scene, temple.theme, this.quality) : buildTemple(this.scene, temple.theme, this.quality);
     if (this.rainOn) this.temple.setRainMode?.(true);
     this.prepareOutdoor();
-    this._fogIn = null; this._fogOut = undefined; this.walkPath = null; this.groundY = 0;
+    this._fogIn = null; this._fogOut = undefined; this.walkPath = null; this.groundY = 0; this.doorTrip = null;
     this.scene.add(this.ripple);
     this.me = me;
     this.setPlayerLook(me);
     const b = this.temple.bounds;
-    const p = prevPos || new THREE.Vector3(0, 0, Math.min(b.maxZ - 3.5, (this.temple.cushions.at(-1)?.pos.z ?? 0) - 1));
+    const p = prevPos || this.temple.spawn?.clone() || new THREE.Vector3(0, 0, Math.min(b.maxZ - 3.5, (this.temple.cushions.at(-1)?.pos.z ?? 0) - 1));
+    if (prevPos && this.blocked(p.x, p.z)) p.copy(this.temple.spawn || p);
     this.player.root.position.set(p.x, 0, p.z);
     this.player.root.rotation.y = 0;
     setSeated(this.player, false);
@@ -147,11 +159,20 @@ export class World {
     this.walkTarget = null;
     this.cam.yaw = 0; this.cam.pitch = 0.24; this.cam.dist = temple.theme.size[0] < 14 ? 5 : 6.2;
     this.cam.target.set(p.x, 2, p.z - 1);
-    this.spawnNpcs(temple.npc || 0);
-    this.spawnAbbot(temple);
-    this.spawnHermit(temple);
-    this.spawnCafePets();
-    this.spawnTellers(temple);
+    if (prison) {
+      // trạng thái cải tạo UI đã báo trước (cổng, phòng của mình, tiến độ trồng rau/đập đá…)
+      const st = this.prisonState;
+      this.temple.prison.setGate(!st?.jailed);
+      this.temple.prison.markCell(st?.jailed ? st.cell : -1);
+      this.temple.prison.setProgress(st?.tasks || null);
+      this.temple.prison.setNpcVisible(this.showNpc !== false);
+    } else {
+      this.spawnNpcs(temple.npc || 0);
+      this.spawnAbbot(temple);
+      this.spawnHermit(temple);
+      this.spawnCafePets();
+      this.spawnTellers(temple);
+    }
     this.emitContext();
   }
 
@@ -196,16 +217,24 @@ export class World {
     return y;
   }
   isInside(x, z) { const od = this.od; return !od || (Math.abs(x) < od.hw && Math.abs(z) < od.hd); }
+  // vật cản hình chữ nhật [x0,z0,x1,z1] của khu (vách phòng giam, sạp, tường rào trại…), nới thêm bán kính người
+  blocked(x, z, r = 0.22) {
+    const list = this.temple?.rects;
+    if (!list || this._ignoreRects) return false;
+    for (const q of list) if (x > q[0] - r && x < q[2] + r && z > q[1] - r && z < q[3] + r) return true;
+    return false;
+  }
   // trả về độ cao đứng được tại (x,z) hoặc null
   walkable(x, z, curY = 0) {
     const b = this.temple.bounds, od = this.od;
-    if (x >= b.minX && x <= b.maxX && z >= b.minZ && z <= b.maxZ) return 0; // trong chánh điện
+    if (x >= b.minX && x <= b.maxX && z >= b.minZ && z <= b.maxZ) return this.blocked(x, z) ? null : 0; // trong chánh điện
     if (!od) return null;
     // khe cửa chính
     if (Math.abs(x) < od.doorW / 2 - 0.35 && z > od.hd - 1.2 && z < od.hd + 1.2) return 0;
     // ngoài tường (tường dày ~0.4)
     if (Math.abs(x) < od.hw + 0.7 && Math.abs(z) < od.hd + 0.7) return null;
     if (Math.hypot(x, z) > this.outR) return null;
+    if (this.blocked(x, z)) return null;
     if (this.gardenBlock?.some(([a, b, r]) => Math.hypot(x - a, z - b) < r)) return null; // tháp trong vườn chùa
     const y = this.groundAt(x, z, curY);
     if (y === null || Math.abs(y - curY) > 0.75) return null; // vực, tường, mặt nước
@@ -218,10 +247,13 @@ export class World {
     if (this.seat) this.stand();
     const out = !this.outside;
     const path = out ? [new THREE.Vector3(0, 0, od.hd - 1.5), new THREE.Vector3(0, 0, od.hd + 3.2), new THREE.Vector3(0, 0, od.hd + 6)] : [new THREE.Vector3(0, 0, od.hd + 1.6), new THREE.Vector3(0, 0, od.hd - 2.5)];
+    // khu có vách ngăn (Nhà Tù): đang trong phòng giam thì đi ra qua cửa phòng trước
+    if (out && this.temple.route) path.unshift(...this.temple.route(this.player.root.position, path[0]).slice(0, -1));
     this.walkPath = path.slice(1);
     this.walkTarget = { pos: path[0], cushion: null };
     // nếu vướng gì không tới được cửa thì sau vài giây đưa thẳng ra/vào
-    this.doorTrip = { out, until: this.clock.elapsedTime + 3 + this.player.root.position.distanceTo(path[0]) / 2.2, turn: 0 };
+    const far = path.reduce((s, p, i) => s + p.distanceTo(i ? path[i - 1] : this.player.root.position), 0);
+    this.doorTrip = { out, until: this.clock.elapsedTime + 3 + far / 2.2, turn: 0 };
   }
   checkDoorTrip(dt) {
     const d = this.doorTrip; if (!d) return;
@@ -549,18 +581,20 @@ export class World {
     return Math.hypot(a.x - p.x, a.z - p.z) < d;
   }
 
-  look(user) {
+  look(user, self = user === this.me) {
     const eq = user.equipped || {};
     const robe = this.items[eq.robe]?.data || this.items.ao_lam?.data;
     const beads = this.items[eq.beads]?.data;
     const cushion = this.items[eq.cushion]?.data;
-    return { appearance: user.appearance, robe, beads, cushion, hat: this.items[eq.hat]?.data, staff: this.items[eq.staff]?.data, cloud: this.items[eq.cloud]?.data, pet: this.items[eq.pet]?.data };
+    // trong khu Nhà Tù: người đang bị giam mặc bộ sọc phạm nhân (của mình theo setPrison, người khác theo cờ jailed máy chủ gửi)
+    const jailed = this.isPrisonArea && (self ? !!this.prisonState?.jailed : !!user.jailed);
+    return { appearance: user.appearance, robe, beads, cushion, hat: jailed ? undefined : this.items[eq.hat]?.data, staff: jailed ? undefined : this.items[eq.staff]?.data, cloud: jailed ? undefined : this.items[eq.cloud]?.data, pet: this.items[eq.pet]?.data, outfit: jailed ? 'phamnhan' : undefined };
   }
 
   setPlayerLook(user) {
     this.me = user;
     const old = this.player;
-    const lk = this.look(user);
+    const lk = this.look(user, true);
     const av = makeAvatar(lk);
     av.root.scale.setScalar(AV_SCALE);
     av.look = lk;
@@ -572,10 +606,13 @@ export class World {
     if (old) {
       av.root.position.copy(old.root.position);
       av.root.rotation.y = old.root.rotation.y;
-      setSeated(av, old.seated);
+      seatAv(av, old.seated ? this.seat : null);
+      if (old.seated && !this.seat) setSeated(av, true);
+      if (!old.seated) { av.baseY = old.baseY || 0; av.root.position.y = av.baseY; }
       av.bowing = old.bowing; av.bowT = old.bowT; av.meditating = old.meditating;
       disposeAvatar(old);
     }
+    av.work = this.playerWork || null;
     if (this.meQuy) setGhost(av, true);
     this.player = av;
     this.scene.add(av.root);
@@ -616,7 +653,7 @@ export class World {
     if (free.length > 2) this.addNpc(free[Math.floor(Math.random() * free.length)]);
   }
   setShowNpc(on) { this.showNpc = on; this.applyNpcVisible(); }
-  applyNpcVisible() { const on = this.showNpc !== false && this.perfLevel < 3; this.npcs.forEach((n) => (n.root.visible = on)); }
+  applyNpcVisible() { const on = this.showNpc !== false && this.perfLevel < 3; this.npcs.forEach((n) => (n.root.visible = on)); this.temple?.prison?.setNpcVisible(on); }
   setShowNames(on) { this.showNames = on; this.perfT = 0; this.remotes.forEach((r) => (r.label.visible = on)); this.npcs.forEach((n) => n.label && (n.label.visible = on)); }
 
   /* ---------------- người chơi khác ---------------- */
@@ -625,7 +662,7 @@ export class World {
     for (const p of players) {
       if (p.id === myId) continue;
       seen.add(p.id);
-      const sig = JSON.stringify([p.appearance, p.equipped, p.q]);
+      const sig = JSON.stringify([p.appearance, p.equipped, p.q, this.isPrisonArea && !!p.jailed]);
       const tag = p.name + '|' + p.level + '|' + (p.honor || '');
       let r = this.remotes.get(p.id);
       if (r && r.sig === sig && r.tag !== tag) {
@@ -640,7 +677,7 @@ export class World {
       if (!r || r.sig !== sig) {
         const prev = r;
         if (prev) { disposeAvatar(prev.av); if (prev.cushion?.occupant === prev.av) prev.cushion.occupant = null; }
-        const lk = this.look(p);
+        const lk = this.look(p, false);
         const av = makeAvatar(lk);
         av.root.scale.setScalar(AV_SCALE);
         av.look = lk;
@@ -666,7 +703,7 @@ export class World {
       if (cu && (p.order !== cu.drink || (p.study !== undefined && !!p.study !== cu.study))) {
         this.temple.setTableOrder?.(p.seat, p.order || 'phin', !!p.study);
       }
-      setSeated(r.av, !!cu);
+      if (r.av.seated !== !!cu || cu?.seatY) seatAv(r.av, cu);
       r.av.bowing = p.a === 2;
       r.av.meditating = p.a === 3;
     }
@@ -759,9 +796,16 @@ export class World {
     if (this.outside) return false;
     const cu = this.nearestFreeCushion(Infinity);
     if (!cu) return false;
-    this.walkPath = null;
-    this.walkTarget = { pos: cu.pos.clone(), cushion: cu };
+    this.walkTo(seatTarget(cu), cu);
     return true;
+  }
+  // đi tới điểm (vòng qua cửa phòng giam nếu khu có vách ngăn); đến nơi thì ngồi nếu có chỗ ngồi
+  walkTo(pos, cushion = null) {
+    const way = (!this.outside && this.temple.route?.(this.player.root.position, pos)) || [pos];
+    const last = way.length - 1;
+    this.walkPath = way.slice(1).map((p, i) => (i === last - 1 ? { pos: p, cushion } : p));
+    this.walkTarget = { pos: way[0], cushion: last ? null : cushion };
+    this.walkStuck = 0;
   }
   setQuy(on) { this.meQuy = on; if (this.player) setGhost(this.player, on); }
 
@@ -770,10 +814,10 @@ export class World {
     if (cu.occupant?.npc) this.evictNpc(cu);
     if (cu.occupant && cu.occupant !== this.player) return false;
     this.seat = cu; cu.occupant = this.player;
-    this.walkTarget = null;
+    this.walkTarget = null; this.walkPath = null;
     this.player.root.position.set(cu.pos.x, 0, cu.pos.z);
     this.player.root.rotation.y = 0;
-    setSeated(this.player, true);
+    seatAv(this.player, cu);
     this.temple.setCushionLook(cu, this.player.look.cushion);
     this.temple.setTableOrder?.(cu.index, this.me?.order || 'phin', !!(this.me?.study || this.player.meditating));
     this.cam.lastUser = 0;
@@ -786,9 +830,11 @@ export class World {
     this.player.meditating = false;
     this.temple.setCushionLook(this.seat, null);
     this.seat.occupant = null;
+    const was = this.seat;
     this.seat = null;
     setSeated(this.player, false);
-    this.player.root.position.z += 0.9;
+    if (was.approach) this.player.root.position.set(was.approach.x, 0, was.approach.z); // đứng dậy bước xuống trước sạp / ghế băng
+    else this.player.root.position.z += 0.9;
     this.emitContext();
   }
   setBowing(on, immediate = false) {
@@ -836,8 +882,86 @@ export class World {
     const p = this.player?.root.position;
     const nearDoor = !!(this.od && p && !this.seat && Math.abs(p.x) < this.od.doorW / 2 + 1.5 && Math.abs(p.z - this.od.hd) < 3.5);
     const ctx = { seated: !!this.seat, canSit: !this.seat && !this.outside && !!this.nearestFreeCushion(), canTalk: !this.seat && this.nearAbbot(), teller: this.seat || this.ride ? -1 : this.nearTeller(), cable: this.ride ? 'riding' : (!this.seat && this.nearCable() ? 'near' : null), door: nearDoor ? (this.outside ? 'in' : 'out') : null, outside: this.outside };
+    // khu Nhà Tù: đứng ở trạm lao động (ngoài sân), cạnh cán bộ, gần cổng trại
+    const pr = this.isPrison ? this.temple.prison : null;
+    ctx.rehab = pr && p && this.outside && !this.seat ? pr.stationAt(p.x, p.z) : null;
+    ctx.police = pr && p && !this.seat ? pr.policeNear(p.x, p.z, 2.8) : null;
+    ctx.gate = !!(pr && p && this.outside && pr.nearGate(p.x, p.z));
     const sig = JSON.stringify(ctx);
     if (sig !== this.ctxSig) { this.ctxSig = sig; this.onContext?.(ctx); }
+  }
+
+  /* ---------------- khu Nhà Tù – Trại cải tạo (mọi hàm không làm gì khi đang ở khu khác) ---------------- */
+  get isPrisonArea() { return !!this.templeData?.theme?.prison; }
+  get isPrison() { return this.isPrisonArea && !!this.temple?.prison; }
+  // UI báo trạng thái cải tạo: { jailed, cell (0..7), tasks:[{id,done,need}] }
+  setPrison(st = {}) {
+    const prev = this.prisonState || {};
+    this.prisonState = { jailed: !!st.jailed, cell: Number.isInteger(st.cell) ? st.cell : prev.cell ?? -1, tasks: st.tasks || prev.tasks || null };
+    const pr = this.isPrison ? this.temple.prison : null;
+    if (pr) {
+      pr.setGate(!this.prisonState.jailed);
+      pr.markCell(this.prisonState.jailed ? this.prisonState.cell : -1);
+      pr.setProgress(this.prisonState.tasks);
+    }
+    if (!!prev.jailed !== this.prisonState.jailed && this.player && this.me && this.isPrisonArea) this.setPlayerLook(this.me); // đổi áo sọc / áo thường
+  }
+  // tạm dừng mọi việc đang làm (ngồi, đi, cáp treo, đi qua cửa)
+  haltPlayer() {
+    if (this.seat) this.stand();
+    if (this.ride) this.endRide();
+    this.walkTarget = null; this.walkPath = null; this.doorTrip = null;
+    this.player.bowing = false; this.player.bowT = 0;
+  }
+  // đưa người chơi vào phòng giam i, tự bước tới sạp còn trống và ngồi xuống
+  goToCell(i) {
+    const c = this.isPrison && this.player ? this.temple.prison.cells[i] : null;
+    if (!c) return false;
+    this.haltPlayer();
+    this.player.root.position.set(c.inside.x, 0, c.inside.z);
+    this.player.root.rotation.y = 0; this.groundY = 0; this.player.baseY = 0;
+    this.cam.yaw = 0; this.cam.pitch = 0.42; this.camOcc = undefined;
+    this.cam.target.set(c.inside.x, 1.65, c.inside.z - 1);
+    const seat = c.seats.find((s) => !s.occupant || s.occupant.npc);
+    if (seat && !this.meQuy) this.walkTo(seatTarget(seat), seat);
+    this.emitContext();
+    return true;
+  }
+  // đưa người chơi ra sân, đứng cạnh trạm lao động task ('trongrau'|'nuoilon'|'nuoica'|'daoda'), mặt hướng vào trạm
+  goToStation(task) {
+    const st = this.isPrison && this.player && this.od ? this.temple.prison.stations[task] : null;
+    if (!st) return false;
+    this.haltPlayer();
+    const [x, z] = st.stand;
+    const y = this.groundAt(x, z, 3) ?? this.groundAt(x, z, 0) ?? this.od.groundY ?? 0;
+    this.player.root.position.set(x, y, z); this.groundY = y; this.player.baseY = y;
+    const rot = Math.atan2(-(st.look[0] - x), -(st.look[1] - z));
+    this.player.root.rotation.y = rot;
+    this.cam.yaw = rot; this.cam.pitch = 0.32; this.camOcc = undefined;
+    this.cam.target.set(x, y + 1.65, z);
+    this._fogOut = undefined;
+    this.emitContext();
+    return true;
+  }
+  // động tác khi làm mini-game: 'dig' | 'water' | 'feed' | 'net' | 'salute' | null
+  setPlayerWork(work) {
+    this.playerWork = work || null;
+    if (!this.player) return;
+    this.player.work = this.playerWork;
+    // đứng ở trạm thì quay mặt vào trạm
+    const pr = this.isPrison ? this.temple.prison : null, p = this.player.root.position, id = work && pr?.stationAt(p.x, p.z);
+    if (id && !this.seat) { const lk = pr.stations[id].look; this.player.root.rotation.y = Math.atan2(-(lk[0] - p.x), -(lk[1] - p.z)); }
+  }
+  // ra trại: cổng mở, cán bộ gác chào, pháo giấy
+  prisonRelease() {
+    this.setPrison({ ...(this.prisonState || {}), jailed: false });
+    const pr = this.isPrison ? this.temple.prison : null;
+    if (!pr) return;
+    pr.setGate(true);
+    pr.salute(9);
+    const p = this.player?.root.position;
+    pr.celebrate(p ? new THREE.Vector3(p.x, this.groundY || 0, p.z) : undefined);
+    this.emitContext();
   }
 
   /* ---------------- điều khiển ---------------- */
@@ -919,6 +1043,16 @@ export class World {
     if (this.hermit && this.ray.intersectObject(this.hermit.root, true).length) { this.onHermit?.(); return; }
     for (const t of this.tellers || []) if (this.ray.intersectObject(t.root, true).length) { this.onTell?.(t.tellerIdx); return; }
     for (const cp of this.cafePets || []) if (this.ray.intersectObject(cp.pet.root, true).length) { this.onCafePetTap?.(cp.name); return; }
+    // khu Nhà Tù: chạm cán bộ / phạm nhân → đi tới đứng trước mặt họ (đến gần cán bộ thì hiện nút trò chuyện)
+    const npc = this.isPrison && this.temple.prison.hitNpc(this.ray);
+    if (npc) {
+      const p = this.player.root.position, d = Math.hypot(p.x - npc.pos.x, p.z - npc.pos.z) || 1;
+      const k = Math.min(1, 1.5 / d), to = new THREE.Vector3(npc.pos.x + (p.x - npc.pos.x) * k, 0, npc.pos.z + (p.z - npc.pos.z) * k);
+      if (this.seat) this.stand();
+      if (npc.police) this.onPoliceTap?.(npc.role);
+      if (d > 1.7) this.walkTo(to);
+      return;
+    }
     // chạm vào Phật tử khác → mở thẻ (gửi lời chúc, tặng hương, kết bạn)
     if (this.remotes.size) {
       const hit = this.ray.intersectObjects([...this.remotes.values()].filter((r) => !r.culled).map((r) => r.av.root), true)[0];
@@ -936,12 +1070,12 @@ export class World {
     if (hitC) {
       cushion = this.temple.cushions.find((c) => c.mesh === hitC.object);
       if (cushion.occupant && !cushion.occupant.npc && cushion.occupant !== this.player) { this.onToast?.('Chỗ này đã có người ngồi'); return; }
-      target = cushion.pos.clone();
+      target = seatTarget(cushion);
     } else {
       const hit = new THREE.Vector3();
       if (!this.ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), -this.player.root.position.y), hit)) return;
       const nearC = this.temple.cushions.find((c) => Math.hypot(c.pos.x - hit.x, c.pos.z - hit.z) < 0.75 && (!c.occupant || c.occupant.npc));
-      if (nearC) { cushion = nearC; target = nearC.pos.clone(); } else target = hit;
+      if (nearC) { cushion = nearC; target = seatTarget(nearC); } else target = hit;
     }
     if (cushion === this.seat) return;
     if (this.seat) this.stand();
@@ -952,8 +1086,7 @@ export class World {
       target.x = THREE.MathUtils.clamp(target.x, b.minX, b.maxX);
       target.z = THREE.MathUtils.clamp(target.z, b.minZ, b.maxZ);
     }
-    this.walkPath = null;
-    this.walkTarget = { pos: target, cushion };
+    this.walkTo(target, cushion);
     this.ripple.position.set(target.x, 0.2, target.z);
     this.rippleT = 0;
   }
@@ -1186,7 +1319,8 @@ export class World {
       const d = Math.hypot(dx, dz);
       if (d < 0.08) {
         const cu = this.walkTarget.cushion;
-        this.walkTarget = this.walkPath?.length ? { pos: this.walkPath.shift(), cushion: null } : null;
+        const nx = this.walkPath?.length ? this.walkPath.shift() : null;
+        this.walkTarget = nx ? (nx.isVector3 ? { pos: nx, cushion: null } : nx) : null;
         if (cu) this.sit(cu);
       } else { mx = dx / d; mz = dz / d; if (d < 0.3) { mx *= d / 0.3; mz *= d / 0.3; } }
     }
@@ -1196,11 +1330,15 @@ export class World {
       const pp = P.root.position, cy = this.groundY ?? 0;
       const nx = pp.x + mx * speed * dt, nz = pp.z + mz * speed * dt;
       let y;
+      // đang lỡ đứng lẫn trong vật cản (vừa dịch chuyển, cửa vừa đóng…) thì cho bước ra
+      this._ignoreRects = this.temple.rects ? this.blocked(pp.x, pp.z, 0.05) : false;
       // trượt theo từng trục khi bị chặn (tường, mép nước…)
-      if ((y = this.walkable(nx, nz, cy)) !== null) { pp.x = nx; pp.z = nz; }
+      if ((y = this.walkable(nx, nz, cy)) !== null) { pp.x = nx; pp.z = nz; this.walkStuck = 0; }
       else if ((y = this.walkable(nx, pp.z, cy)) !== null) pp.x = nx;
       else if ((y = this.walkable(pp.x, nz, cy)) !== null) pp.z = nz;
       else if (this.walkTarget && !this.walkTarget.cushion) { this.walkTarget = null; this.walkPath = null; }
+      else if (this.walkTarget?.cushion && (this.walkStuck = (this.walkStuck || 0) + dt) > 1.5) this.sit(this.walkTarget.cushion); // kẹt mãi không tới chỗ ngồi thì ngồi luôn
+      this._ignoreRects = false;
       if (y !== null && y !== undefined) this.groundY = y;
       P.root.rotation.y = lerpAngle(P.root.rotation.y, Math.atan2(-mx, -mz), Math.min(1, dt * 10));
     }
@@ -1263,7 +1401,7 @@ export class World {
     this.tickLoc(dt, time);
     this.tickBeasts(dt, time);
     this.tickCafePets(dt, time);
-    this.temple.update(dt, time);
+    this.temple.update(dt, time, this);
     if (this.rippleT < 1) {
       this.rippleT += dt * 1.3;
       this.ripple.material.opacity = 0.8 * (1 - this.rippleT);
@@ -1293,7 +1431,7 @@ export class World {
     if (!this.outside) {
       pos.x = THREE.MathUtils.clamp(pos.x, -W / 2 + 0.4, W / 2 - 0.4);
       pos.z = THREE.MathUtils.clamp(pos.z, -D / 2 + 0.4, D / 2 - 0.4);
-      pos.y = THREE.MathUtils.clamp(pos.y, 0.6, H - 0.4);
+      pos.y = THREE.MathUtils.clamp(pos.y, Math.min(H - 0.5, this.temple.camMinY?.(P.root.position.x, P.root.position.z) ?? 0.6), H - 0.4);
       if (this.faded?.size) {
         for (const [o, orig] of this.faded) { (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => m.dispose()); o.material = orig; }
         this.faded.clear();

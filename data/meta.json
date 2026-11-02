@@ -1265,6 +1265,55 @@
       "npc": 3,
       "enabled": true,
       "sort": 16
+    },
+    {
+      "id": "nhatu",
+      "name": "Trại Cải Tạo Bình Minh",
+      "region": "Bắc",
+      "place": "Khu cải tạo – Nhà Tù",
+      "inspired": "Trại cải tạo lao động",
+      "description": "Dãy phòng giam ngăn nắp và sân lao động: trồng rau, nuôi lợn, nuôi cá, đào đá. Cải tạo tốt để được ra trại!",
+      "theme": {
+        "size": [
+          30,
+          22,
+          7
+        ],
+        "prison": true,
+        "wall": "stone",
+        "wallColor": "#c9c2b0",
+        "pillar": "#7d7a70",
+        "floor": "tile",
+        "view": "nhatu",
+        "mural": null,
+        "roof": "#5b5f55",
+        "statues": [],
+        "light": {
+          "hemi": "#f4f1e6",
+          "key": 1.25,
+          "warm": "#ffe2b0"
+        },
+        "fog": "#9fb0a8",
+        "cushions": {
+          "cols": [
+            -12,
+            -9,
+            -6,
+            -3,
+            3,
+            6,
+            9,
+            12
+          ],
+          "rows": 1,
+          "z0": -8,
+          "dz": 2.4
+        },
+        "extras": []
+      },
+      "npc": 0,
+      "enabled": true,
+      "sort": 99
     }
   ],
   "items": [

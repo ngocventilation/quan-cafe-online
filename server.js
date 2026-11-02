@@ -33,7 +33,8 @@ let db = {
   visited: {},
   lanterns: [],
   steles: {},
-  donations: []
+  donations: [],
+  prison: {}
 };
 
 function initDefaultDb() {
@@ -63,6 +64,8 @@ function loadDb() {
     }
   }
   initDefaultDb();
+  // Hồ sơ cải tạo khu Nhà Tù (db cũ chưa có khoá này)
+  if (!db.prison || typeof db.prison !== 'object') db.prison = {};
   // Ensure existing users have Cafe-themed quest titles and starter pets/items
   for (const uid of Object.keys(db.users || {})) {
     const u = db.users[uid];
@@ -147,7 +150,7 @@ app.get('/api/meta', (req, res) => {
 });
 
 app.get('/api/build', (req, res) => {
-  res.json({ build: 'cafe3d-v3' });
+  res.json({ build: 'cafe3d-v4' });
 });
 
 app.get('/api/challenge', (req, res) => {
@@ -262,7 +265,8 @@ app.get('/api/me', (req, res) => {
     user,
     inventory: db.inventory[user.id] || {},
     quests: db.quests[user.id] || getDefaultQuests(),
-    visited: db.visited[user.id] || ['nhattru']
+    visited: db.visited[user.id] || ['nhattru'],
+    prison: prisonState(user.id)
   });
 });
 
@@ -287,6 +291,10 @@ app.post('/api/practice', (req, res) => {
   if (!user) return res.status(401).json({ error: 'Chưa đăng nhập' });
 
   const { type, count = 1, temple = 'nhattru', auto } = req.body;
+  // Đang cải tạo thì không được ghé khu khác: bỏ qua lượt viếng (không báo lỗi)
+  if (type === 'visit' && temple !== PRISON_TEMPLE && isJailed(user.id)) {
+    return res.json({ gained: 0, user, extra: { already: true, jailed: true } });
+  }
   let gained = 0;
   let extra = {};
 
@@ -637,6 +645,184 @@ app.get('/api/que', (req, res) => {
   res.json({ quesm: quesm[Math.floor(Math.random() * quesm.length)] });
 });
 
+/* =====================================================================
+   KHU NHÀ TÙ – TRẠI CẢI TẠO BÌNH MINH
+   Nhập trại → làm đủ 4 việc cải tạo (mini-game) → ra trại, có thưởng.
+   ===================================================================== */
+const PRISON_TEMPLE = 'nhatu';
+const PRISON_CELLS = 8;
+const PRISON_DUR_SEC = 45; // mỗi buổi mini-game dài 45 giây
+const PRISON_RUN_TTL = 10 * 60 * 1000; // lượt chơi bỏ dở quá 10 phút thì huỷ
+const PRISON_FAST = process.env.PRISON_FAST === '1'; // CHỈ để kiểm thử: bỏ thời gian tối thiểu
+const PRISON_TASKS = [
+  { id: 'trongrau', name: 'Trồng rau', icon: '🥬', need: 2, minSec: 20, pass: 6, maxScore: 40, desc: 'Xới đất, gieo hạt, tưới nước rồi thu hoạch rau xanh ở vườn trại.' },
+  { id: 'nuoilon', name: 'Nuôi lợn', icon: '🐷', need: 2, minSec: 20, pass: 8, maxScore: 60, desc: 'Cho lợn ăn đúng lúc đói và dọn chuồng luôn sạch sẽ.' },
+  { id: 'nuoica', name: 'Nuôi cá', icon: '🐟', need: 2, minSec: 20, pass: 5, maxScore: 40, desc: 'Rắc cám cho cá ăn, chỉ vớt những con cá đã lớn.' },
+  { id: 'daoda', name: 'Đào đá', icon: '⛏️', need: 2, minSec: 20, pass: 8, maxScore: 50, desc: 'Canh đúng nhịp bổ cuốc để đập vỡ tảng đá, chở đá về xe cút kít.' }
+];
+const prisonRuns = new Map(); // runId → { uid, task, t0 } (lượt chơi đang mở, chỉ giữ trong bộ nhớ)
+
+const prisonMinSec = (t) => (PRISON_FAST ? 0 : t.minSec);
+const prisonZero = () => Object.fromEntries(PRISON_TASKS.map((t) => [t.id, 0]));
+const isJailed = (uid) => !!(uid && db.prison && db.prison[uid] && db.prison[uid].status === 'giam');
+
+// Lấy (hoặc tạo) hồ sơ cải tạo của người dùng
+function prisonRecord(uid) {
+  if (!db.prison) db.prison = {};
+  const r = db.prison[uid] || (db.prison[uid] = { status: null, cell: null, enteredAt: null, releasedAt: null, times: 0, progress: prisonZero(), best: prisonZero() });
+  if (!r.progress) r.progress = prisonZero();
+  if (!r.best) r.best = prisonZero();
+  return r;
+}
+
+// Trạng thái gửi cho client (null-safe khi chưa có hồ sơ)
+function prisonState(uid) {
+  const r = (db.prison && db.prison[uid]) || {};
+  const progress = r.progress || {};
+  const best = r.best || {};
+  const tasks = PRISON_TASKS.map((t) => ({
+    id: t.id, name: t.name, icon: t.icon, desc: t.desc, need: t.need,
+    done: Math.min(t.need, progress[t.id] || 0),
+    minSec: prisonMinSec(t), pass: t.pass, maxScore: t.maxScore,
+    best: best[t.id] || 0
+  }));
+  return {
+    status: r.status || null,
+    cell: Number.isInteger(r.cell) ? r.cell : null,
+    times: r.times || 0,
+    enteredAt: r.enteredAt || null,
+    releasedAt: r.releasedAt || null,
+    tasks,
+    remaining: tasks.reduce((s, t) => s + (t.need - t.done), 0)
+  };
+}
+
+// Xếp phòng giam đang ít người nhất (bằng nhau thì lấy phòng số nhỏ)
+function prisonPickCell(uid) {
+  const count = new Array(PRISON_CELLS).fill(0);
+  for (const [id, r] of Object.entries(db.prison || {})) {
+    if (String(id) === String(uid) || !r || r.status !== 'giam') continue;
+    if (Number.isInteger(r.cell) && r.cell >= 0 && r.cell < PRISON_CELLS) count[r.cell]++;
+  }
+  let best = 0;
+  for (let i = 1; i < PRISON_CELLS; i++) if (count[i] < count[best]) best = i;
+  return best;
+}
+
+function prisonSweepRuns(now = Date.now()) {
+  for (const [id, run] of prisonRuns) if (now - run.t0 > PRISON_RUN_TTL) prisonRuns.delete(id);
+}
+
+// Cộng EXP và cập nhật cấp (dùng chung bảng cấp trong meta)
+function prisonAddExp(user, n) {
+  user.exp = (user.exp || 0) + n;
+  const newLevel = getLevelFromExp(user.exp);
+  if (newLevel > (user.level || 1)) {
+    user.level = newLevel;
+    broadcastTicker(`✨ ${user.name} vừa lên Cấp Chill ${newLevel} tại Quán Cafe 3D! ☕🎉`);
+    return newLevel;
+  }
+  return 0;
+}
+
+app.get('/api/prison', (req, res) => {
+  const user = authUser(req);
+  if (!user) return res.status(401).json({ error: 'Chưa đăng nhập' });
+  res.json(prisonState(user.id));
+});
+
+app.post('/api/prison/enter', (req, res) => {
+  const user = authUser(req);
+  if (!user) return res.status(401).json({ error: 'Chưa đăng nhập' });
+  const rec = prisonRecord(user.id);
+  if (rec.status !== 'giam') {
+    rec.status = 'giam';
+    rec.progress = prisonZero();
+    rec.enteredAt = Date.now();
+    rec.cell = prisonPickCell(user.id);
+    saveDb();
+    broadcastToTemple(PRISON_TEMPLE, { t: 'prison', ev: 'enter', name: user.name, cell: rec.cell });
+  }
+  res.json(prisonState(user.id));
+});
+
+app.post('/api/prison/visit', (req, res) => {
+  const user = authUser(req);
+  if (!user) return res.status(401).json({ error: 'Chưa đăng nhập' });
+  res.json(prisonState(user.id));
+});
+
+app.post('/api/prison/start', (req, res) => {
+  const user = authUser(req);
+  if (!user) return res.status(401).json({ error: 'Chưa đăng nhập' });
+  const { task } = req.body || {};
+  const t = PRISON_TASKS.find((x) => x.id === task);
+  if (!t) return res.status(400).json({ error: 'Việc cải tạo không hợp lệ' });
+  if (!isJailed(user.id)) return res.status(409).json({ error: 'Bạn không trong thời gian cải tạo' });
+  const now = Date.now();
+  prisonSweepRuns(now);
+  const runId = 'pr_' + Math.random().toString(36).substring(2, 10) + now.toString(36);
+  prisonRuns.set(runId, { uid: user.id, task: t.id, t0: now });
+  res.json({ runId, task: t.id, minSec: prisonMinSec(t), pass: t.pass, maxScore: t.maxScore, durSec: PRISON_DUR_SEC });
+});
+
+app.post('/api/prison/finish', (req, res) => {
+  const user = authUser(req);
+  if (!user) return res.status(401).json({ error: 'Chưa đăng nhập' });
+  const { runId, score } = req.body || {};
+  const now = Date.now();
+  prisonSweepRuns(now);
+  const run = typeof runId === 'string' ? prisonRuns.get(runId) : null;
+  if (!run || String(run.uid) !== String(user.id)) return res.status(404).json({ error: 'Không tìm thấy buổi cải tạo này' });
+  const t = PRISON_TASKS.find((x) => x.id === run.task);
+  if (now - run.t0 < prisonMinSec(t) * 1000) return res.status(400).json({ error: 'Làm nhanh quá, cán bộ chưa ghi nhận' });
+  prisonRuns.delete(runId);
+  if (!isJailed(user.id)) return res.status(409).json({ error: 'Bạn không trong thời gian cải tạo' });
+
+  const rec = prisonRecord(user.id);
+  const sc = Math.min(t.maxScore, Math.max(0, Math.round(Number(score)) || 0));
+  const passed = sc >= t.pass;
+  const gained = { sen: 0, exp: 0, ngoc: 0 };
+  let levelUp = 0;
+  rec.best[t.id] = Math.max(rec.best[t.id] || 0, sc);
+  if (!user.currencies) user.currencies = { sen: 0, ngoc: 0 };
+
+  if (passed) {
+    if ((rec.progress[t.id] || 0) < t.need) rec.progress[t.id] = (rec.progress[t.id] || 0) + 1;
+    gained.sen += 10 + sc;
+    gained.exp += 15;
+    user.currencies.sen = (user.currencies.sen || 0) + 10 + sc;
+    levelUp = prisonAddExp(user, 15) || levelUp;
+  }
+
+  // Đủ số buổi cho cả 4 việc → ra trại
+  const released = PRISON_TASKS.every((x) => (rec.progress[x.id] || 0) >= x.need);
+  if (released) {
+    rec.status = 'tudo';
+    rec.releasedAt = now;
+    rec.times = (rec.times || 0) + 1;
+    gained.sen += 200;
+    gained.ngoc += 5;
+    gained.exp += 100;
+    user.currencies.sen = (user.currencies.sen || 0) + 200;
+    user.currencies.ngoc = (user.currencies.ngoc || 0) + 5;
+    levelUp = prisonAddExp(user, 100) || levelUp;
+  }
+
+  saveDb();
+  if (released) broadcastToTemple(PRISON_TEMPLE, { t: 'prison', ev: 'release', name: user.name });
+
+  const state = prisonState(user.id);
+  res.json({
+    passed, score: sc, gained, released, state, user, levelUp,
+    // kèm hồ sơ đầy đủ để client có thể gọi setProfile() mà không mất túi đồ / nhiệm vụ
+    inventory: db.inventory[user.id] || {},
+    quests: db.quests[user.id] || getDefaultQuests(),
+    visited: db.visited[user.id] || ['nhattru'],
+    prison: state
+  });
+});
+
 // Broadcast Helper
 function broadcastTicker(text) {
   const msg = JSON.stringify({ t: 'ticker', text });
@@ -685,9 +871,15 @@ wss.on('connection', (ws, req) => {
       const m = JSON.parse(data.toString());
       if (m.t === 'join') {
         ws.temple = m.temple || 'nhattru';
-        ws.send(JSON.stringify({ t: 'joined', build: 'cafe3d-v3' }));
+        // Đang cải tạo thì máy chủ ép về Trại Cải Tạo, báo client TRƯỚC 'joined'
+        if (ws.temple !== PRISON_TEMPLE && isJailed(ws.userId)) {
+          ws.temple = PRISON_TEMPLE;
+          ws.send(JSON.stringify({ t: 'jailed', temple: PRISON_TEMPLE }));
+        }
+        ws.send(JSON.stringify({ t: 'joined', build: 'cafe3d-v4' }));
 
-        const activeProfiles = [...simulatedDevotees];
+        // Trong trại chỉ có người thật, không thêm khách giả
+        const activeProfiles = ws.temple === PRISON_TEMPLE ? [] : [...simulatedDevotees];
         if (ws.userId && db.users[ws.userId]) {
           activeProfiles.push(db.users[ws.userId]);
         }
@@ -758,13 +950,16 @@ function broadcastRoom(templeId) {
         seat: c.state.seat,
         a: c.state.a,
         order: c.state.order || u.order || 'phin',
-        study: c.state.study !== undefined ? c.state.study : !!u.study
+        study: c.state.study !== undefined ? c.state.study : !!u.study,
+        jailed: isJailed(c.userId)
       });
     }
   });
 
-  const allPlayers = [...simulatedDevotees, ...realPlayers];
-  const onlineCount = 128 + roomClients.length;
+  // Trại cải tạo: chỉ người thật, không có khách giả và số online thật
+  const isPrison = templeId === PRISON_TEMPLE;
+  const allPlayers = isPrison ? realPlayers : [...simulatedDevotees, ...realPlayers];
+  const onlineCount = (isPrison ? 0 : 128) + roomClients.length;
 
   const msg = JSON.stringify({
     t: 'room',

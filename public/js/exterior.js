@@ -347,6 +347,8 @@ const MOODS = {
   palm: { el: 62, az: 150, zen: '#2a6ad0', hor: '#d3e6f2', gnd: '#b4bcb4', sun: '#fff6e6', sunI: 3.1, glow: 0.75, cloud: 0.45, fog: 0.0024, fogHF: 0.012, fogBase: -1, amb: 0.6, skyI: 1.3 },
   citadel: { el: 26, az: 140, zen: '#4a7cbc', hor: '#e8dcc4', gnd: '#aaa890', sun: '#ffe0b0', sunI: 2.7, glow: 1.2, cloud: 0.45, fog: 0.0036, fogHF: 0.014, fogBase: -3, amb: 0.55, skyI: 1.2 },
   garden: { el: 33, az: -135, zen: '#4683cc', hor: '#e6dec6', gnd: '#a8ac94', sun: '#ffe4bc', sunI: 2.8, glow: 1.05, cloud: 0.42, fog: 0.0032, fogHF: 0.014, fogBase: -1, amb: 0.55, skyI: 1.25 },
+  // trại cải tạo giữa đồng bằng Bắc Bộ: nắng sớm trong, núi xa mờ
+  nhatu: { el: 36, az: 128, zen: '#4a86c8', hor: '#e2e6d6', gnd: '#a9ae98', sun: '#fff0d4', sunI: 2.8, glow: 1.05, cloud: 0.5, fog: 0.0024, fogHF: 0.01, fogBase: -6, amb: 0.56, skyI: 1.22 },
 };
 
 const GLSL_COMMON = /* glsl */`
@@ -1156,7 +1158,7 @@ function hipRoof(env, o) {
   if (vMax >= 1) {
     if (rl > 0.3) {
       orn.push(place(boxUV(rl * 2 + s * 0.3, s * 0.3, s * 0.24), 0, h + s * 0.12, 0));
-      for (const k of [-1, 1]) orn.push(taperTube([new V3(k * (rl - s * 0.1), h + s * 0.12, 0), new V3(k * (rl + s * 0.22), h + s * 0.3, 0), new V3(k * (rl + s * 0.3), h + s * 0.62, 0), new V3(k * (rl + s * 0.16), h + s * 0.8, 0)], (t) => s * 0.14 * (1 - 0.65 * t), 6, 14));
+      if (o.ridgeEnds !== false) for (const k of [-1, 1]) orn.push(taperTube([new V3(k * (rl - s * 0.1), h + s * 0.12, 0), new V3(k * (rl + s * 0.22), h + s * 0.3, 0), new V3(k * (rl + s * 0.3), h + s * 0.62, 0), new V3(k * (rl + s * 0.16), h + s * 0.8, 0)], (t) => s * 0.14 * (1 - 0.65 * t), 6, 14));
     }
     const ornament = o.ornament ?? 'dragon';
     if (ornament === 'dragon' && rl > 0.6) {
@@ -1238,7 +1240,7 @@ function hall(env, o) {
   body.add(mesh(merge([place(boxUV(cx * 2 + 0.6, 0.35, 0.3), 0, o.h + 0.2, cz), place(boxUV(cx * 2 + 0.6, 0.35, 0.3), 0, o.h + 0.2, -cz), place(boxUV(0.3, 0.35, cz * 2 + 0.6), cx, o.h + 0.2, 0), place(boxUV(0.3, 0.35, cz * 2 + 0.6), -cx, o.h + 0.2, 0)]), beamM));
   // mái
   const rw = cx * 2 + over * 2, rd = cz * 2 + over * 2, rh = o.roofH ?? rd * 0.42;
-  const roofCfg = { tile: o.tile || '#7a3a24', ridgeCol: o.ridgeCol, under: o.under, metal: o.metal, ornament: o.ornament, ornMat: o.ornMat };
+  const roofCfg = { tile: o.tile || '#7a3a24', ridgeCol: o.ridgeCol, under: o.under, metal: o.metal, ornament: o.ornament, ornMat: o.ornMat, ridgeEnds: o.ridgeEnds, curl: o.curl };
   const eaveY = o.h + 0.35;
   if ((o.tiers || 1) >= 2) {
     const lower = hipRoof(env, { ...roofCfg, w: rw, d: rd, h: rh, vMax: 0.42 });
@@ -1538,6 +1540,8 @@ const HALL_STYLE = {
   bronze: { outer: '#7a5a2e', tile: '#8a6a3a', under: '#4a3820', col: '#8a6a34', metal: true },
   plaster: { outer: '#efe6d2', tile: '#8a4a2e', under: '#5a4030', col: '#a8503a' },
   khmer: { outer: '#f2d9a0', tile: '#d8641c', under: '#6a2a10', col: '#f0c050' },
+  // dãy nhà giam: tường vôi xám, mái ngói xám không đầu đao rồng
+  stone: { outer: '#d9d2bf', tile: '#6c7068', under: '#3c3e38', col: '#8a877c', ornament: 'none', curl: 0.2, roofH: 4.6, lift: 0.35, flare: 0.25, ridgeEnds: false },
 };
 function hallShell(c) {
   const { env, g, W, D, H, gy, theme } = c;
@@ -1558,7 +1562,7 @@ function hallShell(c) {
     g.add(khmerRoof(env, { w: W + 2 * T + 3.2, d: D + 2 * T + 3.2, y: H + 0.25 }));
   } else {
     const over = theme.view === 'pond' ? 2.0 : 3.2;
-    const rf = hipRoof(env, { w: W + 2 * T + over * 2, d: D + 2 * T + over * 2, h: Math.min(D, W) * 0.36 + 2, tile: st.tile, under: st.under, metal: st.metal, ridgeCol: st.ridge, scale: Math.max(1.2, Math.min(W, D) / 9) });
+    const rf = hipRoof(env, { w: W + 2 * T + over * 2, d: D + 2 * T + over * 2, h: st.roofH ?? Math.min(D, W) * 0.36 + 2, tile: st.tile, under: st.under, metal: st.metal, ridgeCol: st.ridge, scale: Math.max(1.2, Math.min(W, D) / 9), ornament: st.ornament, curl: st.curl, lift: st.lift, flare: st.flare, ridgeEnds: st.ridgeEnds });
     rf.position.y = H + 0.4; g.add(rf);
   }
   // xà viền đỡ mái
@@ -3075,9 +3079,323 @@ VIEWS.hoangoc = (c) => {
   return { groundY: gy, walkR: ER, blocks: [...blocks, ...garden], noGarden: nope };
 };
 
+/* ---------- Trại Cải Tạo Bình Minh: sân lao động trong tường rào cao, dây thép gai, chòi canh; vườn rau, chuồng lợn, ao cá, bãi đá ---------- */
+const _UP = new V3(0, 1, 0);
+// thanh tròn nối hai điểm [x,y,z] (cột rào, dây thép, thanh giằng)
+function rod(a, b, r = 0.04, seg = 6) {
+  const A = new V3(...a), B = new V3(...b), d = B.clone().sub(A), len = Math.max(0.001, d.length());
+  const geo = new THREE.CylinderGeometry(r, r, len, seg);
+  return geo.applyMatrix4(new THREE.Matrix4().compose(A.add(B).multiplyScalar(0.5), new THREE.Quaternion().setFromUnitVectors(_UP, d.normalize()), new V3(1, 1, 1)));
+}
+function starPath(g, cx, cy, R, r = R * 0.382) { g.beginPath(); for (let i = 0; i < 10; i++) { const a = -PI / 2 + (i * PI) / 5, k = i % 2 ? r : R; g.lineTo(cx + Math.cos(a) * k, cy + Math.sin(a) * k); } g.closePath(); g.fill(); }
+const flagTex = () => ctex('flagvn', 192, 128, (g, w, h) => { g.fillStyle = '#d8231b'; g.fillRect(0, 0, w, h); g.fillStyle = '#ffd21f'; starPath(g, w / 2, h / 2 + 2, h * 0.31); }, { repeat: false });
+// biển chữ: nền đỏ chữ vàng (khẩu hiệu) hoặc nền xanh chữ trắng (biển chỉ dẫn)
+const boardTex = (text, sub, bg = '#a3201a', fg = '#ffd54a') => ctex('board|' + text + '|' + sub + '|' + bg, 1024, 256, (g, w, h) => {
+  const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, shade(bg, 0.1)); gr.addColorStop(1, shade(bg, -0.28));
+  g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  g.strokeStyle = fg; g.lineWidth = 10; g.strokeRect(14, 14, w - 28, h - 28);
+  g.fillStyle = fg; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.font = `800 ${sub ? 88 : 108}px system-ui, sans-serif`; g.fillText(text, w / 2, sub ? h * 0.4 : h / 2 + 4, w - 90);
+  if (sub) { g.font = '600 46px system-ui, sans-serif'; g.fillStyle = '#fff6dc'; g.fillText(sub, w / 2, h * 0.77, w - 120); }
+}, { repeat: false });
+const gateSignTex = () => ctex('gatesign', 1024, 160, (g, w, h) => {
+  const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#c0281e'); gr.addColorStop(1, '#7e140e');
+  g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  g.strokeStyle = '#ffd54a'; g.lineWidth = 8; g.strokeRect(10, 10, w - 20, h - 20);
+  g.fillStyle = '#ffd54a'; starPath(g, 70, h / 2, 34); starPath(g, w - 70, h / 2, 34);
+  g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = '900 84px system-ui, sans-serif';
+  g.fillText('TRẠI CẢI TẠO BÌNH MINH', w / 2, h / 2 + 4, w - 220);
+}, { repeat: false });
+// chiếu tôn sóng (mái chuồng, mái chòi)
+const tinTex = () => ctex('tin', 128, 128, (g, w, h) => {
+  for (let x = 0; x < w; x += 16) { const gr = g.createLinearGradient(x, 0, x + 16, 0); gr.addColorStop(0, '#8a8e8a'); gr.addColorStop(0.5, '#c8ccc6'); gr.addColorStop(1, '#8a8e8a'); g.fillStyle = gr; g.fillRect(x, 0, 16, h); }
+  speckle(g, w, h, 90, ['#8a5a3a', '#6a4a30'], 1, 6, 0.08, 0.3); // gỉ sét
+});
+function signBoard(env, g, { x, y = 0, z, ry = 0, w = 3.2, h = 0.8, post = 1.4, text, sub, bg, fg }) {
+  const p = new THREE.Group();
+  p.add(mesh(new THREE.PlaneGeometry(w, h), env.std('board|' + text + '|' + sub, { map: boardTex(text, sub, bg, fg), roughness: 0.6 }), { pos: [0, post + h / 2, 0.036] }));
+  p.add(mesh(merge([place(boxUV(w + 0.12, h + 0.12, 0.06), 0, post + h / 2, 0), place(boxUV(0.09, post + h, 0.09), -w / 2 + 0.25, (post + h) / 2, -0.07), place(boxUV(0.09, post + h, 0.09), w / 2 - 0.25, (post + h) / 2, -0.07)]), env.std('boardBack', { color: '#4f5450', roughness: 0.6, metalness: 0.35 }), { cast: true }));
+  p.position.set(x, y, z); p.rotation.y = ry; g.add(p);
+  return p;
+}
+// mặt phẳng nằm ngang (lối đi), UV theo mét
+function flats(list, y, s = 3) {
+  return merge(list.map(([x0, z0, x1, z1]) => {
+    const p = new THREE.PlaneGeometry(x1 - x0, z1 - z0); p.rotateX(-PI / 2);
+    const uv = p.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, (uv.getX(i) * (x1 - x0) + x0) / s, (uv.getY(i) * (z1 - z0) - z1) / s);
+    return p.translate((x0 + x1) / 2, y, (z0 + z1) / 2);
+  }));
+}
+VIEWS.nhatu = (c) => {
+  const { env, g, I } = c;
+  const hd = I ? c.D / 2 : 11;
+  const gy = I ? -0.45 : 0;
+  const X0 = -36, X1 = 36, Z0 = -hd - 9, Z1 = 50, WH = 4.2, GW = 7.2, ER = 74;
+  const yard = (x, z) => boxDist(x, z, X0, X1, Z0, Z1);
+  const road = (x, z) => boxDist(x, z, -3.6, 3.6, Z1, 900);
+  const quarry = (x, z) => boxDist(x, z, 22, 35.5, 32, 47);
+  const h = (x, z) => {
+    const r = Math.hypot(x, z), a = Math.atan2(x, z);
+    // ruộng lúa phẳng quanh trại, xa xa là đồi và dãy núi
+    let y = gy - 0.28 + fbm(x * 0.018, z * 0.018, 3, 5) * 0.3;
+    y += (ridge(a, r, { rc: 560, width: 240, H: 140, freq: 2.4, seed: 9 }) + ridge(a, r, { rc: 260, width: 90, H: 28, freq: 3.6, seed: 4 })) * smooth(110, 220, r);
+    const d = Math.min(yard(x, z), road(x, z) + 1);
+    return d < 8 ? lerp(gy - 0.04, y, smooth(0.5, 8, d)) : y;
+  };
+  const col = (t, x, y, z, ny) => {
+    if (yard(x, z) < 1) {
+      t.set('#7d8b4a').lerp(C('#9c8a62'), (nz(x * 0.13, z * 0.13, 2) * 0.5 + 0.5) * 0.7); // cỏ cháy lẫn đất nện
+      const q = quarry(x, z); if (q < 5) t.lerp(C('#a9a498'), smooth(5, 0, q) * 0.9);
+      return;
+    }
+    if (road(x, z) < 1) { t.set('#6e6a62'); return; }
+    if (y < gy + 1.2) { const k = Math.abs(Math.floor((x + 7) / 30) + Math.floor((z - 3) / 22)) % 3; t.set(['#6f9a3c', '#86a845', '#a3b052'][k]); t.multiplyScalar(0.92 + nz(x * 0.08, z * 0.08, 3) * 0.12); return; }
+    terrCol(t, y, ny, { grass: '#5c7e36', forest: '#2e5028', rock: '#6f6a5a' });
+  };
+  const tmat = env.std('ground_nhatu', { vertexColors: true, map: detailTex('grass'), roughness: 1 }, { detail: 0.05 });
+  g.add(polarTerrain(env, { r0: 0.5, r1: 170, lin: true, segR: 90, segA: env.hq ? 240 : 150, h, col, mat: tmat }));
+  g.add(polarTerrain(env, { r0: 170, r1: 1500, segR: 50, segA: 240, h, col }));
+  const rects = [], blocks = [];
+  if (!I) {
+    const hl = hall(env, { w: 30, d: 22, h: 6, plinth: 0.45, ver: 1.2, over: 1.2, wall: '#e2dbc6', door: '#3f5f45', frame: '#2a2e28', col: '#8a877c', tile: '#6c7068', under: '#3c3e38', ornament: 'none', ridgeEnds: false, curl: 0.2, style: 'plaster', bays: 7, stepW: 8 });
+    hl.position.y = gy; g.add(hl);
+    c.camera = { pos: [62, 34, 96], target: [0, 1, 18] };
+  }
+
+  /* lối đi bê tông + đường nhựa ngoài cổng */
+  const paths = [[-2.2, hd + 1.5, 2.2, Z1 + 0.3], [-17, hd + 2.2, 17, hd + 4.4], [-16.6, 23.5, -2.2, 26.6], [2.2, 21.4, 14.4, 24.4], [-17.8, 39.9, -2.2, 43.1], [2.2, 38.6, 17, 41.8]];
+  g.add(mesh(flats(paths, gy + 0.02), env.std('nhPath', { map: texRepeat(stoneTex('#bdb6a6'), 1, 1), roughness: 0.92 })));
+  g.add(mesh(flats([[-3.6, Z1 + 0.3, 3.6, 260]], gy - 0.015, 4), env.std('nhRoad', { color: '#6c6862', roughness: 0.95 }, { detail: 0.35 })));
+
+  /* tường rào cao + dây thép gai */
+  const wallM = texMat(env, 'nhWall', plasterTex('#d6cfba'), 1, 1);
+  const segs = [[[X0, Z0], [X1, Z0]], [[X1, Z0], [X1, Z1]], [[X1, Z1], [GW / 2 + 1.3, Z1]], [[-GW / 2 - 1.3, Z1], [X0, Z1]], [[X0, Z1], [X0, Z0]]];
+  const wl = [], bl = [], cl = [], posts = [], wires = [], coils = [];
+  for (const [[x0, z0], [x1, z1]] of segs) {
+    const L = Math.hypot(x1 - x0, z1 - z0), a = Math.atan2(x1 - x0, z1 - z0), mx = (x0 + x1) / 2, mz = (z0 + z1) / 2;
+    wl.push(place(boxUV(0.5, WH, L + 0.5, 1.5), mx, gy + WH / 2, mz, a));
+    bl.push(place(boxUV(0.64, 0.7, L + 0.64, 1), mx, gy + 0.35, mz, a));
+    cl.push(place(boxUV(0.72, 0.16, L + 0.72, 1), mx, gy + WH + 0.08, mz, a));
+    rects.push([Math.min(x0, x1) - 0.3, Math.min(z0, z1) - 0.3, Math.max(x0, x1) + 0.3, Math.max(z0, z1) + 0.3]);
+    // cọc thép nghiêng vào trong sân, ba sợi dây gai, cuộn dây gai hình lò xo
+    const dx = (x1 - x0) / L, dz = (z1 - z0) / L;
+    let nx = dz, nzz = -dx; if (nx * -mx + nzz * ((Z0 + Z1) / 2 - mz) < 0) { nx = -nx; nzz = -nzz; }
+    const top = gy + WH + 0.16, n = Math.max(1, Math.round(L / 2.5));
+    for (let k = 0; k <= n; k++) { const t = k / n, x = lerp(x0, x1, t), z = lerp(z0, z1, t); posts.push(rod([x, top, z], [x + nx * 0.32, top + 0.9, z + nzz * 0.32], 0.035, 4)); }
+    for (const k of [0.35, 0.62, 0.88]) wires.push(rod([x0 + nx * 0.36 * k, top + k, z0 + nzz * 0.36 * k], [x1 + nx * 0.36 * k, top + k, z1 + nzz * 0.36 * k], 0.012, 3));
+    const nc = Math.round(L / (env.hq ? 0.45 : 0.7));
+    for (let k = 0; k < nc; k++) coils.push([lerp(x0, x1, (k + 0.5) / nc), top + 0.3, lerp(z0, z1, (k + 0.5) / nc), a, k]);
+  }
+  g.add(mesh(merge(wl), wallM, { cast: true }));
+  g.add(mesh(merge(bl), env.std('nhWallBase', { map: texRepeat(stoneTex('#8f897c'), 1, 1), roughness: 0.95 })));
+  g.add(mesh(merge(cl), env.std('nhCap', { color: '#9c978b', roughness: 0.9 }), { cast: true }));
+  const wireM = env.std('nhWire', { color: '#5b5f62', roughness: 0.45, metalness: 0.7 });
+  g.add(mesh(merge([...posts, ...wires]), wireM));
+  const coilIM = new THREE.InstancedMesh(new THREE.TorusGeometry(0.3, 0.012, 3, env.hq ? 14 : 10), wireM, coils.length);
+  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), qa = new THREE.Quaternion(), one = new V3(1, 1, 1);
+  coils.forEach(([x, y, z, a, k], i) => { q.setFromEuler(new THREE.Euler(0, a, 0)); qa.setFromEuler(new THREE.Euler(0, k % 2 ? 0.38 : -0.38, 0)); m4.compose(new V3(x, y, z), q.multiply(qa), one); coilIM.setMatrixAt(i, m4); });
+  g.add(coilIM);
+
+  /* cổng sắt xanh hai cánh + trụ cổng + biển tên trại */
+  const pilM = texMat(env, 'nhPillar', plasterTex('#cfc8b2'), 1, 1);
+  const pil = [];
+  for (const s of [-1, 1]) {
+    const x = s * (GW / 2 + 0.65);
+    pil.push(place(boxUV(1.3, 5.4, 1.3, 1.5), x, gy + 2.7, Z1), place(boxUV(1.55, 0.25, 1.55), x, gy + 5.5, Z1));
+    rects.push([x - 0.7, Z1 - 0.7, x + 0.7, Z1 + 0.7]);
+  }
+  g.add(mesh(merge(pil), pilM, { cast: true }));
+  const steelM = env.std('nhSteel', { color: '#3f4a44', roughness: 0.5, metalness: 0.5 });
+  g.add(mesh(merge([place(boxUV(GW + 2.6, 0.22, 0.22), 0, gy + 5.75, Z1), place(boxUV(0.12, 1.6, 0.12), -GW / 2 - 0.2, gy + 6.4, Z1), place(boxUV(0.12, 1.6, 0.12), GW / 2 + 0.2, gy + 6.4, Z1), place(boxUV(GW + 1.4, 1.45, 0.1), 0, gy + 6.55, Z1)]), steelM, { cast: true }));
+  const signM = env.std('nhGateSign', { map: gateSignTex(), roughness: 0.55, emissive: '#3a0a06', emissiveIntensity: 0.25 });
+  for (const s of [-1, 1]) { const sp = mesh(new THREE.PlaneGeometry(GW + 1.2, (GW + 1.2) * 0.156), signM, { pos: [0, gy + 6.55, Z1 + s * 0.06] }); if (s < 0) sp.rotation.y = PI; g.add(sp); }
+  g.add(mesh(merge([-1, 1].map((s) => place(new THREE.SphereGeometry(0.24, 12, 8), s * (GW / 2 + 0.65), gy + 5.9, Z1))), env.std('nhLamp', { color: '#fff2c8', emissive: '#ffcf70', emissiveIntensity: 0.9, roughness: 0.4 })));
+  const gateM = env.std('nhGate', { color: '#2e6b45', roughness: 0.42, metalness: 0.45 });
+  const leafGeo = (sg) => {
+    const w = GW / 2 - 0.05, H = 4.1, p = [], X = (v) => sg * v;
+    p.push(place(boxUV(w, 1.7, 0.07), X(w / 2), 1.0, 0));
+    p.push(place(boxUV(0.13, H, 0.13), X(0.07), H / 2 + 0.12, 0), place(boxUV(0.13, H, 0.13), X(w - 0.07), H / 2 + 0.12, 0));
+    p.push(place(boxUV(w, 0.13, 0.13), X(w / 2), H + 0.12, 0), place(boxUV(w, 0.1, 0.1), X(w / 2), 1.9, 0), place(boxUV(w, 0.1, 0.1), X(w / 2), 0.12, 0));
+    for (let x = 0.2; x < w - 0.1; x += 0.2) p.push(place(new THREE.CylinderGeometry(0.024, 0.024, H - 1.85, 6), X(x), 1.95 + (H - 1.85) / 2, 0), place(new THREE.ConeGeometry(0.045, 0.2, 4), X(x), H + 0.28, 0));
+    for (let x = 0.45; x < w - 0.2; x += 0.55) p.push(place(boxUV(0.06, 1.5, 0.11), X(x), 1.0, 0));
+    return merge(p);
+  };
+  const leaves = [-1, 1].map((s) => {
+    const L = new THREE.Group(); L.position.set(s * GW / 2, gy, Z1);
+    L.add(mesh(leafGeo(-s), gateM, { cast: true })); g.add(L); return L;
+  });
+  signBoard(env, g, { x: -GW / 2 - 4.2, y: gy, z: Z1 + 1.6, w: 3.4, h: 0.85, post: 1.2, text: 'KHU VỰC CẤM', sub: 'Không phận sự miễn vào', bg: '#a3201a', fg: '#ffe7a0' });
+
+  /* chốt gác cạnh cổng */
+  const BX = GW / 2 + 4.6, BZ = Z1 - 2.6;
+  g.add(mesh(boxUV(2.4, 2.5, 2.2, 1.5), texMat(env, 'nhBooth', plasterTex('#e6d28a'), 1, 1), { pos: [BX, gy + 1.25, BZ], cast: true }));
+  g.add(mesh(boxUV(3.0, 0.16, 2.8), env.std('nhTin', { map: texRepeat(tinTex(), 2, 2), roughness: 0.5, metalness: 0.5 }), { pos: [BX, gy + 2.62, BZ], cast: true }));
+  const glassM = env.std('nhGlass', { color: '#26343c', roughness: 0.15, metalness: 0.4 });
+  g.add(mesh(merge([place(new THREE.PlaneGeometry(1.4, 0.9), BX - 1.205, gy + 1.65, BZ, -PI / 2), place(new THREE.PlaneGeometry(1.2, 0.9), BX, gy + 1.65, BZ - 1.105, PI)]), glassM));
+  g.add(mesh(new THREE.PlaneGeometry(1.5, 0.38), env.std('board|CHỐT GÁC|', { map: boardTex('CHỐT GÁC', '', '#1f4e8c', '#ffffff'), roughness: 0.6 }), { pos: [BX - 1.215, gy + 2.3, BZ], rot: [0, -PI / 2, 0] }));
+  rects.push([BX - 1.3, BZ - 1.2, BX + 1.3, BZ + 1.2]);
+
+  /* chòi canh bốn góc */
+  const tw = [], troof = [], tlamp = [];
+  for (const [x, z] of [[X0 + 2.4, Z0 + 2.4], [X1 - 2.4, Z0 + 2.4], [X0 + 2.4, Z1 - 2.4], [X1 - 2.4, Z1 - 2.4]]) {
+    const P = gy + 5.6, cx = Math.sign(-x), cz = Math.sign((Z0 + Z1) / 2 - z);
+    const legs = [[-1, -1], [1, -1], [1, 1], [-1, 1]];
+    legs.forEach(([sx, sz]) => tw.push(rod([x + sx * 1.35, gy, z + sz * 1.35], [x + sx * 1.05, P, z + sz * 1.05], 0.1, 6)));
+    for (let i = 0; i < 4; i++) {
+      const [ax, az] = legs[i], [bx, bz] = legs[(i + 1) % 4];
+      tw.push(rod([x + ax * 1.28, gy + 0.9, z + az * 1.28], [x + bx * 1.12, gy + 4.4, z + bz * 1.12], 0.045, 4), rod([x + bx * 1.28, gy + 0.9, z + bz * 1.28], [x + ax * 1.12, gy + 4.4, z + az * 1.12], 0.045, 4));
+      tw.push(rod([x + ax * 1.5, P + 0.1, z + az * 1.5], [x + ax * 1.5, P + 2.3, z + az * 1.5], 0.05, 5));
+    }
+    tw.push(place(boxUV(3.3, 0.2, 3.3), x, P, z));
+    for (const [sx, sz, w, d] of [[0, -1, 3.3, 0.08], [0, 1, 3.3, 0.08], [-1, 0, 0.08, 3.3], [1, 0, 0.08, 3.3]]) tw.push(place(boxUV(w, 1.0, d), x + sx * 1.61, P + 0.6, z + sz * 1.61));
+    // thang leo phía trong sân
+    const lx = x + cx * 1.62;
+    for (const o of [-0.25, 0.25]) tw.push(rod([lx + cx * 0.5, gy, z + o], [lx, P, z + o], 0.035, 4));
+    for (let k = 1; k < 13; k++) { const t = k / 13; tw.push(rod([lx + cx * 0.5 * (1 - t), gy + P * t - gy * t, z - 0.25], [lx + cx * 0.5 * (1 - t), gy + P * t - gy * t, z + 0.25], 0.025, 4)); }
+    troof.push(place(new THREE.ConeGeometry(2.7, 1.0, 4, 1), x, P + 2.75, z, PI / 4));
+    tlamp.push(place(new THREE.CylinderGeometry(0.2, 0.26, 0.4, 10), x + cx * 1.3, P + 1.3, z + cz * 1.3, 0, PI / 2.4, 0));
+    rects.push([x - 1.6, z - 1.6, x + 1.6, z + 1.6]);
+  }
+  const towerM = env.std('nhTower', { color: '#55604e', roughness: 0.75, metalness: 0.2 });
+  g.add(mesh(merge(tw), towerM, { cast: true }));
+  g.add(mesh(merge(troof), env.std('nhTinRoof', { map: texRepeat(tinTex(), 3, 1), roughness: 0.5, metalness: 0.5, side: THREE.DoubleSide }), { cast: true }));
+  g.add(mesh(merge(tlamp), env.std('nhSpot', { color: '#e8e4d8', emissive: '#fff0b0', emissiveIntensity: 0.5, roughness: 0.3, metalness: 0.6 })));
+
+  /* cột cờ + khẩu hiệu giữa sân */
+  const FX = -6, FZ = 32;
+  g.add(mesh(merge([place(boxUV(2.4, 0.25, 2.4), FX, gy + 0.12, FZ), place(boxUV(1.6, 0.25, 1.6), FX, gy + 0.37, FZ), place(new THREE.CylinderGeometry(0.05, 0.08, 9.2, 10), FX, gy + 4.6, FZ), place(new THREE.SphereGeometry(0.12, 10, 8), FX, gy + 9.25, FZ)]), env.std('nhPole', { color: '#d8d6cf', roughness: 0.4, metalness: 0.6 }), { cast: true }));
+  const flagGeo = new THREE.PlaneGeometry(2.1, 1.4, 14, 7); flagGeo.translate(1.12, 0, 0);
+  const flag = mesh(flagGeo, env.std('nhFlag', { map: flagTex(), roughness: 0.75, side: THREE.DoubleSide }), { pos: [FX, gy + 8.4, FZ], cast: true });
+  g.add(flag);
+  const fp = flagGeo.attributes.position, fbase = Float32Array.from(fp.array);
+  c.upd.push((dt, t) => {
+    for (let i = 0; i < fp.count; i++) { const x = fbase[i * 3], y = fbase[i * 3 + 1], k = x / 2.2; fp.setZ(i, (Math.sin(t * 3.2 - x * 2.4 + y * 0.6) * 0.16 + Math.sin(t * 5.1 - x * 4) * 0.04) * k); fp.setY(i, y - k * k * 0.08); }
+    fp.needsUpdate = true; flagGeo.computeVertexNormals();
+  });
+  blocks.push([FX, FZ, 1.4]);
+  signBoard(env, g, { x: 6, y: gy, z: 32, ry: PI, w: 4.6, h: 1.15, post: 1.5, text: 'LAO ĐỘNG LÀ VINH QUANG', sub: 'Cải tạo tốt – Sớm về với gia đình' });
+  blocks.push([6, 32, 1.2]);
+
+  /* trạm 1: vườn rau tăng gia */
+  const GX0 = -32.5, GX1 = -19.5, GZ = [18.6, 21.2, 23.8, 26.4, 29.0];
+  const soilM = env.std('nhSoil', { color: '#6a4a33', roughness: 1 }, { detail: 0.7 });
+  g.add(mesh(merge(GZ.map((z) => place(boxUV(GX1 - GX0, 0.3, 1.4), (GX0 + GX1) / 2, gy + 0.15, z))), soilM, { cast: true }));
+  GZ.forEach((z) => rects.push([GX0, z - 0.7, GX1, z + 0.7]));
+  const leafy = merge(Array.from({ length: 7 }, (_, k) => { const s = new THREE.SphereGeometry(0.21, 8, 6); s.scale(1, 0.4, 0.6); s.translate(0, 0, 0.14); s.rotateX(-0.55); s.rotateY((k / 7) * TAU); return s.translate(0, 0.09, 0); }).concat([new THREE.SphereGeometry(0.14, 8, 6).scale(1, 0.85, 1).translate(0, 0.15, 0)]));
+  const vegList = [], VR = mulberry(31);
+  GZ.forEach((z, bi) => { for (const dz of [-0.33, 0.33]) for (let x = GX0 + 0.45; x < GX1 - 0.3; x += 0.62) vegList.push({ x: x + (VR() - 0.5) * 0.1, y: gy + 0.3, z: z + dz, s: 0.8 + VR() * 0.4, ry: VR() * TAU, bi }); });
+  const vegIM = new THREE.InstancedMesh(leafy, env.std('nhVeg', { color: '#ffffff', roughness: 0.75 }, { wind: 0.02 }), vegList.length);
+  const VEGC = ['#4f8a3a', '#7fb04a', '#3f7a4a', '#9cc25a', '#5a9a3e'].map((h2) => C(h2));
+  const growVeg = (k) => {
+    vegList.forEach((v, i) => { const s = v.s * (0.55 + 0.65 * k); q.setFromEuler(new THREE.Euler(0, v.ry, 0)); m4.compose(new V3(v.x, v.y, v.z), q, new V3(s, s, s)); vegIM.setMatrixAt(i, m4); });
+    vegIM.instanceMatrix.needsUpdate = true;
+  };
+  vegList.forEach((v, i) => vegIM.setColorAt(i, VEGC[v.bi]));
+  growVeg(0.5); vegIM.castShadow = true; g.add(vegIM);
+  const jar = new THREE.LatheGeometry([[0, 0], [0.32, 0], [0.48, 0.25], [0.52, 0.5], [0.42, 0.78], [0.3, 0.86], [0.32, 0.92], [0.27, 0.92]].map(([a, b]) => new THREE.Vector2(a, b)), 16);
+  g.add(mesh(merge([place(jar.clone(), -18.3, gy, 30.4), place(jar, -18.2, gy, 18.0, 0, 0, 0, 0.8)]), env.std('nhJar', { color: '#7a4a2a', roughness: 0.35 }), { cast: true }));
+  blocks.push([-18.3, 30.4, 0.6], [-18.2, 18.0, 0.5]);
+  signBoard(env, g, { x: -16.6, y: gy, z: 20.3, ry: PI / 2, w: 3.0, h: 0.75, text: 'VƯỜN RAU TĂNG GIA', sub: 'Xới đất · gieo hạt · tưới rau', bg: '#1f5a3a', fg: '#ffffff' });
+
+  /* trạm 2: chuồng lợn */
+  const PX0 = 16, PX1 = 30, PZ0 = 17, PZ1 = 27;
+  g.add(mesh(boxUV(PX1 - PX0, 0.12, PZ1 - PZ0, 2), env.std('nhSlab', { color: '#a49e92', roughness: 0.95 }, { detail: 0.4 }), { pos: [(PX0 + PX1) / 2, gy + 0.06, (PZ0 + PZ1) / 2] }));
+  const mud = new THREE.CircleGeometry(1, 24); mud.rotateX(-PI / 2); mud.scale(2.4, 1, 1.6);
+  g.add(mesh(mud, env.std('nhMud', { color: '#4a3524', roughness: 0.3 }), { pos: [25.5, gy + 0.125, 24.6] }));
+  const fence = [], fw = (x0, z0, x1, z1) => {
+    const L = Math.hypot(x1 - x0, z1 - z0), n = Math.max(1, Math.round(L / 1.4)), a = Math.atan2(x1 - x0, z1 - z0);
+    for (let k = 0; k <= n; k++) fence.push(place(boxUV(0.13, 1.2, 0.13), lerp(x0, x1, k / n), gy + 0.6, lerp(z0, z1, k / n)));
+    for (const y of [0.35, 0.7, 1.05]) fence.push(place(boxUV(0.06, 0.1, L), (x0 + x1) / 2, gy + y, (z0 + z1) / 2, a));
+    rects.push([Math.min(x0, x1) - 0.12, Math.min(z0, z1) - 0.12, Math.max(x0, x1) + 0.12, Math.max(z0, z1) + 0.12]);
+  };
+  fw(PX0, PZ0, PX1, PZ0); fw(PX1, PZ0, PX1, PZ1); fw(PX1, PZ1, PX0, PZ1); fw(PX0, PZ1, PX0, PZ0);
+  // mái che tôn ở cuối chuồng
+  for (const [x, z] of [[22.4, 17.3], [29.7, 17.3], [22.4, 21], [29.7, 21]]) fence.push(place(boxUV(0.14, 2.6, 0.14), x, gy + 1.3, z));
+  g.add(mesh(merge(fence), env.std('nhFence', { map: woodTex('#7a5a3a'), roughness: 0.9 }), { cast: true }));
+  g.add(mesh(boxUV(8.2, 0.06, 4.6), env.std('nhTin', {}), { pos: [26.05, gy + 2.55, 19.15], rot: [0.14, 0, 0], cast: true }));
+  const trough = merge([place(boxUV(0.7, 0.42, 4.2), PX0 + 0.75, gy + 0.33, 22.5)]);
+  g.add(mesh(trough, env.std('nhConc', { color: '#9a958a', roughness: 0.95 }, { detail: 0.5 }), { cast: true }));
+  g.add(mesh(boxUV(0.5, 0.02, 4.0), env.std('nhFeed', { color: '#8a6a3a', roughness: 1 }, { detail: 1.2 }), { pos: [PX0 + 0.75, gy + 0.545, 22.5] }));
+  const hay = merge(Array.from({ length: 7 }, (_, k) => place(new THREE.SphereGeometry(0.55, 10, 7).scale(1, 0.55, 1), 27.4 + (k % 3) * 0.55, gy + 0.2 + (k > 4 ? 0.3 : 0), 18.2 + Math.floor(k / 3) * 0.45, k)));
+  g.add(mesh(hay, env.std('nhHay', { color: '#d8b860', roughness: 1 }, { detail: 1.5 })));
+  signBoard(env, g, { x: 14.4, y: gy, z: 26.2, ry: -PI / 2, w: 2.8, h: 0.75, text: 'CHUỒNG LỢN', sub: 'Cho lợn ăn · dọn chuồng sạch', bg: '#1f4e8c', fg: '#ffffff' });
+
+  /* trạm 3: ao cá lát bờ bê tông */
+  const PCX = -24, PCZ = 41.5, PW = 13, PD = 8, waterY = gy + 0.4;
+  const rim = [];
+  for (const s of [-1, 1]) rim.push(place(boxUV(PW + 0.9, 0.62, 0.45, 1.5), PCX, gy + 0.26, PCZ + s * (PD / 2 + 0.225)), place(boxUV(0.45, 0.62, PD, 1.5), PCX + s * (PW / 2 + 0.225), gy + 0.26, PCZ));
+  g.add(mesh(merge(rim), env.std('nhRim', { map: texRepeat(stoneTex('#a8a294'), 1, 1), roughness: 0.92 }), { cast: true }));
+  g.add(mesh(new THREE.PlaneGeometry(PW, PD).rotateX(-PI / 2), env.std('nhPondBed', { color: '#2c3626', roughness: 1 }, { detail: 0.6 }), { pos: [PCX, gy + 0.02, PCZ] }));
+  const water = mesh(new THREE.PlaneGeometry(PW, PD).rotateX(-PI / 2), env.std('nhPondWater', { color: '#3f7464', transparent: true, opacity: 0.56, roughness: 0.22, metalness: 0.1, envMapIntensity: 0.25, depthWrite: false }), { pos: [PCX, waterY, PCZ], receive: false });
+  water.userData.noWalk = true; water.renderOrder = 2; g.add(water);
+  // bèo tây nổi + cầu ao bằng gỗ để đứng làm việc
+  const R2 = mulberry(12), weeds = [], blooms = [];
+  for (let i = 0; i < 9; i++) {
+    const cx = PCX + (R2() - 0.5) * (PW - 2), cz = PCZ + (R2() < 0.5 ? -1 : 1) * (PD / 2 - 0.8 - R2() * 0.8);
+    for (let k = 0; k < 5; k++) { const s = new THREE.SphereGeometry(0.2, 7, 5); s.scale(1, 0.35, 1); weeds.push(place(s, cx + (R2() - 0.5) * 0.7, waterY + 0.03, cz + (R2() - 0.5) * 0.7)); }
+    if (i % 3 === 0) blooms.push(place(new THREE.SphereGeometry(0.07, 6, 5), cx, waterY + 0.14, cz));
+  }
+  g.add(mesh(merge(weeds), env.std('nhWeed', { color: '#4f8a3a', roughness: 0.6 })), mesh(merge(blooms), env.std('nhBloom', { color: '#b98ad8', roughness: 0.6 })));
+  g.add(mesh(merge([place(boxUV(2.2, 0.1, 1.3), PCX + PW / 2 - 0.35, gy + 0.6, PCZ), place(boxUV(0.12, 0.7, 0.12), PCX + PW / 2 - 1.3, gy + 0.25, PCZ - 0.55), place(boxUV(0.12, 0.7, 0.12), PCX + PW / 2 - 1.3, gy + 0.25, PCZ + 0.55)]), env.std('nhFence', {}), { cast: true }));
+  signBoard(env, g, { x: -16.2, y: gy, z: 45.6, ry: PI / 2, w: 2.6, h: 0.75, text: 'AO CÁ', sub: 'Rắc cám · vớt cá to', bg: '#1f4e8c', fg: '#ffffff' });
+
+  /* trạm 4: bãi đá */
+  const boulders = [[31.5, gy + 1.1, 40, 3.3, 0.85], [33.2, gy + 0.9, 35.4, 2.7, 0.85], [32.2, gy + 0.8, 43.9, 2.3, 0.8], [29.1, gy + 0.5, 37.8, 1.8, 0.8], [29.3, gy + 0.45, 42.6, 1.7, 0.8], [34.2, gy + 2.7, 40.2, 2.2, 0.9], [27.4, gy + 0.25, 35.6, 0.9, 0.8], [27.2, gy + 0.22, 40.6, 0.8, 0.8], [26.9, gy + 0.2, 44.6, 0.75, 0.8]];
+  g.add(rocks(env, boulders, '#9d978b', 23));
+  boulders.forEach(([x, , z, s]) => { if (s > 1) blocks.push([x, z, s * 0.92]); });
+  const RQ = mulberry(41), rubble = [];
+  for (let i = 0; i < (env.hq ? 70 : 40); i++) { const x = 22 + RQ() * 7, z = 33.5 + RQ() * 13; rubble.push([x, gy + 0.04, z, 0.12 + RQ() * 0.22, 0.7]); }
+  g.add(rocks(env, rubble, '#aaa498', 29));
+  // đống đá hộc đã đập xong (lớn dần theo tiến độ cải tạo)
+  const pile = [];
+  for (let i = 0; i < 36; i++) { const a = RQ() * TAU, r = Math.sqrt(RQ()) * 1.2, lvl = i < 16 ? 0 : i < 28 ? 1 : 2; pile.push([20.6 + Math.cos(a) * r * (1 - lvl * 0.3), gy + 0.12 + lvl * 0.22, 34.6 + Math.sin(a) * r * (1 - lvl * 0.3), 0.2 + RQ() * 0.1, 0.8]); }
+  const pileIM = rocks(env, pile, '#b9b3a6', 37); g.add(pileIM);
+  const setStones = (k) => { pileIM.count = Math.max(6, Math.round(6 + k * (pile.length - 6))); };
+  setStones(0.4);
+  // xe cút kít chở đá + búa tạ, cuốc chim dựng bên tảng đá
+  const WB = new THREE.Group(), tray = new THREE.CylinderGeometry(0.62, 0.42, 0.42, 4, 1, true); tray.rotateY(PI / 4); tray.scale(1, 1, 1.35);
+  WB.add(mesh(tray, env.std('nhTray', { color: '#2f6a8a', roughness: 0.45, metalness: 0.5, side: THREE.DoubleSide }), { pos: [0, 0.62, 0], cast: true }));
+  WB.add(mesh(new THREE.TorusGeometry(0.22, 0.07, 8, 18), env.std('nhTyre', { color: '#222222', roughness: 0.9 }), { pos: [0, 0.23, 0.85], rot: [0, PI / 2, 0], cast: true }));
+  WB.add(mesh(merge([rod([-0.32, 0.45, 0.85], [-0.36, 0.75, -1.1], 0.03), rod([0.32, 0.45, 0.85], [0.36, 0.75, -1.1], 0.03), rod([-0.32, 0.45, 0.85], [0.32, 0.45, 0.85], 0.025), rod([-0.3, 0.42, -0.2], [-0.3, 0, -0.35], 0.03), rod([0.3, 0.42, -0.2], [0.3, 0, -0.35], 0.03)]), steelM, { cast: true }));
+  WB.add(rocks(env, [[0.05, 0.75, 0.05, 0.18, 0.8], [-0.15, 0.72, -0.15, 0.16, 0.8], [0.18, 0.7, 0.2, 0.15, 0.8]], '#b9b3a6', 51));
+  WB.position.set(21.6, gy, 43.4); WB.rotation.y = 2.4; g.add(WB);
+  blocks.push([21.6, 43.4, 0.9]);
+  g.add(mesh(merge([rod([26.2, gy, 39.1], [26.5, gy + 0.95, 39.6], 0.03), place(boxUV(0.14, 0.14, 0.32), 26.5, gy + 0.98, 39.62, 0.4), rod([25.8, gy + 0.02, 46.2], [26.4, gy + 0.05, 47.0], 0.03)]), env.std('nhTool', { color: '#5a4a3a', roughness: 0.7, metalness: 0.3 }), { cast: true }));
+  signBoard(env, g, { x: 16.4, y: gy, z: 36.4, ry: -PI / 2, w: 2.6, h: 0.75, text: 'BÃI ĐÁ', sub: 'Đập đá · chở đá về bãi', bg: '#1f4e8c', fg: '#ffffff' });
+
+  /* cây bàng trong sân, rừng tre, cây và ruộng lúa ngoài tường */
+  const shade2 = [[-10.5, 18.6], [10.5, 18.6], [-33.6, 34], [33.6, 29.5], [-9.5, 47.6]];
+  g.add(forest(env, 'broad', shade2.map(([x, z]) => ({ x, z, y: gy - 0.05, s: 0.75 })), { seed: 15, cast: true }));
+  shade2.forEach(([x, z]) => blocks.push([x, z, 0.75]));
+  const avoid = (x, z) => yard(x, z) < 8 || road(x, z) < 5;
+  const ground = (x, z) => h(x, z) - 0.1;
+  g.add(forest(env, 'bamboo', scatter(env.hq ? 46 : 24, { r0: 62, r1: 160, seed: 61, avoid, y: ground, s: [0.8, 1.1] }), { seed: 61 }));
+  g.add(forest(env, 'broad', scatter(env.hq ? 200 : 90, { r0: 70, r1: 460, seed: 62, avoid, y: ground, s: [0.9, 1.5] }), { seed: 62 }));
+  g.add(treeline(env, { rc: 330, width: 50, H: 20, seed: 7, color: '#2e4826' }));
+
+  /* vị trí trạm lao động, người làm, đường đi tuần của quản giáo — prison.js dùng */
+  const stations = {
+    trongrau: { area: [GX0 - 1.2, 17.0, -15.6, 30.8], stand: [-17.7, 25.05], look: [-24, 25.05], npcs: [{ x: -25.6, z: 25.1, look: [-25.6, 23.8], work: 'water', tool: 'binh' }, { x: -29.6, z: 20.0, look: [-29.6, 21.2], work: 'dig', tool: 'xeng' }] },
+    nuoilon: { area: [12.6, 16.2, 31, 27.8], stand: [14.7, 22.9], look: [18.5, 22.9], npcs: [{ x: 14.9, z: 20.2, look: [17.5, 20.2], work: 'feed', tool: 'xo' }] },
+    nuoica: { area: [-32, 35.8, -15.4, 47.2], stand: [-18.8, 41.5], look: [-24, 41.5], npcs: [{ x: -25.2, z: 36.75, look: [-25.2, 40], work: 'net', tool: 'vot' }] },
+    daoda: { area: [16, 31.2, 35.8, 49.6], stand: [18.6, 40.2], look: [26, 40.2], npcs: [{ x: 26.2, z: 37.3, look: [29.1, 37.8], work: 'dig', tool: 'cuoc' }] },
+  };
+  const patrol = [[0, hd + 6], [-14.6, 25.05, 'trongrau'], [-12, 33], [-15.2, 41.5, 'nuoica'], [0, 46], [15.4, 40.2, 'daoda'], [12, 31], [13.4, 22.9, 'nuoilon']];
+  return {
+    groundY: gy, walkR: ER, blocks, rects, noGarden: () => true,
+    prison: {
+      gy, X0, X1, Z0, Z1, stations, patrol, guard: [GW / 2 + 1.9, Z1 - 1.9],
+      gate: { leaves, w: GW, z: Z1, rect: [-GW / 2 - 0.1, Z1 - 0.32, GW / 2 + 0.1, Z1 + 0.32] },
+      pen: { x0: PX0 + 0.7, x1: PX1 - 0.6, z0: PZ0 + 0.6, z1: PZ1 - 0.6, y: gy + 0.12 },
+      pond: { cx: PCX, cz: PCZ, w: PW, d: PD, y: waterY },
+      grow: growVeg, stones: setStones,
+    },
+  };
+};
+
 // hướng nắng riêng cho ảnh mô hình (để mặt tiền được chiếu sáng)
-const MODEL_MOOD = { lamkinh: { az: 50, el: 30 }, tranho: { az: 70, el: 24 }, thienmau: { az: 40, el: 7 }, nhattru: { az: 60, el: 40 }, huongson: { az: 40, el: 38, fogBase: -3, fogHF: 0.02 }, baison: { az: 55, el: 32 }, vinhan: { az: 40, el: 50 }, doivang: { az: 60, el: 34 }, linhson: { az: 50, el: 30 } };
-const VIEW_OF = { linhung: 'sontra', nuisam: 'nuisam', lamkinh: 'citadel', nhattru: 'pond', tranho: 'lake', huongson: 'cave', dinhmay: 'clouds', baison: 'mountain', thienmau: 'river', vinhan: 'palm', doivang: 'garden', linhson: 'baden', kimson: 'fansipan', cuuphong: 'cuuphong', hoangoc: 'hoangoc' };
+const MODEL_MOOD = { lamkinh: { az: 50, el: 30 }, tranho: { az: 70, el: 24 }, thienmau: { az: 40, el: 7 }, nhattru: { az: 60, el: 40 }, huongson: { az: 40, el: 38, fogBase: -3, fogHF: 0.02 }, baison: { az: 55, el: 32 }, vinhan: { az: 40, el: 50 }, doivang: { az: 60, el: 34 }, linhson: { az: 50, el: 30 }, nhatu: { az: 42, el: 34 } };
+const VIEW_OF = { linhung: 'sontra', nuisam: 'nuisam', lamkinh: 'citadel', nhattru: 'pond', tranho: 'lake', huongson: 'cave', dinhmay: 'clouds', baison: 'mountain', thienmau: 'river', vinhan: 'palm', doivang: 'garden', linhson: 'baden', kimson: 'fansipan', cuuphong: 'cuuphong', hoangoc: 'hoangoc', nhatu: 'nhatu' };
 
 function disposeGroup(g) {
   const geos = new Set(), mats = new Set();
@@ -3121,6 +3439,8 @@ export function buildSurroundings(scene, theme, quality = 'high') {
     groundY: c.gy,
     walkR: res.walkR || 0,
     blocks: res.blocks || null,
+    rects: res.rects || null, // vật cản hình chữ nhật [x0,z0,x1,z1] (tường rào trại…)
+    prison: res.prison || null, // dữ liệu sân trại cải tạo cho prison.js
     noGarden: res.noGarden || null,
     forest: (kind, list, o) => forest(env, kind, list, o),
     cable: c.cable || null,

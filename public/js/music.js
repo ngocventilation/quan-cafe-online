@@ -23,6 +23,8 @@ const PRESETS = {
   cuuphong: { scale: 'bac', root: 220, lead: 'tranh', second: 'bell', beat: 1.25, nature: 'water', gong: 40 },
   hoangoc: { scale: 'xuan', root: 246.94, lead: 'sao', second: 'bau', beat: 1.15, nature: 'wind', gong: 48 },
   kimson: { scale: 'bac', root: 261.63, lead: 'bell', second: 'sao', beat: 1.5, nature: 'wind', gong: 40 },
+  // Trại cải tạo: sáo trúc chậm rãi, tiếng chim sân trại, không chiêng
+  nhatu: { scale: 'bac', root: 220, lead: 'sao', second: 'tranh', beat: 1.3, nature: 'birds', gong: 0 },
 };
 const LEAD_GAIN = { tranh: 0.14, bau: 0.12, sao: 0.075, roneat: 0.1, bell: 0.06 };
 const hash = (s) => { let h = 2166136261; for (const c of String(s)) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return h >>> 0; };

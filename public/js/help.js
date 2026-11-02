@@ -147,6 +147,14 @@ export function howtoHtml(tab, { sects, exp }) {
     </table>
     <p>1 quả quý đổi được 1 Ngọc ngay trong Vườn Phật. Mỗi người trồng tối đa 5 cây ở một chùa, mỗi chùa có tối đa 50 cây. Không trồng được trên lối đi chính hoặc quá sát cây khác.</p>
     <h4>${ic('lotus')} Hứng hoa sala</h4><p>Ra sân chùa, bấm <b>Công quả → Hứng hoa sala</b>. Kéo khay trong 45 giây (máy tính dùng được phím mũi tên hoặc A, D): hoa vàng trắng tính 1 bông, hoa hồng tính 3 bông. Mỗi ngày có 3 lượt, mỗi lượt nhận 10 đến 40 Sen tuỳ số hoa. Bấm Dừng giữa chừng thì lượt đó không được tính.</p><p>Hứng đủ <b>1.080 hoa</b> được tặng <b>Áo Hoa Sala</b>. Bảng xếp hạng tuần cập nhật 3 tiếng một lần.</p>
+    <h4>🚔 Trại Cải Tạo Bình Minh</h4><p>Khu Nhà Tù trên Bản đồ: dãy phòng giam và sân lao động. Vào trại bạn chọn <b>Thăm trại</b> (khách, đi lại tự do) hoặc <b>Nhập trại cải tạo</b>: mặc áo phạm nhân, được xếp một phòng giam và <b>không sang khu khác được</b> cho đến khi ra trại.</p>
+    <table class="tbl">
+      <tr><td>🥬 Trồng rau</td><td>Bấm luống: cuốc → gieo → tưới → hái. Đạt từ 6 điểm</td></tr>
+      <tr><td>🐷 Nuôi lợn</td><td>Cho lợn đói ăn đúng lúc, dọn phân. Đạt từ 8 điểm</td></tr>
+      <tr><td>🐟 Nuôi cá</td><td>Rắc cám, chỉ vớt cá lớn có vòng vàng. Đạt từ 5 điểm</td></tr>
+      <tr><td>⛏️ Đào đá</td><td>Bấm khi kim vào vùng xanh, 3 nhát vỡ tảng. Đạt từ 8 điểm</td></tr>
+    </table>
+    <p>Ra sân, lại gần từng trạm rồi bấm nút để làm. Mỗi buổi 45 giây, mỗi việc cần <b>2 buổi đạt</b>; xem tiến độ ở <b>📋 Sổ cải tạo</b>. Buổi đạt được thưởng Hạt và EXP. Xong cả 4 việc là <b>ra trại</b>: cổng mở, thưởng 200 Hạt và 5 Sao, rồi bấm “Đi tới khu khác” hoặc ra cổng để mở Bản đồ. Khách thăm trại cũng làm thử được (không ghi sổ).</p>
     <h4>${ic('sound')} Âm thanh</h4><p>Nên đeo tai nghe để nghe tiếng mõ, chuông và đại chúng niệm Phật. Tắt/bật, chỉnh nhịp mõ trong Cài đặt.</p>
   </div>`;
   if (tab === 'grow') return `<div class="prose howto">
@@ -184,6 +192,7 @@ export function howtoHtml(tab, { sects, exp }) {
     <details><summary>Làm sao để đổi tên nhân vật?</summary><p>Tính năng đổi tên hiện đã tắt. Nếu tên của bạn bị che thành ***, vào <b>Hồ sơ → Sửa nhân vật</b> để đặt tên mới phù hợp.</p>
       <ul><li><b>Lần đầu:</b> miễn phí.</li><li><b>Các lần sau:</b> 20 Ngọc mỗi lần.</li><li><b>Mời từ 10 bạn thật</b> (bạn đạt cấp 3 trở lên, không bị khoá): miễn phí, 7 ngày đổi một lần.</li><li><b>Tên đang bị che thành ***:</b> miễn phí, 7 ngày đổi một lần.</li></ul>
       <p>Tên dài tối đa 24 ký tự và 6 từ, chỉ gồm chữ cái tiếng Việt, tối đa 4 chữ số và khoảng trắng. Không dùng từ ngữ chưa phù hợp hoặc tên dành riêng như Admin, Quản trị, Trụ trì, Hòa thượng.</p></details>
+    <details><summary>Đang ở trại cải tạo, sao không mở được Bản đồ?</summary><p>Khi đã <b>nhập trại</b>, bạn phải cải tạo xong mới được sang khu khác: hoàn thành đủ 4 việc (mỗi việc 2 buổi đạt). Mở <b>📋 Sổ cải tạo</b> ở thanh dưới màn hình để xem còn bao nhiêu buổi, bấm “Đi làm” để tới trạm. Thoát game rồi vào lại vẫn về thẳng trại.</p></details>
     <details><summary>Đổi máy thì có mất tài khoản không?</summary><p>Không, nếu bạn giữ <b>mã khôi phục</b> (Hồ sơ → Tài khoản). Trên máy mới, ở màn tạo nhân vật chọn “Đã có tài khoản? Khôi phục bằng mã”.</p></details>
     <details><summary>Các máy chủ khác nhau thế nào?</summary><p>Mỗi máy chủ có nhân vật, tiến độ và Ngọc riêng. Người mới nên chọn máy chủ được gợi ý. Đã có tài khoản thì chọn đúng máy chủ cũ để đăng nhập. Đang ở trong chùa muốn đổi thì bấm nút Máy chủ trong thanh điều khiển.</p></details>
     <details><summary>Muốn góp ý hoặc đề xuất chùa thì làm sao?</summary><p>Mở menu <b>Góp ý</b>, chọn Đề xuất chùa hoặc Góp ý tính năng rồi gửi nội dung. Mục Ủng hộ cũng nằm ở đây.</p></details>

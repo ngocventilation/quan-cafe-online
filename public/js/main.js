@@ -13,6 +13,7 @@ import { mountTryOn } from './tryon.js';
 import { showLoader, hideLoader, setLoader, nextFrames, skeleton, busy, startCoach, howtoHtml } from './help.js';
 import { paintThumbs } from './thumbs.js';
 import { makeCard, nativeShare, facebookShare, copyText, download, shareUrl, petalShower } from './share.js';
+import { runRehab, REHAB } from './rehab.js';
 
 const $ = (id) => document.getElementById(id);
 const $$ = (sel, el = document) => [...el.querySelectorAll(sel)];
@@ -27,7 +28,7 @@ addEventListener('unhandledrejection', (e) => (document.body.dataset.err = Strin
 const S = { meta: null, items: {}, profile: null, temple: null, ws: null, view: 'boot', bow: 'idle', pendingBeads: 0, beadShown: 0 };
 const ROUND_NAMES = ['thứ nhất', 'thứ hai', 'thứ ba', 'thứ tư', 'thứ năm', 'thứ sáu', 'thứ bảy', 'thứ tám', 'thứ chín', 'thứ mười'];
 const TEMPLE_ICON = {};
-const TEMPLE_BG = { linhung: '#dfeef2', nuisam: '#eaf0d8', nhattru: '#e6f0dc', tranho: '#dbe8f0', huongson: '#e2ddd5', dinhmay: '#e4ecf6', baison: '#f0e3d0', thienmau: '#f6e0cc', vinhan: '#e2f2e6', doivang: '#fbe6c0', linhson: '#f6e4cc', kimson: '#e6ebee', cuuphong: '#dce9e4', hoangoc: '#f3e8cf' };
+const TEMPLE_BG = { linhung: '#dfeef2', nuisam: '#eaf0d8', nhattru: '#e6f0dc', tranho: '#dbe8f0', huongson: '#e2ddd5', dinhmay: '#e4ecf6', baison: '#f0e3d0', thienmau: '#f6e0cc', vinhan: '#e2f2e6', doivang: '#fbe6c0', linhson: '#f6e4cc', kimson: '#e6ebee', cuuphong: '#dce9e4', hoangoc: '#f3e8cf', nhatu: '#e3e2d6' };
 
 /* =====================================================================
    TIỆN ÍCH GIAO DIỆN
@@ -138,10 +139,11 @@ function stopQuyListen() {
 function applyQuy(prev) {
   const u = S.profile?.user;
   if (!u) return;
-  document.body.classList.toggle('is-quy', u.quy);
-  S.world?.setQuy(u.quy);
-  show('quyBar', u.quy);
-  if (u.quy) {
+  const quy = !!u.quy; // máy chủ không gửi quy thì coi là người thường (toggle/show với undefined sẽ bật nhầm)
+  document.body.classList.toggle('is-quy', quy);
+  S.world?.setQuy(quy);
+  show('quyBar', quy);
+  if (quy) {
     const left = Math.max(0, u.quyNeed - u.quySec);
     $('quyFill').style.width = `${(u.quySec / u.quyNeed) * 100}%`;
     $('quyLeft').textContent = `Còn ${Math.ceil(left / 60)} phút nghe kinh`;
@@ -171,9 +173,12 @@ function setProfile(data) {
     const q = new Map(data.q.map((x) => [x[0], x]));
     data = { ...S.profile, user: data.user, quests: S.profile.quests.map((o) => { const x = q.get(o.id); return x ? { ...o, progress: x[1], claimed: !!x[2], done: !!x[3] } : o; }) };
   }
-  S.profile = { user: data.user, account: data.account || S.profile?.account, inventory: data.inventory, quests: data.quests, visited: data.visited };
+  // phản hồi chỉ có user (luyện tập, gọi món…) thì giữ nguyên túi đồ, nhiệm vụ, chùa đã viếng và hồ sơ cải tạo
+  const old = S.profile || {};
+  S.profile = { user: data.user, account: data.account || old.account, inventory: data.inventory ?? old.inventory ?? {}, quests: data.quests ?? old.quests ?? [], visited: data.visited ?? old.visited ?? [], prison: data.prison ?? old.prison ?? null };
   renderHud();
   applyQuy(prev);
+  applyPrison();
   if (S.world && prev && JSON.stringify([prev.appearance, prev.equipped]) !== JSON.stringify([data.user.appearance, data.user.equipped])) S.world.setPlayerLook(data.user);
   S.sheetRender?.();
 }
@@ -392,8 +397,8 @@ function renderHud() {
   $('meAva').innerHTML = u.avatar ? `<img src="${u.avatar}" alt="">` : sect.icon; $('meAva').style.background = sect.color;
   $('meAva').style.background = sect.color;
   $('meXp').style.width = u.expNext ? Math.min(100, (u.exp / u.expNext) * 100) + '%' : '100%';
-  $('wSen').textContent = fmt(u.sen);
-  $('wNgoc').textContent = fmt(u.ngoc);
+  $('wSen').textContent = fmt(u.sen ?? u.currencies?.sen);
+  $('wNgoc').textContent = fmt(u.ngoc ?? u.currencies?.ngoc);
   const claimable = S.profile.quests.filter((q) => q.done && !q.claimed).length;
   $('qBadge').textContent = claimable; show('qBadge', claimable > 0);
   $$('[data-qty]').forEach((b) => (b.textContent = '×' + qty(b.dataset.qty)));
@@ -446,9 +451,10 @@ async function boot() {
     try {
       setProfile(await api('/me')); bb(100);
       await new Promise((r) => setTimeout(r, 250));
-      $('welcomeText').innerHTML = `Chào mừng <b>${esc(S.profile.user.name)}</b> đến Quán Cafe Online 3D ☕<br>${esc(S.profile.user.title)}`;
+      $('welcomeText').innerHTML = `Chào mừng <b>${esc(S.profile.user.name)}</b> đến Quán Cafe Online 3D ☕<br>${esc(S.profile.user.title)}${jailed() ? `<br>🔒 Bạn đang trong thời gian cải tạo ở <b>${esc(templeName(PRISON_ID))}</b>` : ''}`;
       show('boot', false); show('welcome');
-      $('btnEnter').onclick = () => { Sound.init(); show('welcome', false); const last = local.get('temple'); enterTemple(S.meta.temples.find((t) => t.id === last) ? last : S.meta.temples[0].id); };
+      // đang cải tạo thì vào thẳng trại, bỏ qua khu đã ở lần trước
+      $('btnEnter').onclick = () => { Sound.init(); show('welcome', false); const last = local.get('temple'); enterTemple(jailed() && hasPrison() ? PRISON_ID : S.meta.temples.find((t) => t.id === last) ? last : S.meta.temples[0].id); };
       return;
     } catch (e) {
       if (e.status === 401) token.clear();
@@ -914,6 +920,7 @@ async function openStory(id = S.temple?.id) {
   sheet(t.name, null, (el) => { el.innerHTML = storyHtml(t, c.stories[id]); el.scrollTop = 0; });
 }
 async function openMapView({ focus } = {}) {
+  if (jailed()) return lockedToast();
   const [c, online, pilgrim] = await Promise.all([loadContent(), api('/online').catch(() => ({})), loadPilgrim(60e3)]);
   openMap({
     temples: S.meta.temples, stories: c.stories, visited: new Set(S.profile.visited), current: S.temple?.id, focus, online: online.temples || online, pilgrim, items: S.items,
@@ -962,7 +969,7 @@ function visitNotes(x = {}) {
    SƯ TRỤ TRÌ: giới thiệu chùa, kể sự tích, hướng dẫn lễ Phật
    ===================================================================== */
 // Nhân vật hư cấu cho các ngôi chùa trong game (không phải người thật)
-const ABBOTS = { nhattru: 'Barista Tâm Liên', tranho: 'Barista Quảng Hồ', huongson: 'Barista Diệu Sơn', dinhmay: 'Barista Trúc Vân', baison: 'Barista Bảo Sơn', thienmau: 'Barista Hương Giang', vinhan: 'Barista Vĩnh Tâm', doivang: 'Barista Kim Tâm', linhson: 'Barista Huyền Không', kimson: 'Barista Kim Đỉnh', linhung: 'Barista Minh Ứng', nuisam: 'Barista Thanh Sam', cuuphong: 'Barista Tịnh Phong', hoangoc: 'Barista Ngọc Liên' };
+const ABBOTS = { nhattru: 'Barista Tâm Liên', tranho: 'Barista Quảng Hồ', huongson: 'Barista Diệu Sơn', dinhmay: 'Barista Trúc Vân', baison: 'Barista Bảo Sơn', thienmau: 'Barista Hương Giang', vinhan: 'Barista Vĩnh Tâm', doivang: 'Barista Kim Tâm', linhson: 'Barista Huyền Không', kimson: 'Barista Kim Đỉnh', linhung: 'Barista Minh Ứng', nuisam: 'Barista Thanh Sam', cuuphong: 'Barista Tịnh Phong', hoangoc: 'Barista Ngọc Liên', nhatu: 'Quản giáo Nguyễn Văn Chính' };
 // Lão Hành Khất: cảm hứng từ ông lão bán bí kiếp cho cậu bé trong phim Tuyệt Đỉnh Kungfu. Cậu bé dốc tiền mua sách, bị đánh vì cứu cô bé bán kẹo, về sau mới hiểu tài năng thật ở trong mình.
 const HERMIT_LESSONS = ['Thức thứ nhất: Thở. Chưa thở được thì chưa làm được gì.', 'Thức thứ hai: Lắng. Nghe người khác nói hết câu.', 'Thức thứ ba: Nhịn. Lời nặng để qua đêm rồi hãy nói.', 'Thức thứ tư: Xả. Nắm chặt bao nhiêu, mỏi tay bấy nhiêu.', 'Thức thứ năm: Tha. Người đầu tiên được nhẹ lòng là mình.', 'Thức thứ sáu: Cho. Có cây kẹo cũng chia cho người khác một nửa.', 'Thức thứ bảy: Niệm. Một câu Phật hiệu, trăm mối lo tan.', 'Thức cuối: Vạn Phật quy tâm. Không tìm đâu xa, tuyệt học ở ngay trong lòng bạn.'];
 async function talkHermit() {
@@ -1058,7 +1065,7 @@ async function talkTeller(i) {
 }
 
 // Tượng lớn ngoài trời dựng theo khung cảnh, còn lại lấy từ danh sách tượng trong chánh điện
-const VIEW_STATUES = { fansipan: ['amida', 'quanam'], sontra: ['quanam'] };
+const VIEW_STATUES = { fansipan: ['amida', 'quanam'], sontra: ['quanam'], nhatu: [] };
 const statueKinds = (t) => [...(t.theme.statues || []).map((s) => s.kind), ...(VIEW_STATUES[t.theme.view] || [])];
 // Người mới đang chọn chùa thì tải sẵn tượng của chùa đó; chờ dừng tay mới tải để bấm thử nhiều chùa không tốn mạng
 let warmTimer;
@@ -1071,6 +1078,12 @@ function warmTemple(id) {
   }, 800);
 }
 async function enterTemple(id) {
+  // đang cải tạo: không sang khu khác, máy chủ cũng ép về trại
+  if (jailed() && hasPrison() && id !== PRISON_ID) {
+    if (S.temple?.id === PRISON_ID) return lockedToast();
+    id = PRISON_ID;
+  }
+  if (S.rehab) return toast('Đang làm dở việc cải tạo, xong rồi hãy đi nhé');
   const t = S.meta.temples.find((x) => x.id === id) || S.meta.temples[0];
   S.temple = t;
   local.set('temple', t.id);
@@ -1128,6 +1141,7 @@ async function enterTemple(id) {
   await S.world.warmUp();
   S.world.start();
   applyQuy();
+  S.prisonSig = null; applyPrison(true); // dựng lại cảnh: báo trạng thái cải tạo cho thế giới 3D (áo phạm nhân, phòng giam)
   await nextFrames(3);
   hideLoader();
   S.view = 'hall';
@@ -1159,7 +1173,8 @@ async function enterTemple(id) {
   if (local.get('checkinDay') !== new Date().toDateString()) dailyCheckin();
   const op = new URLSearchParams(location.search).get('open');
   if (['rank', 'quests', 'map', 'guide', 'community'].includes(op) && !S.openedParam) { S.openedParam = 1; setTimeout(() => openSheet(op), 1200); }
-  if (!local.get('story:' + t.id)) {
+  if (isPrisonArea(t.id)) prisonArrive(); // trại không có barista: cán bộ trại chào thay
+  else if (!local.get('story:' + t.id)) {
     local.set('story:' + t.id, 1);
     setTimeout(() => talkAbbot({ first: true }), local.get('coached') ? 1500 : 0);
   }
@@ -1254,9 +1269,11 @@ function connectWs() {
     }
     if (m.t === 'roomFull') { states.clear(); S.world?.applyRoom([], S.profile.user.id); return showTempleFull(m); }
     if (m.t === 'joined') { states.clear(); if (m.build) checkBuild(m.build); return; }
+    if (m.t === 'jailed') { onJailed(m); return; }
+    if (m.t === 'prison') { onPrisonEvent(m); return; }
     if (m.t === 'room') {
       if (m.temple !== S.temple?.id) return;
-      if (S.view === 'hall' || S.view === 'beads' || S.view === 'chant' || S.view === 'meditate' || S.view === 'wheel') S.world.applyRoom(m.players, S.profile.user.id);
+      if (S.view === 'hall' || S.view === 'beads' || S.view === 'chant' || S.view === 'meditate' || S.view === 'wheel' || S.view === 'rehab') S.world.applyRoom(m.players, S.profile.user.id);
       $('tOnline').innerHTML = `<i class="dot"></i> ${m.online} đang online`;
       const n = S.world.bowingCount();
       if (n >= 2 && S.bow === 'bowing') $('tOnline').innerHTML += ` · <svg class="i"><use href="#i-fire"/></svg> Đồng tâm ${n} người cùng lạy`;
@@ -1391,7 +1408,7 @@ let idleAt = Date.now(), idleLeft = 0;
 for (const ev of ['pointerdown', 'keydown', 'wheel']) addEventListener(ev, () => { idleAt = Date.now(); }, { capture: true, passive: true });
 function idleCheck() {
   if (S.idle || S.full || !S.temple || !S.ws) return;
-  if (S.view === 'meditate' || quyL.on || Date.now() - idleAt < IDLE_MS) { idleLeft = 0; return show('idleWarn', false); }
+  if (S.view === 'meditate' || S.view === 'rehab' || quyL.on || Date.now() - idleAt < IDLE_MS) { idleLeft = 0; return show('idleWarn', false); }
   if (document.hidden) return idleOut();
   if (!idleLeft) { idleLeft = IDLE_WARN; Sound.chime(); show('idleWarn', true); }
   $('idleCount').textContent = `Tự ngắt sau ${idleLeft} giây`;
@@ -1432,21 +1449,309 @@ function feed(text) {
 }
 
 /* =====================================================================
+   KHU NHÀ TÙ – TRẠI CẢI TẠO BÌNH MINH (nhatu)
+   Nhập trại → làm đủ 4 việc cải tạo (mini-game ở rehab.js) → ra trại có thưởng.
+   Đang giam: mặc áo phạm nhân, ở phòng giam, bản đồ khoá, máy chủ ép về trại.
+   ===================================================================== */
+const PRISON_ID = 'nhatu';
+const prisonOf = () => S.profile?.prison || null;
+const jailed = () => prisonOf()?.status === 'giam';
+const hasPrison = () => !!S.meta?.temples?.some((t) => t.id === PRISON_ID);
+const isPrisonArea = (id = S.temple?.id) => !!id && (id === PRISON_ID || !!S.meta?.temples?.find((t) => t.id === id)?.theme?.prison);
+// việc cải tạo: số liệu máy chủ (done, best…) gộp với mô tả và luật chơi trong rehab.js
+const prisonTasks = () => { const ts = prisonOf()?.tasks; return ts?.length ? ts.filter((t) => REHAB[t.id]).map((t) => ({ ...REHAB[t.id], ...t })) : Object.values(REHAB).map((d) => ({ ...d, done: 0, best: 0 })); };
+const taskInfo = (id) => prisonTasks().find((t) => t.id === id) || REHAB[id];
+const cellNo = () => (prisonOf()?.cell ?? 0) + 1;
+const prisonLeft = () => prisonOf()?.remaining ?? prisonTasks().reduce((a, t) => a + Math.max(0, t.need - t.done), 0);
+const prisonReward = (g = {}) => [g.sen && `${ic('sen')} +${fmt(g.sen)} Hạt`, g.ngoc && `${ic('ngoc')} +${fmt(g.ngoc)} Sao`, g.exp && `+${fmt(g.exp)} EXP`].filter(Boolean).join(' · ');
+const lockedToast = () => toast(`🔒 Bạn đang cải tạo ở <b>${esc(templeName(PRISON_ID) || 'Trại cải tạo')}</b><br><small>Hoàn thành ${prisonLeft()} buổi lao động còn lại để được ra trại rồi mới sang khu khác.</small>`, 4500);
+function setPrisonState(st) { if (!S.profile || !st) return; S.profile.prison = st.state || st; applyPrison(); S.sheetRender?.(); }
+const POLICE = {
+  quangiao: { name: 'Quản giáo Nguyễn Văn Chính', role: 'Quản giáo phân trại' },
+  gac: { name: 'Cán bộ Lê Minh Trực', role: 'Cán bộ gác cổng trại' },
+  nu: { name: 'Cán bộ Phạm Thu Hà', role: 'Cán bộ trực dãy phòng giam' },
+};
+const POLICE_TIPS = [
+  'Lao động là vinh quang. Làm tốt từng việc nhỏ thì ngày ra trại sẽ đến nhanh thôi.',
+  'Ở vườn rau, gieo hạt xong phải tưới ngay, để lâu là héo cả luống đấy.',
+  'Lợn nào hiện bong bóng bát cơm là đang đói. Cho ăn đúng lúc mới được tính, nhớ dọn chuồng cho sạch.',
+  'Ao cá: rắc cám cho cá lớn, chỉ vớt con có vòng vàng. Vớt nhầm cá con là bị trừ điểm.',
+  'Mỏ đá: đừng vội. Canh kim vào vùng xanh rồi hãy bổ, trúng vạch vàng giữa tính hai nhát.',
+  'Giữ phòng giam gọn gàng, sống hoà nhã với bạn cùng phòng.',
+  'Ai cũng có lúc lầm lỡ. Quan trọng là biết sửa mình mỗi ngày.',
+  'Mỗi buổi lao động chỉ 45 giây, tập trung là đạt.',
+  'Cố lên! Gia đình đang chờ bạn trở về.',
+];
+const policeTip = () => POLICE_TIPS[Math.floor(Math.random() * POLICE_TIPS.length)];
+
+// Bật/tắt giao diện cải tạo; báo thế giới 3D khi trạng thái đổi (force: vừa dựng lại cảnh)
+function applyPrison(force = false) {
+  const p = prisonOf(), on = jailed(), here = isPrisonArea();
+  document.body.classList.toggle('is-jailed', on);
+  document.body.classList.toggle('in-prison', here);
+  show('prisonBar', on && here);
+  if (on) renderPrisonBar();
+  if (S.world && S.temple && here) {
+    const sig = JSON.stringify([on, p?.cell, prisonTasks().map((t) => t.done)]);
+    if (force || sig !== S.prisonSig) {
+      S.prisonSig = sig;
+      try { S.world.setPrison?.({ jailed: on, cell: p?.cell ?? 0, tasks: prisonTasks() }); } catch (e) { console.warn('setPrison', e); }
+    }
+  }
+  if (S.ctx && S.world && S.view === 'hall') renderCtx(S.ctx); // nhãn nút ngữ cảnh đổi theo trạng thái (vd. cổng mở khi ra trại)
+}
+function renderPrisonBar() {
+  const ts = prisonTasks(), need = ts.reduce((a, t) => a + t.need, 0), done = ts.reduce((a, t) => a + Math.min(t.done, t.need), 0), left = prisonLeft();
+  $('pbCell').textContent = `Phòng ${cellNo()}`;
+  $('pbTasks').innerHTML = ts.map((t) => `<button class="pb-task${t.done >= t.need ? ' ok' : ''}" data-task="${t.id}" title="${esc(t.name)}: đã đạt ${Math.min(t.done, t.need)}/${t.need} buổi">${t.icon}<b>${Math.min(t.done, t.need)}/${t.need}</b></button>`).join('');
+  $('pbFill').style.width = `${need ? (done / need) * 100 : 0}%`;
+  $('pbLeft').textContent = left > 0 ? `Còn ${left} buổi lao động đạt nữa là được ra trại` : 'Đã đủ, chờ cán bộ làm thủ tục ra trại';
+  $$('[data-task]', $('pbTasks')).forEach((b) => (b.onclick = () => goStation(b.dataset.task)));
+}
+$('pbBook').onclick = () => openRehabBook();
+$('pbCellBtn').onclick = () => goCell();
+
+// Nút ngữ cảnh ở trại: trạm lao động > cán bộ > cổng
+function prisonCtx(ctx) {
+  if (!isPrisonArea() || ctx.seated || ctx.cable) return null;
+  if (ctx.rehab && REHAB[ctx.rehab]) {
+    const d = taskInfo(ctx.rehab);
+    return { act: 'rehab', arg: d.id, label: jailed() ? `${d.icon} ${d.name}${d.done >= d.need ? ' ✓' : ` (${d.done}/${d.need})`}` : `${d.icon} Làm thử ${d.name.toLowerCase()}` };
+  }
+  if (ctx.police) return { act: 'police', arg: ctx.police, label: '👮 Trò chuyện với cán bộ' };
+  if (ctx.gate) return { act: 'gate', arg: '', label: jailed() ? '🔒 Cổng trại đang khoá' : '🚪 Ra cổng – Đi khu khác' };
+  return null;
+}
+function leavePrisonGate() {
+  if (jailed()) return lockedToast();
+  Sound.chime?.();
+  openMapView();
+}
+function goCell() {
+  if (!jailed()) return;
+  if (!S.world?.goToCell) return toast(`🛏️ Phòng giam số ${cellNo()} ở dãy trong nhà`);
+  try { S.world.goToCell(prisonOf().cell ?? 0); } catch (e) { console.warn(e); }
+  toast(`🛏️ Về phòng giam số ${cellNo()}`, 3000);
+}
+function goStation(task) {
+  const d = taskInfo(task); if (!d) return;
+  if (!isPrisonArea()) return toast(`${d.icon} Trạm ${esc(d.name.toLowerCase())} ở sân lao động của ${esc(templeName(PRISON_ID) || 'trại cải tạo')}`);
+  if (!S.world?.goToStation) return startRehab(task); // cảnh 3D chưa có trạm: vào thẳng mini-game
+  try { S.world.goToStation(task); } catch (e) { console.warn(e); }
+  toast(`${d.icon} Đang ra <b>${esc(d.name)}</b>… tới nơi bấm nút <b>${d.icon} ${esc(d.name)}</b> để bắt đầu`, 4500);
+}
+
+// Vừa vào trại: đang giam thì về phòng, chưa thì cán bộ chào và mời chọn
+async function prisonArrive() {
+  try { setPrisonState(await api('/prison')); } catch {}
+  if (jailed()) {
+    try { S.world?.goToCell?.(prisonOf().cell ?? 0); } catch {}
+    setTimeout(() => toast(`🔒 Bạn đang cải tạo · <b>Phòng ${cellNo()}</b><br><small>Còn ${prisonLeft()} buổi lao động. Mở 📋 Sổ cải tạo để xem việc cần làm.</small>`, 5500), 600);
+    return;
+  }
+  setTimeout(prisonWelcome, 700);
+}
+function prisonWelcome() {
+  if (!isPrisonArea() || jailed()) return;
+  if (S.coaching) { S.afterCoach = prisonWelcome; return; }
+  const p = prisonOf() || {}, u = S.profile.user, gac = POLICE.gac;
+  modal(`<div class="abbot-head"><span class="ava police">👮</span><div><b>${esc(gac.name)}</b><small>${esc(gac.role)} · ${esc(S.temple.name)}</small></div></div>
+    <div class="abbot-say"><p>Chào <b>${esc(u.name)}</b>! Đây là <b>${esc(S.temple.name)}</b>: dãy phòng giam ngăn nắp và sân lao động với 4 việc <b>trồng rau, nuôi lợn, nuôi cá, đào đá</b>.</p>
+      <p>Bạn vào <b>thăm trại</b> hay muốn <b>nhập trại cải tạo</b>? Nhập trại thì mặc áo phạm nhân, ở phòng giam và chỉ được sang khu khác khi đã cải tạo xong (mỗi việc 2 buổi đạt). Ra trại được thưởng ${ic('sen')} 200 Hạt và ${ic('ngoc')} 5 Sao.</p>
+      ${p.times ? `<p class="muted">Bạn từng ra trại ${p.times} lần.</p>` : ''}</div>
+    <div class="abbot-opts"><button class="btn gold" id="pjEnter">🔒 Nhập trại cải tạo</button><button class="btn ghost" id="pjVisit">👀 Thăm trại (khách)</button></div>`, (el) => {
+    el.querySelector('#pjEnter').onclick = (e) => busy(e.currentTarget, enterPrison);
+    el.querySelector('#pjVisit').onclick = () => { closeModal(); visitPrison(); };
+  });
+}
+async function enterPrison() {
+  let st;
+  try { st = await post('/prison/enter'); } catch (e) { toast(esc(e.message)); return false; }
+  if (!$('modal').classList.contains('hidden') && $('modalCard').querySelector('#pjEnter, .abbot-head .police')) closeModal();
+  setPrisonState(st);
+  Sound.bigBell?.();
+  try { S.world?.goToCell?.(prisonOf().cell ?? 0); } catch {}
+  toast(`🔒 Đã nhập trại · <b>Phòng ${cellNo()}</b><br><small>Ra sân lao động hoàn thành 4 việc cải tạo để được ra trại. Mở 📋 Sổ cải tạo để xem tiến độ.</small>`, 6500);
+  return true;
+}
+async function visitPrison() {
+  try { setPrisonState(await post('/prison/visit')); } catch {}
+  toast('👀 Bạn đang thăm trại với tư cách khách. Lại gần các trạm ngoài sân để làm thử, ra cổng trại để đi khu khác.', 5500);
+}
+
+// Sổ cải tạo: 4 việc, tiến độ, điểm cao nhất, nút đi làm
+function openRehabBook() {
+  sheet('Sổ cải tạo', null, (el) => {
+    const p = prisonOf(), on = jailed(), ts = prisonTasks();
+    const need = ts.reduce((a, t) => a + t.need, 0), done = ts.reduce((a, t) => a + Math.min(t.done, t.need), 0);
+    el.innerHTML = `<div class="rb-head"><span class="big">${on ? '🔒' : p?.status === 'tudo' ? '🕊️' : '👀'}</span><div style="flex:1;min-width:0">
+        <b>${on ? `Phạm nhân ${esc(S.profile.user.name)} · Phòng ${cellNo()}` : p?.status === 'tudo' ? 'Đã hoàn thành cải tạo' : 'Khách tham quan'}</b>
+        <small>${on ? (prisonLeft() ? `Còn ${prisonLeft()} buổi lao động đạt nữa là được ra trại. Mỗi buổi 45 giây.` : 'Đã đủ, chờ cán bộ làm thủ tục ra trại.') : `Bạn ${p?.times ? `đã ra trại ${p.times} lần` : 'chưa nhập trại'}. Có thể làm thử các việc dưới đây (không ghi sổ).`}</small>
+        ${on ? `<div class="bar"><i style="width:${need ? (done / need) * 100 : 0}%"></i></div>` : ''}</div></div>
+      ${ts.map((t) => `<div class="card rb-task${on && t.done >= t.need ? ' ok' : ''}"><span class="ic">${t.icon}</span><div class="body"><b>${esc(t.name)}</b><p>${esc(t.desc)}</p>
+        ${on ? `<div class="rb-pips">${Array.from({ length: t.need }, (_, k) => `<i class="${k < t.done ? 'on' : ''}"></i>`).join('')}</div>` : ''}
+        <div class="rb-meta">Đạt từ ${t.pass} điểm · Điểm cao nhất ${t.best || 0}${on ? ` · Đã đạt ${Math.min(t.done, t.need)}/${t.need} buổi` : ''}</div></div>
+        <div class="side"><button class="btn small ${on && t.done >= t.need ? 'ghost' : 'gold'}" data-go="${t.id}">${on ? (t.done >= t.need ? 'Làm thêm' : 'Đi làm') : 'Làm thử'}</button></div></div>`).join('')}
+      ${on ? `<button class="btn ghost" id="rbCell" style="width:100%">🛏️ Về phòng giam số ${cellNo()}</button>` : isPrisonArea() ? '<button class="btn gold" id="rbEnter" style="width:100%">🔒 Nhập trại cải tạo</button>' : ''}`;
+    $$('[data-go]', el).forEach((b) => (b.onclick = () => { closeSheet(); goStation(b.dataset.go); }));
+    el.querySelector('#rbCell')?.addEventListener('click', () => { closeSheet(); goCell(); });
+    el.querySelector('#rbEnter')?.addEventListener('click', (e) => busy(e.currentTarget, enterPrison));
+  });
+}
+
+// Mini-game: ẩn HUD, tạm dừng vẽ cảnh 3D cho nhẹ máy, nhân vật làm động tác lao động
+function beginRehabView(d) {
+  stopBowing(true);
+  if (S.world?.seated) S.world.stand();
+  closeSheet(); show('offerMenu', false);
+  if (S.world) { S.world.keys = {}; S.world.walkTarget = null; S.world.walkPath = null; }
+  try { S.world?.setPlayerWork?.(d.work); } catch {}
+  S.view = 'rehab';
+  show('hud', false); show('lanternLayer', false);
+  S.world?.stop();
+}
+function endRehabView() {
+  S.rehab = null;
+  try { S.world?.setPlayerWork?.(null); } catch {}
+  show('lanternLayer');
+  if (S.view === 'rehab') resumeHall();
+  applyPrison();
+}
+async function startRehab(task) {
+  const d = taskInfo(task);
+  if (!d || S.rehab || S.view !== 'hall') return;
+  if (!jailed()) return practiceRehab(d);
+  S.rehab = { task };
+  let run;
+  try { run = await post('/prison/start', { task }); } catch (e) {
+    S.rehab = null; toast(esc(e.message));
+    if (e.status === 409) api('/prison').then(setPrisonState).catch(() => {});
+    return;
+  }
+  Sound.chime?.();
+  beginRehabView(d);
+  runRehab(task, {
+    durSec: run.durSec || 45, pass: run.pass ?? d.pass, maxScore: run.maxScore ?? d.maxScore,
+    onCancel: () => { endRehabView(); toast(`${d.icon} Đã bỏ dở ${esc(d.name.toLowerCase())}, buổi này không được ghi sổ`); },
+    onFinish: async (score) => {
+      let r;
+      try { r = await post('/prison/finish', { runId: run.runId, score }); } catch (e) { endRehabView(); toast(esc(e.message), 4500); return; }
+      endRehabView();
+      afterRehab(d, r);
+    },
+  });
+}
+// Khách thăm trại làm thử cho biết: không gọi máy chủ, không thưởng
+function practiceRehab(d) {
+  S.rehab = { task: d.id, practice: true };
+  beginRehabView(d);
+  runRehab(d.id, {
+    durSec: 45, pass: d.pass, maxScore: d.maxScore, practice: true,
+    onCancel: endRehabView,
+    onFinish: (score) => {
+      endRehabView();
+      toast(`${d.icon} Làm thử ${esc(d.name.toLowerCase())}: <b>${score}</b> điểm${score >= d.pass ? ' – đủ mức đạt!' : ''}<br><small>Khách tham quan không được ghi sổ. Muốn được tính, hãy nhập trại cải tạo.</small>`, 5500);
+    },
+  });
+}
+function afterRehab(d, r) {
+  if (r.state) S.profile.prison = r.state;
+  handleResult({ ...r, gained: 0 }, { silent: true }); // phản hồi có đủ user, túi đồ, nhiệm vụ, hồ sơ cải tạo
+  const t = taskInfo(d.id), rw = prisonReward(r.gained);
+  if (r.passed) {
+    Sound.success?.(); petalShower(14, [d.icon, '✨', '⭐']);
+    toast(`✅ <b>Đạt!</b> ${d.icon} ${esc(d.name)}: ${r.score} điểm${rw ? `<br>${rw}` : ''}<br><small>${jailed() ? `Đã đạt ${Math.min(t.done, t.need)}/${t.need} buổi · còn ${prisonLeft()} buổi nữa là ra trại` : 'Cán bộ đã ghi vào sổ'}</small>`, 5500);
+  } else toast(`❌ <b>Chưa đạt</b> ${d.icon} ${esc(d.name)}: ${r.score}/${t.pass} điểm. Buổi sau cố gắng hơn nhé!`, 4500);
+  if (r.levelUp) setTimeout(() => { Sound.bigBell?.(); toast(`${ic('spark')} Lên cấp ${r.levelUp}!`, 3500); }, 4000); // sau thông báo kết quả buổi
+  if (r.released) setTimeout(() => celebrateRelease(r), 1200);
+}
+function celebrateRelease(r) {
+  try { S.world?.prisonRelease?.(); } catch (e) { console.warn(e); }
+  Sound.success?.(); setTimeout(() => Sound.bigBell?.(), 500);
+  petalShower(60, ['🎉', '🎊', '✨', '🕊️', '🌼']);
+  setTimeout(() => petalShower(30, ['🎉', '✨', '🕊️']), 2600);
+  const p = prisonOf() || {}, rw = prisonReward(r.gained);
+  modal(`<div class="big">🕊️</div><div class="legend-kicker">${esc(templeName(PRISON_ID) || 'Trại cải tạo')}</div>
+    <h3>Chúc mừng bạn ra trại!</h3>
+    <p>Bạn đã hoàn thành đủ 4 việc cải tạo ${prisonTasks().map((t) => t.icon).join(' ')}. Cán bộ trại chúc bạn sống tốt, làm ăn lương thiện và sớm về với gia đình.</p>
+    ${rw ? `<p class="release-gift">Phần thưởng: ${rw}</p>` : ''}
+    ${p.times > 1 ? `<p class="muted">Đây là lần ra trại thứ ${p.times} của bạn.</p>` : ''}
+    <button class="btn gold" id="mGo">${ic('map')} Đi tới khu khác</button><button class="btn ghost" id="mStay">Ở lại tham quan</button>`, (el) => {
+    el.querySelector('#mGo').onclick = () => { closeModal(); openMapView(); };
+    el.querySelector('#mStay').onclick = () => { closeModal(); toast('🚪 Cổng trại đã mở. Ra cổng khi bạn muốn đi khu khác nhé', 4500); };
+  });
+}
+// Cán bộ trại: lời khuyên ngẫu nhiên, hướng dẫn 4 việc, nhắc số buổi còn lại
+function talkPolice(kind = 'quangiao') {
+  const who = POLICE[kind] || POLICE.quangiao, u = S.profile.user;
+  const head = `<div class="abbot-head"><span class="ava police">👮</span><div><b>${esc(who.name)}</b><small>${esc(who.role)} · ${esc(templeName(PRISON_ID) || 'Trại cải tạo')}</small></div></div>`;
+  const say = (html, opts) => modal(`${head}<div class="abbot-say">${html}</div><div class="abbot-opts">${opts}</div>`, (el) => {
+    $$('[data-a]', el).forEach((b) => (b.onclick = () => go(b.dataset.a, b)));
+  }, { replace: true });
+  const greet = () => {
+    const p = prisonOf();
+    if (jailed()) return `<p>Chào phạm nhân <b>${esc(u.name)}</b>, phòng ${cellNo()}. ${prisonLeft() ? `Bạn còn <b>${prisonLeft()}</b> buổi lao động nữa:` : 'Bạn đã làm đủ, chờ làm thủ tục ra trại.'}</p>
+      <p>${prisonTasks().map((t) => `${t.icon} ${Math.min(t.done, t.need)}/${t.need}`).join(' · ')}</p><p>${esc(policeTip())}</p>`;
+    if (p?.status === 'tudo') return `<p>Chào <b>${esc(u.name)}</b>! Bạn đã cải tạo tốt và ra trại${p.times > 1 ? ` ${p.times} lần` : ''} rồi. Giờ bạn là khách của trại, cứ tự nhiên tham quan.</p>${kind === 'gac' ? '<p>Cổng trại đã mở, muốn đi khu khác thì cứ ra cổng.</p>' : ''}`;
+    return `<p>Chào <b>${esc(u.name)}</b>, bạn đang thăm trại với tư cách khách. ${kind === 'gac' ? 'Muốn đi khu khác thì cứ ra cổng nhé.' : 'Có thể làm thử các việc ở sân lao động.'}</p>`;
+  };
+  const menu = () => (jailed()
+    ? `<button class="btn gold" data-a="book">📋 Mở Sổ cải tạo</button><button class="btn ghost" data-a="how">❓ Hướng dẫn 4 việc lao động</button><button class="btn ghost" data-a="tip">💬 Xin cán bộ lời khuyên</button><button class="btn ghost" data-a="cell">🛏️ Về phòng giam</button><button class="btn ghost" data-a="bye">Chào cán bộ ạ</button>`
+    : `${kind === 'gac' ? '<button class="btn gold" data-a="gate">🚪 Ra cổng – Đi khu khác</button>' : ''}<button class="btn ${kind === 'gac' ? 'ghost' : 'gold'}" data-a="enter">🔒 Xin nhập trại cải tạo</button><button class="btn ghost" data-a="how">❓ Trong trại làm những việc gì?</button><button class="btn ghost" data-a="tip">💬 Nghe cán bộ dặn dò</button><button class="btn ghost" data-a="bye">Chào cán bộ ạ</button>`);
+  const go = (a, btn) => {
+    Sound.chime?.();
+    if (a === 'bye') return closeModal();
+    if (a === 'book') { closeModal(); return openRehabBook(); }
+    if (a === 'cell') { closeModal(); return goCell(); }
+    if (a === 'gate') { closeModal(); return leavePrisonGate(); }
+    if (a === 'enter') return busy(btn, enterPrison);
+    if (a === 'menu') return say(greet(), menu());
+    if (a === 'tip') return say(`<p>${esc(policeTip())}</p>`, '<button class="btn gold" data-a="tip">Cán bộ nói thêm đi ạ</button><button class="btn ghost" data-a="menu">Quay lại</button>');
+    if (a === 'how') {
+      const ts = prisonTasks();
+      return say(`<p>Trại có 4 việc lao động ngoài sân, mỗi buổi 45 giây:</p><ul>${ts.map((t) => `<li>${t.icon} <b>${esc(t.name)}</b> (đạt từ ${t.pass} điểm): ${esc(t.hint || t.desc)}</li>`).join('')}</ul>
+        <p>Mỗi việc cần ${ts[0]?.need || 2} buổi đạt. Đủ cả 4 việc là được ra trại, thưởng 200 Hạt và 5 Sao.</p>`, '<button class="btn gold" data-a="menu">Đã hiểu ạ</button>');
+    }
+  };
+  Sound.chime?.();
+  say(greet(), menu());
+}
+// Máy chủ báo tài khoản đang bị giam mà lại vào khu khác (vd. mở ở máy khác): đưa về trại
+function onJailed() {
+  api('/me').then(setProfile).catch(() => {}).finally(() => {
+    if (S.temple?.id === PRISON_ID || !hasPrison()) return;
+    toast('🔒 Bạn đang trong thời gian cải tạo, cán bộ đưa bạn về trại', 4500);
+    enterTemple(PRISON_ID);
+  });
+}
+// Người khác nhập trại / ra trại
+function onPrisonEvent(m) {
+  if ((m.uid && m.uid === S.profile?.user.id) || m.name === S.profile?.user.name || !isPrisonArea()) return;
+  if (m.ev === 'enter') toast(`🚔 <b>${esc(m.name)}</b> vừa nhập trại cải tạo${Number.isInteger(m.cell) ? ` · phòng ${m.cell + 1}` : ''}`, 4000);
+  else if (m.ev === 'release') { Sound.chime?.(); petalShower(16, ['🕊️', '✨']); toast(`🕊️ <b>${esc(m.name)}</b> đã hoàn thành cải tạo và ra trại. Chúc mừng!`, 5000); }
+}
+
+/* =====================================================================
    NGỒI / LẠY
    ===================================================================== */
 function renderCtx(ctx) {
+  S.ctx = ctx;
   Sound.setOutdoors(!!ctx.outside);
   const b = $('btnCtx');
   const tell = ctx.teller >= 0 && !ctx.seated;
-  show(b, ctx.seated || ctx.canSit || ctx.canTalk || tell || !!ctx.door || !!ctx.cable);
-  b.dataset.act = ctx.cable === 'riding' ? 'unride' : ctx.seated ? '' : ctx.canTalk ? 'talk' : tell ? 'tell' : ctx.cable ? 'ride' : ctx.door && !ctx.canSit ? 'door' : '';
+  const pact = prisonCtx(ctx); // trạm lao động, cán bộ, cổng trại (khu nhatu)
+  show(b, !!pact || ctx.seated || ctx.canSit || ctx.canTalk || tell || !!ctx.door || !!ctx.cable);
+  b.dataset.act = pact ? pact.act : ctx.cable === 'riding' ? 'unride' : ctx.seated ? '' : ctx.canTalk ? 'talk' : tell ? 'tell' : ctx.cable ? 'ride' : ctx.door && !ctx.canSit ? 'door' : '';
   b.dataset.teller = ctx.teller;
-  b.textContent = b.dataset.act === 'unride' ? 'Rời cáp treo' : b.dataset.act === 'ride' ? (S.world?.od?.cable?.say?.btn || 'Đi cáp treo lên đỉnh') : ctx.seated ? 'Đứng dậy' : b.dataset.act === 'talk' ? 'Gọi món với Barista ☕' : b.dataset.act === 'tell' ? 'Trò chuyện' : b.dataset.act === 'door' ? (ctx.door === 'out' ? 'Ra sân ngắm cảnh' : 'Vào quán cafe') : 'Ngồi vào bàn ☕';
+  b.dataset.arg = pact?.arg || '';
+  b.textContent = pact ? pact.label : b.dataset.act === 'unride' ? 'Rời cáp treo' : b.dataset.act === 'ride' ? (S.world?.od?.cable?.say?.btn || 'Đi cáp treo lên đỉnh') : ctx.seated ? 'Đứng dậy' : b.dataset.act === 'talk' ? 'Gọi món với Barista ☕' : b.dataset.act === 'tell' ? 'Trò chuyện' : b.dataset.act === 'door' ? (ctx.door === 'out' ? (isPrisonArea() ? 'Ra sân lao động' : 'Ra sân ngắm cảnh') : (isPrisonArea() ? 'Vào dãy phòng giam' : 'Vào quán cafe')) : isPrisonArea() ? 'Ngồi xuống' : 'Ngồi vào bàn ☕';
   const ob = $('btnOut');
   show(ob, !!S.world?.od && !ctx.seated && !ctx.cable);
   show('btnChore', !!ctx.outside && !ctx.seated && !ctx.cable);
   if (ctx.outside) $('guide').classList.add('fade'); // chữ hướng dẫn ngồi bàn chỉ dành cho trong quán
-  ob.innerHTML = ctx.outside ? `${ic('temple')} Vào quán cafe` : `${ic('map')} Ra sân ngắm cảnh`;
+  const pz = isPrisonArea();
+  ob.innerHTML = ctx.outside ? `${ic('temple')} ${pz ? 'Vào dãy phòng giam' : 'Vào quán cafe'}` : `${ic('map')} ${pz ? 'Ra sân lao động' : 'Ra sân ngắm cảnh'}`;
+  if (ctx.outside !== S.wasOutside && pz) { S.wasOutside = ctx.outside; if (ctx.outside) toast(jailed() ? '🧑‍🌾 Sân lao động: đi tới vườn rau 🥬, chuồng lợn 🐷, ao cá 🐟, mỏ đá ⛏️ rồi bấm nút để làm việc' : '👀 Sân lao động của trại. Lại gần các trạm để làm thử, cổng trại ở phía trước', 5000); }
   if (ctx.outside !== S.wasOutside) { S.wasOutside = ctx.outside; if (ctx.outside) toast(S.world?.od?.cable?.say ? `${ic('map')} ${esc(S.world.od.cable.say.hint)}` : S.world?.od?.cable ? `${ic('map')} Bạn đang ở sân vườn ngoài trời. Ga cáp treo ở bên phải sân – lại gần để đi cáp treo ngắm toàn cảnh.` : `${ic('map')} Bạn đang ở sân vườn ngoài trời. Đi dạo ngắm cảnh, bấm “Vào quán cafe” khi muốn quay lại bàn.`, 5000); }
   if (!ctx.seated && S.bow !== 'idle') stopBowing(true);
 }
@@ -1692,7 +1997,7 @@ function goToCable(id) {
   };
   setTimeout(step, 600);
 }
-$('btnCtx').onclick = () => { const act = $('btnCtx').dataset.act; if (act === 'talk') return talkAbbot(); if (act === 'tell') return talkTeller(+$('btnCtx').dataset.teller); if (act === 'door') return S.world.goThroughDoor(); if (act === 'ride') { Sound.chime?.(); return S.world.rideCable(); } if (act === 'unride') return S.world.endRide(); if (S.world.seated) S.world.stand(); else if (S.world.sit()) Sound.chime(); };
+$('btnCtx').onclick = () => { const act = $('btnCtx').dataset.act, arg = $('btnCtx').dataset.arg; if (act === 'rehab') return startRehab(arg); if (act === 'police') return talkPolice(arg); if (act === 'gate') return leavePrisonGate(); if (act === 'talk') return talkAbbot(); if (act === 'tell') return talkTeller(+$('btnCtx').dataset.teller); if (act === 'door') return S.world.goThroughDoor(); if (act === 'ride') { Sound.chime?.(); return S.world.rideCable(); } if (act === 'unride') return S.world.endRide(); if (S.world.seated) S.world.stand(); else if (S.world.sit()) Sound.chime(); };
 
 function stopBowing(immediate) {
   if (!S.world?.player) return;
@@ -3320,6 +3625,7 @@ function renderDonate(el) {
 
 /* ---------- phím tắt ---------- */
 addEventListener('keydown', (e) => {
+  if (S.view === 'rehab') return; // mini-game cải tạo tự xử lý phím (rehab.js)
   if (S.view === 'chant') { if (e.code === 'Space' && !e.repeat) { e.preventDefault(); hitMo(false); } else if (e.code === 'Escape') leaveChant(); return; }
   if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
   if (S.view === 'beads') {

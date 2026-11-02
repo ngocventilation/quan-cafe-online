@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="build" content="cafe3d-v3" />
+  <meta name="build" content="cafe3d-v4" />
   <meta name="theme-color" content="#1a110b" />
   <title>Quán Cafe Online 3D – Lofi Chill, Học Bài &amp; TikTok Live</title>
   <meta name="description" content="Không gian Quán Cafe 3D trực tuyến: gọi Cà phê Phin, Matcha, Trà sữa lên bàn 3D, bật nhạc Lofi mưa rơi học bài, nuôi Mèo Cam &amp; Corgi và bắn pháo hoa TikTok Live." />
@@ -23,33 +23,35 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="stylesheet" href="/css/app.css?v=cafe3d3" />
+  <link rel="stylesheet" href="/css/app.css?v=cafe3d4" />
   <script type="importmap">
     { "imports": {
-        "/js/api.js": "/js/api.js?v=cafe3d3",
-        "/js/audio.js": "/js/audio.js?v=cafe3d3",
-        "/js/avatar.js": "/js/avatar.js?v=cafe3d3",
-        "/js/beads.js": "/js/beads.js?v=cafe3d3",
-        "/js/chores.js": "/js/chores.js?v=cafe3d3",
-        "/js/cushion.js": "/js/cushion.js?v=cafe3d3",
-        "/js/exterior.js": "/js/exterior.js?v=cafe3d3",
-        "/js/gear.js": "/js/gear.js?v=cafe3d3",
-        "/js/grounds.js": "/js/grounds.js?v=cafe3d3",
-        "/js/help.js": "/js/help.js?v=cafe3d3",
-        "/js/icons.js": "/js/icons.js?v=cafe3d3",
-        "/js/kinh.js": "/js/kinh.js?v=cafe3d3",
-        "/js/lotus.js": "/js/lotus.js?v=cafe3d3",
-        "/js/main.js": "/js/main.js?v=cafe3d3",
-        "/js/mapview.js": "/js/mapview.js?v=cafe3d3",
-        "/js/music.js": "/js/music.js?v=cafe3d3",
-        "/js/pets.js": "/js/pets.js?v=cafe3d3",
-        "/js/share.js": "/js/share.js?v=cafe3d3",
-        "/js/statues.js": "/js/statues.js?v=cafe3d3",
-        "/js/temple.js": "/js/temple.js?v=cafe3d3",
-        "/js/textures.js": "/js/textures.js?v=cafe3d3",
-        "/js/thumbs.js": "/js/thumbs.js?v=cafe3d3",
-        "/js/tryon.js": "/js/tryon.js?v=cafe3d3",
-        "/js/world.js": "/js/world.js?v=cafe3d3",
+        "/js/api.js": "/js/api.js?v=cafe3d4",
+        "/js/audio.js": "/js/audio.js?v=cafe3d4",
+        "/js/avatar.js": "/js/avatar.js?v=cafe3d4",
+        "/js/beads.js": "/js/beads.js?v=cafe3d4",
+        "/js/chores.js": "/js/chores.js?v=cafe3d4",
+        "/js/cushion.js": "/js/cushion.js?v=cafe3d4",
+        "/js/exterior.js": "/js/exterior.js?v=cafe3d4",
+        "/js/gear.js": "/js/gear.js?v=cafe3d4",
+        "/js/grounds.js": "/js/grounds.js?v=cafe3d4",
+        "/js/help.js": "/js/help.js?v=cafe3d4",
+        "/js/icons.js": "/js/icons.js?v=cafe3d4",
+        "/js/kinh.js": "/js/kinh.js?v=cafe3d4",
+        "/js/lotus.js": "/js/lotus.js?v=cafe3d4",
+        "/js/main.js": "/js/main.js?v=cafe3d4",
+        "/js/mapview.js": "/js/mapview.js?v=cafe3d4",
+        "/js/music.js": "/js/music.js?v=cafe3d4",
+        "/js/pets.js": "/js/pets.js?v=cafe3d4",
+        "/js/prison.js": "/js/prison.js?v=cafe3d4",
+        "/js/rehab.js": "/js/rehab.js?v=cafe3d4",
+        "/js/share.js": "/js/share.js?v=cafe3d4",
+        "/js/statues.js": "/js/statues.js?v=cafe3d4",
+        "/js/temple.js": "/js/temple.js?v=cafe3d4",
+        "/js/textures.js": "/js/textures.js?v=cafe3d4",
+        "/js/thumbs.js": "/js/thumbs.js?v=cafe3d4",
+        "/js/tryon.js": "/js/tryon.js?v=cafe3d4",
+        "/js/world.js": "/js/world.js?v=cafe3d4",
         "three": "https://unpkg.com/three@0.164.1/build/three.module.js",
         "three/addons/": "https://unpkg.com/three@0.164.1/examples/jsm/" } }
   </script>
@@ -208,7 +210,7 @@
       <button data-sheet="shop" title="Menu & Cửa hàng"><span><svg class="i"><use href="#i-shop"/></svg></span><em>Cửa hàng</em></button>
       <button data-sheet="community" title="Cộng đồng & Lời nhắn"><span><svg class="i"><use href="#i-users"/></svg></span><i class="badge hidden" id="cBadge"></i><em>Cộng đồng</em></button>
       <button data-sheet="rank" title="Bảng xếp hạng Top Chill"><span><svg class="i"><use href="#i-trophy"/></svg></span><em>Top Chill</em></button>
-      <button data-sheet="map" title="Bản đồ 17 Quán Cafe 3D"><span><svg class="i"><use href="#i-map"/></svg></span><i class="badge dot hidden" id="mapDot"></i><em>Đổi Quán 3D</em></button>
+      <button data-sheet="map" title="Bản đồ 18 Khu"><span><svg class="i"><use href="#i-map"/></svg></span><i class="badge dot hidden" id="mapDot"></i><em>Đổi Quán 3D</em></button>
       <button data-sheet="guide" title="Phong cách Cafe & Chill"><span><svg class="i"><use href="#i-book"/></svg></span><em>Phong cách</em></button>
       <button data-sheet="support" title="Góp ý & Donate"><span><svg class="i"><use href="#i-chat"/></svg></span><em>Donate</em></button>
       <button id="btnServer" title="Đổi máy chủ"><span><svg class="i"><use href="#i-server"/></svg></span><em>Máy chủ</em></button>
@@ -226,6 +228,13 @@
     <p class="guide" id="guide">Chạm bàn trống để ngồi · Kéo để xoay góc nhìn · Bấm ☕ Menu Bàn 3D hoặc 🎁 Quà TikTok để tương tác Live</p>
 
     <div id="quyBar" class="quy-bar hidden"><b>Bạn đang cạn năng lượng vì chạy deadline</b><small>Đứng yên nghe nhạc Lofi để nạp lại năng lượng.</small><div class="fund-track"><i id="quyFill"></i></div><small id="quyLeft"></small><button id="quyListen" class="btn small gold">Nghe nhạc</button></div>
+    <div id="prisonBar" class="prison-bar hidden" aria-label="Tiến độ cải tạo">
+      <div class="pb-head"><b>🔒 Đang cải tạo</b><span id="pbCell">Phòng 1</span></div>
+      <div class="pb-tasks" id="pbTasks"></div>
+      <div class="fund-track"><i id="pbFill"></i></div>
+      <small id="pbLeft"></small>
+      <div class="pb-btns"><button class="btn small gold" id="pbBook">📋 Sổ cải tạo</button><button class="btn small ghost" id="pbCellBtn">🛏️ Về phòng giam</button></div>
+    </div>
     <div class="ctx-wrap"><button id="btnCtx" class="ctx hidden">Ngồi vào bàn</button></div>
     <div class="actions">
       <button id="btnBow" class="act"><span>☕</span><em id="bowLabel">Nhâm nhi</em></button>
@@ -314,6 +323,6 @@
   <div id="liveBannerLayer" class="live-banner-layer"></div>
   <div id="toast" class="toast"></div>
 
-  <script type="module" src="/js/main.js?v=cafe3d3"></script>
+  <script type="module" src="/js/main.js?v=cafe3d4"></script>
 </body>
 </html>
