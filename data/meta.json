@@ -1,0 +1,2714 @@
+{
+  "sects": {
+    "truclam": {
+      "id": "truclam",
+      "name": "Lofi Chill",
+      "color": "#4f8a4a",
+      "icon": "🎧",
+      "desc": "Góc yên tĩnh bên khung cửa sổ mưa rơi, tiếng nhạc Lofi ấm áp cùng chiếc Laptop sáng đèn.",
+      "bonusText": "Học bài & Làm việc ×1.3",
+      "bonus": {
+        "meditate": 1.3
+      },
+      "titles": [
+        "Khách Ghé Quán",
+        "Góc Cửa Sổ",
+        "Tín Đồ Lofi",
+        "Chiến Thần Deadline",
+        "Lofi Chill Master"
+      ]
+    },
+    "tinhdo": {
+      "id": "tinhdo",
+      "name": "Specialty Coffee",
+      "color": "#c4688a",
+      "icon": "☕",
+      "desc": "Đam mê hương vị nguyên bản từ hạt Arabica Cầu Đất, cà phê Phin truyền thống tới V60, Espresso.",
+      "bonusText": "Pha chế & Rang xay ×1.3",
+      "bonus": {
+        "bead": 1.3,
+        "round": 1.3
+      },
+      "titles": [
+        "Tập Sự Pha Chế",
+        "Yêu Cà Phê Phin",
+        "Nghệ Nhân Latte Art",
+        "Chuyên Gia Arabica",
+        "Barista Trưởng"
+      ]
+    },
+    "lamte": {
+      "id": "lamte",
+      "name": "Acoustic Soul",
+      "color": "#c0602e",
+      "icon": "🎸",
+      "desc": "Say mê những giai điệu Acoustic mộc mạc, tiếng đàn guitar thùng và những buổi trò chuyện trực tiếp.",
+      "bonusText": "Nhâm nhi & Giao lưu ×1.3",
+      "bonus": {
+        "bow": 1.3
+      },
+      "titles": [
+        "Thính Giả Quen",
+        "Giai Điệu Mộc",
+        "Nghệ Sĩ Acoustic",
+        "Tâm Hồn Đồng Điệu",
+        "Ngôi Sao Đêm Nhạc"
+      ]
+    },
+    "taodong": {
+      "id": "taodong",
+      "name": "Mèo & Trà Chiều",
+      "color": "#3f6f9a",
+      "icon": "🐱",
+      "desc": "Thưởng thức trà sữa, bánh ngọt croissant và vuốt ve những chú mèo cam, cún Corgi đáng yêu trong quán.",
+      "bonusText": "Ngồi bàn & Thư giãn ×1.5",
+      "bonus": {
+        "sit": 1.5,
+        "meditate": 1.1
+      },
+      "titles": [
+        "Khách Yêu Mèo",
+        "Bạn Thân Corgi",
+        "Tín Đồ Trà Bánh",
+        "Sen Của Hoàng Thượng",
+        "Chủ Quán Mèo Chill"
+      ]
+    }
+  },
+  "temples": [
+    {
+      "id": "nhattru",
+      "name": "Tiệm Cà Phê Phố Cổ",
+      "region": "Bắc",
+      "place": "Hoàn Kiếm, Hà Nội",
+      "inspired": "Cà Phê Phố Cổ & Hồ Gươm",
+      "description": "Không gian gỗ trầm ấm áp giữa lòng Hà Nội, ban công nhìn xuống mặt hồ phẳng lặng và hương cà phê trứng thơm lừng.",
+      "theme": {
+        "size": [
+          28,
+          28,
+          9
+        ],
+        "wall": "wood",
+        "wallColor": "#5a3220",
+        "pillar": "#7a2a18",
+        "floor": "wood",
+        "view": "pond",
+        "windowsAllSides": true,
+        "mural": null,
+        "roof": "#3a2a20",
+        "statues": [
+          {
+            "kind": "quanam",
+            "x": 0,
+            "scale": 1.05,
+            "mat": "white"
+          }
+        ],
+        "light": {
+          "hemi": "#ffe8c4",
+          "key": 1.3,
+          "warm": "#ffb070"
+        },
+        "fog": "#1d1510",
+        "cushions": {
+          "cols": [
+            -8.8,
+            -6.4,
+            -4,
+            -1.6,
+            1.6,
+            4,
+            6.4,
+            8.8
+          ],
+          "rows": 7,
+          "z0": -5.6,
+          "dz": 2.4
+        },
+        "extras": [
+          "lotusPond"
+        ]
+      },
+      "npc": 2,
+      "enabled": true,
+      "sort": 0
+    },
+    {
+      "id": "tranho",
+      "name": "Cà Phê Hoàng Hôn Hồ Tây",
+      "region": "Bắc",
+      "place": "Tây Hồ, Hà Nội",
+      "inspired": "Santorini & Sunset Hồ Tây",
+      "description": "Quán cafe lộng gió bên mặt hồ mênh mông, nơi ngắm hoàng hôn đỏ rực và thưởng thức Cold Brew mát lạnh.",
+      "theme": {
+        "size": [
+          32,
+          32,
+          10.3
+        ],
+        "wall": "wood",
+        "wallColor": "#6a3a22",
+        "pillar": "#6b2414",
+        "floor": "wood",
+        "view": "lake",
+        "mural": {
+          "bg": "#3a160f",
+          "accent": "#d9a645"
+        },
+        "roof": "#2f1d14",
+        "statues": [
+          {
+            "kind": "amida",
+            "x": 0,
+            "scale": 0.82,
+            "mat": "wood_gold"
+          }
+        ],
+        "light": {
+          "hemi": "#ffe2b8",
+          "key": 1.4,
+          "warm": "#ffa860"
+        },
+        "fog": "#140c08",
+        "cushions": {
+          "cols": [
+            -11.2,
+            -8.8,
+            -6.4,
+            -4,
+            -1.6,
+            1.6,
+            4,
+            6.4,
+            8.8,
+            11.2
+          ],
+          "rows": 9,
+          "z0": -6.7,
+          "dz": 2.4
+        },
+        "extras": [
+          "tower"
+        ]
+      },
+      "npc": 4,
+      "enabled": true,
+      "sort": 1
+    },
+    {
+      "id": "huongson",
+      "name": "Tiệm Cafe Hang Đá Rêu Phong",
+      "region": "Bắc",
+      "place": "Ninh Bình – Hương Sơn",
+      "inspired": "Cave Specialty Coffee",
+      "description": "Quán cà phê độc đáo ẩn mình dưới vòm đá tự nhiên, ánh đèn Edison vàng ấm phản chiếu trên làn sương mờ.",
+      "theme": {
+        "size": [
+          30,
+          30,
+          11.5
+        ],
+        "wall": "rock",
+        "wallColor": "#5d554c",
+        "pillar": null,
+        "floor": "stone",
+        "view": "cave",
+        "mural": null,
+        "roof": "#3c3631",
+        "statues": [
+          {
+            "kind": "quanam",
+            "x": 0,
+            "scale": 1.32,
+            "mat": "gold"
+          },
+          {
+            "kind": "shakya",
+            "x": -5.2,
+            "scale": 0.84,
+            "mat": "stone"
+          },
+          {
+            "kind": "shakya",
+            "x": 5.2,
+            "scale": 0.84,
+            "mat": "stone"
+          }
+        ],
+        "light": {
+          "hemi": "#d6d0c4",
+          "key": 0.7,
+          "warm": "#ff9a50"
+        },
+        "fog": "#1a1714",
+        "cushions": {
+          "cols": [
+            -11.2,
+            -8.8,
+            -6.4,
+            -4,
+            -1.6,
+            1.6,
+            4,
+            6.4,
+            8.8,
+            11.2
+          ],
+          "rows": 8,
+          "z0": -6,
+          "dz": 2.4
+        },
+        "extras": [
+          "stalactites",
+          "haze"
+        ]
+      },
+      "npc": 3,
+      "enabled": true,
+      "sort": 2
+    },
+    {
+      "id": "dinhmay",
+      "name": "Cloud Cafe Đỉnh Mây",
+      "region": "Bắc",
+      "place": "Uông Bí, Quảng Ninh",
+      "inspired": "Săn Mây Yên Tử",
+      "description": "Quán gỗ săn mây trên đỉnh núi cao, bốn bề là biển mây bồng bềnh và rừng trúc xanh mát.",
+      "theme": {
+        "size": [
+          26,
+          26,
+          9.6
+        ],
+        "wall": "bronze",
+        "wallColor": "#7a5a2e",
+        "pillar": "#8a6a34",
+        "floor": "stone",
+        "view": "clouds",
+        "mural": null,
+        "roof": "#4a3820",
+        "statues": [
+          {
+            "kind": "shakya",
+            "x": 0,
+            "scale": 0.74,
+            "mat": "bronze"
+          }
+        ],
+        "light": {
+          "hemi": "#e8f0ff",
+          "key": 1.6,
+          "warm": "#ffc080"
+        },
+        "fog": "#1c1a18",
+        "cushions": {
+          "cols": [
+            -8.8,
+            -6.4,
+            -4,
+            -1.6,
+            1.6,
+            4,
+            6.4,
+            8.8
+          ],
+          "rows": 7,
+          "z0": -4.6,
+          "dz": 2.4
+        },
+        "extras": [
+          "bamboo"
+        ]
+      },
+      "npc": 2,
+      "enabled": true,
+      "sort": 3
+    },
+    {
+      "id": "baison",
+      "name": "Đại Sảnh Roastery Bái Sơn",
+      "region": "Bắc",
+      "place": "Gia Viễn, Ninh Bình",
+      "inspired": "Reserve Roastery & Lounge",
+      "description": "Không gian Roastery 3D rộng lớn với quầy Barista trung tâm hoành tráng, hàng chục bàn gỗ đón hàng trăm khách cùng lúc.",
+      "theme": {
+        "size": [
+          43,
+          40,
+          13.8
+        ],
+        "wall": "wood",
+        "wallColor": "#5a2e1a",
+        "pillar": "#5e2010",
+        "floor": "wood",
+        "view": "mountain",
+        "mural": {
+          "bg": "#2e1a10",
+          "accent": "#c9a050"
+        },
+        "roof": "#2a1810",
+        "statues": [
+          {
+            "kind": "amida",
+            "x": -9.2,
+            "scale": 0.95,
+            "mat": "bronze_dark"
+          },
+          {
+            "kind": "shakya",
+            "x": 0,
+            "scale": 1.05,
+            "mat": "bronze_dark"
+          },
+          {
+            "kind": "amida",
+            "x": 9.2,
+            "scale": 0.95,
+            "mat": "bronze_dark"
+          }
+        ],
+        "light": {
+          "hemi": "#ffe2b8",
+          "key": 1.3,
+          "warm": "#ffa860"
+        },
+        "fog": "#120b07",
+        "cushions": {
+          "cols": [
+            -16,
+            -13.6,
+            -11.2,
+            -8.8,
+            -6.4,
+            -4,
+            -1.6,
+            1.6,
+            4,
+            6.4,
+            8.8,
+            11.2,
+            13.6,
+            16
+          ],
+          "rows": 11,
+          "z0": -7.8,
+          "dz": 2.4
+        },
+        "extras": []
+      },
+      "npc": 5,
+      "enabled": true,
+      "sort": 4
+    },
+    {
+      "id": "thienmau",
+      "name": "Cà Phê Bên Dòng Sông Hương",
+      "region": "Trung",
+      "place": "Kim Long, TP. Huế",
+      "inspired": "Tiệm Trà & Cà Phê Cố Đô",
+      "description": "Phong cách Indochine hoài cổ bên bờ sông Hương thơ mộng, tiếng nhạc Trịnh và Lofi du dương chiều hoàng hôn.",
+      "theme": {
+        "size": [
+          30,
+          30,
+          10.3
+        ],
+        "wall": "lacquer",
+        "wallColor": "#8a1e14",
+        "pillar": "#a3261a",
+        "floor": "tile",
+        "view": "river",
+        "mural": {
+          "bg": "#5a1410",
+          "accent": "#e8c060"
+        },
+        "roof": "#3a1a10",
+        "statues": [
+          {
+            "kind": "shakya",
+            "x": 0,
+            "scale": 1.06,
+            "mat": "gold"
+          }
+        ],
+        "light": {
+          "hemi": "#ffd8b0",
+          "key": 1.4,
+          "warm": "#ff9850"
+        },
+        "fog": "#170a06",
+        "cushions": {
+          "cols": [
+            -11.2,
+            -8.8,
+            -6.4,
+            -4,
+            -1.6,
+            1.6,
+            4,
+            6.4,
+            8.8,
+            11.2
+          ],
+          "rows": 8,
+          "z0": -6.2,
+          "dz": 2.4
+        },
+        "extras": [
+          "tower"
+        ]
+      },
+      "npc": 3,
+      "enabled": true,
+      "sort": 5
+    },
+    {
+      "id": "vinhan",
+      "name": "Sài Gòn Acoustic Lounge",
+      "region": "Nam",
+      "place": "Quận 1, TP. Hồ Chí Minh",
+      "inspired": "Rooftop & Acoustic Sài Gòn",
+      "description": "Không gian khoáng đạt giữa lòng Sài Gòn nhộn nhịp, cửa kính lớn nhìn ra hàng dừa xanh và sân khấu nhạc sống.",
+      "theme": {
+        "size": [
+          35,
+          32,
+          11.5
+        ],
+        "wall": "plaster",
+        "wallColor": "#e8dcc4",
+        "pillar": "#a8503a",
+        "floor": "stone",
+        "view": "palm",
+        "mural": {
+          "bg": "#6a3a22",
+          "accent": "#e8c060"
+        },
+        "roof": "#5a4030",
+        "statues": [
+          {
+            "kind": "shakya",
+            "x": 0,
+            "scale": 0.82,
+            "mat": "gold"
+          }
+        ],
+        "light": {
+          "hemi": "#fff4e0",
+          "key": 1.8,
+          "warm": "#ffc080"
+        },
+        "fog": "#2a2018",
+        "cushions": {
+          "cols": [
+            -13.6,
+            -11.2,
+            -8.8,
+            -6.4,
+            -4,
+            -1.6,
+            1.6,
+            4,
+            6.4,
+            8.8,
+            11.2,
+            13.6
+          ],
+          "rows": 9,
+          "z0": -6.7,
+          "dz": 2.4
+        },
+        "extras": []
+      },
+      "npc": 4,
+      "enabled": true,
+      "sort": 6
+    },
+    {
+      "id": "doivang",
+      "name": "Tiệm Cà Phê Vườn Nhiệt Đới",
+      "region": "Nam",
+      "place": "Sóc Trăng – Miền Tây",
+      "inspired": "Tropical Garden Oasis",
+      "description": "Tiệm cà phê sân vườn rực rỡ sắc vàng nhiệt đới, bao quanh bởi cây xanh mát rượi và gió miền Tây.",
+      "theme": {
+        "size": [
+          27,
+          30,
+          11.5
+        ],
+        "wall": "khmer",
+        "wallColor": "#e8a23a",
+        "pillar": "#f0c050",
+        "floor": "tile",
+        "view": "garden",
+        "mural": {
+          "bg": "#8a3a12",
+          "accent": "#ffd870"
+        },
+        "roof": "#8a2a10",
+        "statues": [
+          {
+            "kind": "khmer",
+            "x": 0,
+            "scale": 0.8,
+            "mat": "gold"
+          }
+        ],
+        "light": {
+          "hemi": "#fff0d0",
+          "key": 1.7,
+          "warm": "#ffb060"
+        },
+        "fog": "#2a160a",
+        "cushions": {
+          "cols": [
+            -8.8,
+            -6.4,
+            -4,
+            -1.6,
+            1.6,
+            4,
+            6.4,
+            8.8
+          ],
+          "rows": 8,
+          "z0": -5.7,
+          "dz": 2.4
+        },
+        "extras": [
+          "naga"
+        ]
+      },
+      "npc": 3,
+      "enabled": true,
+      "sort": 7
+    },
+    {
+      "id": "linhson",
+      "name": "Panorama Cafe Đỉnh Núi Bà",
+      "region": "Nam",
+      "place": "Tây Ninh",
+      "inspired": "Cloud View Bistro Tây Ninh",
+      "description": "Tiệm cà phê kính săn mây trên đỉnh núi cao nhất Nam Bộ, tầm nhìn toàn cảnh hồ Dầu Tiếng từ độ cao gần 1000m.",
+      "theme": {
+        "size": [
+          30,
+          28,
+          10.8
+        ],
+        "wall": "plaster",
+        "wallColor": "#e9c46a",
+        "pillar": "#a3261a",
+        "floor": "tile",
+        "view": "baden",
+        "hallStyle": {
+          "outer": "#e9c46a",
+          "tile": "#a8321c",
+          "col": "#a3261a"
+        },
+        "mural": {
+          "bg": "#7a1e12",
+          "accent": "#ffd870"
+        },
+        "roof": "#8a2a16",
+        "statues": [
+          {
+            "kind": "quanam",
+            "x": 0,
+            "scale": 1.38,
+            "mat": "gold"
+          },
+          {
+            "kind": "shakya",
+            "x": -5.4,
+            "scale": 0.86,
+            "mat": "bronze"
+          },
+          {
+            "kind": "amida",
+            "x": 5.4,
+            "scale": 0.86,
+            "mat": "bronze"
+          }
+        ],
+        "light": {
+          "hemi": "#fff0d8",
+          "key": 1.6,
+          "warm": "#ffb070"
+        },
+        "fog": "#24160c",
+        "cushions": {
+          "cols": [
+            -11.2,
+            -8.8,
+            -6.4,
+            -4,
+            -1.6,
+            1.6,
+            4,
+            6.4,
+            8.8,
+            11.2
+          ],
+          "rows": 7,
+          "z0": -5.9,
+          "dz": 2.4
+        },
+        "extras": []
+      },
+      "npc": 3,
+      "enabled": true,
+      "sort": 8
+    },
+    {
+      "id": "lamkinh",
+      "name": "Tiệm Cà Phê Gỗ Lam Kinh",
+      "region": "Trung",
+      "place": "Thọ Xuân, Thanh Hoá",
+      "inspired": "Heritage Wood Cafe",
+      "description": "Kiến trúc gỗ lim cổ điển kết hợp ánh đèn vàng ấm, góc học bài và đọc sách cực kỳ tĩnh lặng.",
+      "theme": {
+        "size": [
+          36,
+          30,
+          12.6
+        ],
+        "wall": "lacquer",
+        "wallColor": "#7a1c10",
+        "pillar": "#8a2014",
+        "floor": "tile",
+        "view": "citadel",
+        "hallStyle": {
+          "outer": "#8a2a18",
+          "tile": "#6a4030",
+          "under": "#3a140c",
+          "col": "#8a2014",
+          "ridge": "#c89a50"
+        },
+        "mural": {
+          "bg": "#4a120c",
+          "accent": "#e8c060"
+        },
+        "roof": "#3a1a10",
+        "statues": [
+          {
+            "kind": "shakya",
+            "x": 0,
+            "scale": 1.06,
+            "mat": "gold"
+          }
+        ],
+        "light": {
+          "hemi": "#ffdcb4",
+          "key": 1.4,
+          "warm": "#ffa050"
+        },
+        "fog": "#160a06",
+        "cushions": {
+          "cols": [
+            -13.6,
+            -11.2,
+            -8.8,
+            -6.4,
+            -4,
+            -1.6,
+            1.6,
+            4,
+            6.4,
+            8.8,
+            11.2,
+            13.6
+          ],
+          "rows": 8,
+          "z0": -6.6,
+          "dz": 2.4
+        },
+        "extras": []
+      },
+      "npc": 3,
+      "enabled": true,
+      "sort": 9
+    },
+    {
+      "id": "kimson",
+      "name": "Fansipan Cloud Roastery",
+      "region": "Bắc",
+      "place": "Đỉnh Fansipan, Sa Pa, Lào Cai",
+      "inspired": "Cafe Trên Mây Sa Pa",
+      "description": "Tiệm cà phê sương mù trên nóc nhà Đông Dương, nhâm nhi Cacao nóng và Cà phê Arabica giữa biển mây.",
+      "theme": {
+        "size": [
+          30,
+          26,
+          10
+        ],
+        "wall": "wood",
+        "wallColor": "#6a4428",
+        "pillar": "#6e2a18",
+        "floor": "wood",
+        "view": "fansipan",
+        "hallStyle": {
+          "outer": "#4f3a28",
+          "tile": "#5c5349",
+          "under": "#35251a",
+          "col": "#4a2e1a"
+        },
+        "mural": {
+          "bg": "#3a2416",
+          "accent": "#c9a050"
+        },
+        "roof": "#2e2018",
+        "statues": [
+          {
+            "kind": "amida",
+            "x": 0,
+            "scale": 0.88,
+            "mat": "gold"
+          },
+          {
+            "kind": "shakya",
+            "x": -5.4,
+            "scale": 0.86,
+            "mat": "gold"
+          },
+          {
+            "kind": "quanam",
+            "x": 5.4,
+            "scale": 0.92,
+            "mat": "gold"
+          }
+        ],
+        "light": {
+          "hemi": "#fff2de",
+          "key": 1.5,
+          "warm": "#ffb878"
+        },
+        "fog": "#1c130c",
+        "cushions": {
+          "cols": [
+            -11.2,
+            -8.8,
+            -6.4,
+            -4,
+            -1.6,
+            1.6,
+            4,
+            6.4,
+            8.8,
+            11.2
+          ],
+          "rows": 7,
+          "z0": -5.4,
+          "dz": 2.4
+        },
+        "extras": []
+      },
+      "npc": 3,
+      "enabled": true,
+      "sort": 10
+    },
+    {
+      "id": "linhung",
+      "name": "Seaview Cafe Bán Đảo Sơn Trà",
+      "region": "Trung",
+      "place": "Bãi Bụt, Sơn Trà, Đà Nẵng",
+      "inspired": "Ocean Breeze Cafe Đà Nẵng",
+      "description": "Quán cà phê hướng biển tuyệt đẹp trên bán đảo Sơn Trà, nghe tiếng sóng vỗ và ngắm vịnh Đà Nẵng.",
+      "theme": {
+        "size": [
+          30,
+          26,
+          10
+        ],
+        "wall": "plaster",
+        "wallColor": "#ecd9a8",
+        "pillar": "#a3261a",
+        "floor": "tile",
+        "view": "sontra",
+        "hallStyle": {
+          "outer": "#e8d3a0",
+          "tile": "#9a4a26",
+          "under": "#5a3a24",
+          "col": "#b8352a"
+        },
+        "mural": {
+          "bg": "#7a2a18",
+          "accent": "#f0c860"
+        },
+        "roof": "#6a2a18",
+        "statues": [
+          {
+            "kind": "shakya",
+            "x": 0,
+            "scale": 0.88,
+            "mat": "gold"
+          },
+          {
+            "kind": "quanam",
+            "x": 5.4,
+            "scale": 0.92,
+            "mat": "white"
+          },
+          {
+            "kind": "shakya",
+            "x": -5.4,
+            "scale": 0.86,
+            "mat": "bronze"
+          }
+        ],
+        "light": {
+          "hemi": "#fff2de",
+          "key": 1.6,
+          "warm": "#ffc080"
+        },
+        "fog": "#22160c",
+        "cushions": {
+          "cols": [
+            -11.2,
+            -8.8,
+            -6.4,
+            -4,
+            -1.6,
+            1.6,
+            4,
+            6.4,
+            8.8,
+            11.2
+          ],
+          "rows": 7,
+          "z0": -5.4,
+          "dz": 2.4
+        },
+        "extras": []
+      },
+      "npc": 3,
+      "enabled": true,
+      "sort": 10
+    },
+    {
+      "id": "nuisam",
+      "name": "Tiệm Cà Phê Đồi Thất Sơn",
+      "region": "Nam",
+      "place": "Châu Đốc, An Giang",
+      "inspired": "Sunset Hill Cafe An Giang",
+      "description": "Góc chill bình yên nhìn xuống cánh đồng thốt nốt mênh mông mùa nước nổi miền Tây.",
+      "theme": {
+        "size": [
+          32,
+          28,
+          10.8
+        ],
+        "wall": "plaster",
+        "wallColor": "#e9c46a",
+        "pillar": "#a3261a",
+        "floor": "tile",
+        "view": "nuisam",
+        "hallStyle": {
+          "outer": "#efdca4",
+          "tile": "#2f7f6f",
+          "under": "#4a2616",
+          "col": "#b03020",
+          "ridge": "#e0b84a"
+        },
+        "mural": {
+          "bg": "#7a1e12",
+          "accent": "#ffd870"
+        },
+        "roof": "#2a5a50",
+        "statues": [
+          {
+            "kind": "quanam",
+            "x": 0,
+            "scale": 1.38,
+            "mat": "gold"
+          }
+        ],
+        "light": {
+          "hemi": "#fff0d8",
+          "key": 1.6,
+          "warm": "#ffb070"
+        },
+        "fog": "#24160c",
+        "cushions": {
+          "cols": [
+            -11.2,
+            -8.8,
+            -6.4,
+            -4,
+            -1.6,
+            1.6,
+            4,
+            6.4,
+            8.8,
+            11.2
+          ],
+          "rows": 7,
+          "z0": -5.9,
+          "dz": 2.4
+        },
+        "extras": []
+      },
+      "npc": 3,
+      "enabled": true,
+      "sort": 11
+    },
+    {
+      "id": "cuuphong",
+      "name": "Lakeview Bistro Tam Chúc",
+      "region": "Bắc",
+      "place": "Kim Bảng, Hà Nam",
+      "inspired": "Mountain & Lake Lounge",
+      "description": "Tiệm cà phê ven hồ nước phẳng lặng như gương với dãy núi đá vôi trùng điệp phía chân trời.",
+      "theme": {
+        "size": [
+          38,
+          32,
+          12
+        ],
+        "wall": "plaster",
+        "wallColor": "#8a857a",
+        "pillar": "#5c4a38",
+        "floor": "stone",
+        "view": "cuuphong",
+        "hallStyle": {
+          "outer": "#77726a",
+          "tile": "#51453a",
+          "under": "#2e241c",
+          "col": "#5c4a38"
+        },
+        "mural": {
+          "bg": "#3e3a32",
+          "accent": "#d8b868"
+        },
+        "roof": "#2e241c",
+        "statues": [
+          {
+            "kind": "amida",
+            "x": 0,
+            "scale": 0.82,
+            "mat": "bronze_dark"
+          },
+          {
+            "kind": "shakya",
+            "x": -7,
+            "scale": 0.8,
+            "mat": "bronze_dark"
+          },
+          {
+            "kind": "shakya",
+            "x": 7,
+            "scale": 0.8,
+            "mat": "bronze_dark"
+          }
+        ],
+        "light": {
+          "hemi": "#fff2de",
+          "key": 1.6,
+          "warm": "#ffc080"
+        },
+        "fog": "#1c1812",
+        "cushions": {
+          "cols": [
+            -13.6,
+            -11.2,
+            -8.8,
+            -6.4,
+            -4,
+            -1.6,
+            1.6,
+            4,
+            6.4,
+            8.8,
+            11.2,
+            13.6
+          ],
+          "rows": 9,
+          "z0": -6.4,
+          "dz": 2.4
+        },
+        "extras": []
+      },
+      "npc": 3,
+      "enabled": true,
+      "sort": 13
+    },
+    {
+      "id": "hoangoc",
+      "name": "Tiệm Cà Phê Mưa Đà Lạt",
+      "region": "Trung",
+      "place": "Trại Mát, Đà Lạt, Lâm Đồng",
+      "inspired": "Dalat Pine & Rain Lofi Cafe",
+      "description": "Tiệm cà phê gỗ thông giữa sương mù Đà Lạt, nghe tiếng mưa rơi ngoài hiên và nhạc Lofi cực chill.",
+      "theme": {
+        "size": [
+          30,
+          30,
+          11
+        ],
+        "wall": "plaster",
+        "wallColor": "#ecd28a",
+        "pillar": "#a8321f",
+        "floor": "tile",
+        "view": "hoangoc",
+        "hallStyle": {
+          "outer": "#f0d48a",
+          "tile": "#b5552c",
+          "under": "#5a2e1a",
+          "col": "#a8321f"
+        },
+        "mural": {
+          "bg": "#2f6f62",
+          "accent": "#f0c860"
+        },
+        "roof": "#5a2e1a",
+        "statues": [
+          {
+            "kind": "shakya",
+            "x": 0,
+            "scale": 0.92,
+            "mat": "gold"
+          },
+          {
+            "kind": "quanam",
+            "x": 5.6,
+            "scale": 0.92,
+            "mat": "white"
+          },
+          {
+            "kind": "amida",
+            "x": -5.6,
+            "scale": 0.9,
+            "mat": "gold"
+          }
+        ],
+        "light": {
+          "hemi": "#fff4e0",
+          "key": 1.6,
+          "warm": "#ffc080"
+        },
+        "fog": "#201810",
+        "cushions": {
+          "cols": [
+            -11.2,
+            -8.8,
+            -6.4,
+            -4,
+            -1.6,
+            1.6,
+            4,
+            6.4,
+            8.8,
+            11.2
+          ],
+          "rows": 8,
+          "z0": -5.6,
+          "dz": 2.4
+        },
+        "extras": []
+      },
+      "npc": 3,
+      "enabled": true,
+      "sort": 14
+    },
+    {
+      "id": "tutue",
+      "name": "Tiệm Trà & Bánh Mộc Nhiên",
+      "region": "Nam",
+      "place": "TP. Hồ Chí Minh",
+      "inspired": "Zen & Matcha Tearoom",
+      "description": "Không gian tối giản kiểu Nhật - Việt kết hợp, nổi tiếng với Matcha Latte đánh tay và bánh ngọt thủ công.",
+      "theme": {
+        "size": [
+          32,
+          28,
+          11
+        ],
+        "wall": "plaster",
+        "wallColor": "#f0e2bc",
+        "pillar": "#9c2f20",
+        "floor": "tile",
+        "view": "tutue",
+        "hallStyle": {
+          "outer": "#f0e2bc",
+          "tile": "#a84a28",
+          "under": "#5a2e1a",
+          "col": "#9c2f20"
+        },
+        "mural": {
+          "bg": "#7a2a18",
+          "accent": "#f0c860"
+        },
+        "roof": "#5a2a18",
+        "statues": [
+          {
+            "kind": "shakya",
+            "x": 0,
+            "scale": 0.92,
+            "mat": "gold"
+          },
+          {
+            "kind": "quanam",
+            "x": 5.8,
+            "scale": 0.9,
+            "mat": "white"
+          },
+          {
+            "kind": "amida",
+            "x": -5.8,
+            "scale": 0.88,
+            "mat": "gold"
+          }
+        ],
+        "light": {
+          "hemi": "#fff4e0",
+          "key": 1.6,
+          "warm": "#ffc080"
+        },
+        "fog": "#201810",
+        "cushions": {
+          "cols": [
+            -11.2,
+            -8.8,
+            -6.4,
+            -4,
+            -1.6,
+            1.6,
+            4,
+            6.4,
+            8.8,
+            11.2
+          ],
+          "rows": 7,
+          "z0": -5.6,
+          "dz": 2.4
+        },
+        "extras": []
+      },
+      "npc": 3,
+      "enabled": true,
+      "sort": 15
+    },
+    {
+      "id": "bachlien",
+      "name": "Ocean Pearl Cafe Nha Trang",
+      "region": "Trung",
+      "place": "Nha Trang, Khánh Hoà",
+      "inspired": "Coastal White Cafe",
+      "description": "Không gian trắng tinh khôi bên vịnh biển Nha Trang ngập nắng, lý tưởng để livestream và giao lưu bạn bè.",
+      "theme": {
+        "size": [
+          28,
+          24,
+          10
+        ],
+        "wall": "plaster",
+        "wallColor": "#efe0b8",
+        "pillar": "#a8321f",
+        "floor": "tile",
+        "view": "bachlien",
+        "hallStyle": {
+          "outer": "#efe0b8",
+          "tile": "#b5552c",
+          "under": "#5a2e1a",
+          "col": "#a8321f"
+        },
+        "mural": {
+          "bg": "#2f5f7a",
+          "accent": "#f0c860"
+        },
+        "roof": "#5a2e1a",
+        "statues": [
+          {
+            "kind": "shakya",
+            "x": 0,
+            "scale": 0.9,
+            "mat": "white"
+          },
+          {
+            "kind": "quanam",
+            "x": 5,
+            "scale": 0.86,
+            "mat": "white"
+          },
+          {
+            "kind": "amida",
+            "x": -5,
+            "scale": 0.86,
+            "mat": "gold"
+          }
+        ],
+        "light": {
+          "hemi": "#fff4e4",
+          "key": 1.6,
+          "warm": "#ffc890"
+        },
+        "fog": "#221a12",
+        "cushions": {
+          "cols": [
+            -8.8,
+            -6.4,
+            -4,
+            -1.6,
+            1.6,
+            4,
+            6.4,
+            8.8
+          ],
+          "rows": 6,
+          "z0": -5,
+          "dz": 2.4
+        },
+        "extras": []
+      },
+      "npc": 3,
+      "enabled": true,
+      "sort": 16
+    }
+  ],
+  "items": [
+    {
+      "id": "huong_tram",
+      "name": "Cà Phê Phin Sữa Đá",
+      "type": "consumable",
+      "price_sen": 20,
+      "price_ngoc": 0,
+      "unlock_level": 1,
+      "description": "Gọi 1 ly Cà Phê Phin Sữa Đá đậm đà đặt lên bàn 3D trước mặt bạn (+15 điểm Chill).",
+      "data": {
+        "icon": "🪔"
+      },
+      "enabled": true,
+      "sort": 0
+    },
+    {
+      "id": "nen_sap",
+      "name": "Matcha Latte Kem Sữa",
+      "type": "consumable",
+      "price_sen": 10,
+      "price_ngoc": 0,
+      "unlock_level": 1,
+      "description": "Gọi 1 ly Matcha Latte xanh mướt phủ lớp kem béo ngậy lên bàn 3D (+20 điểm Chill).",
+      "data": {
+        "icon": "🕯️"
+      },
+      "enabled": true,
+      "sort": 1
+    },
+    {
+      "id": "hoa_dang",
+      "name": "Combo Trà Sữa & Bánh Croissant",
+      "type": "consumable",
+      "price_sen": 15,
+      "price_ngoc": 0,
+      "unlock_level": 1,
+      "description": "Bày lên bàn 1 ly Trà Sữa Trân Châu Đường Đen kèm đĩa bánh sừng bò thơm phức (+30 điểm Chill).",
+      "data": {
+        "icon": "🌼"
+      },
+      "enabled": true,
+      "sort": 2
+    },
+    {
+      "id": "den_hoa_dang",
+      "name": "Thiệp Tâm Sự / Lời Nhắn Live",
+      "type": "consumable",
+      "price_sen": 40,
+      "price_ngoc": 5,
+      "unlock_level": 2,
+      "description": "Viết lời nhắn, lời chúc hoặc tâm sự thả bay lung linh trên màn hình Live cho mọi người cùng đọc (+40 điểm Chill).",
+      "data": {
+        "icon": "🏮"
+      },
+      "enabled": true,
+      "sort": 3
+    },
+    {
+      "id": "ao_lam",
+      "name": "Outfit Denim Casual",
+      "type": "robe",
+      "price_sen": 0,
+      "price_ngoc": 0,
+      "unlock_level": 1,
+      "description": "Trang phục xanh Denim trẻ trung, năng động khi đi cafe.",
+      "data": {
+        "color": "#6f8fb8",
+        "sash": "#e6bd45",
+        "default": true
+      },
+      "enabled": true,
+      "sort": 4
+    },
+    {
+      "id": "ao_xam",
+      "name": "Outfit Barista Charcoal",
+      "type": "robe",
+      "price_sen": 0,
+      "price_ngoc": 0,
+      "unlock_level": 1,
+      "description": "Tạp dề & áo xám khói chuẩn phong cách Barista chuyên nghiệp.",
+      "data": {
+        "color": "#b8c0c8",
+        "sash": "#e6bd45",
+        "default": true
+      },
+      "enabled": true,
+      "sort": 5
+    },
+    {
+      "id": "ao_nau",
+      "name": "Outfit Espresso Vintage",
+      "type": "robe",
+      "price_sen": 120,
+      "price_ngoc": 0,
+      "unlock_level": 3,
+      "description": "Tông nâu hạt cà phê rang mộc ấm áp, cổ điển.",
+      "data": {
+        "color": "#7a5a3e",
+        "sash": "#d9b25a"
+      },
+      "enabled": true,
+      "sort": 6
+    },
+    {
+      "id": "ao_trang",
+      "name": "Outfit Minimalist White",
+      "type": "robe",
+      "price_sen": 200,
+      "price_ngoc": 0,
+      "unlock_level": 5,
+      "description": "Sơ mi trắng tối giản chuẩn Hàn Quốc đi chụp hình cafe.",
+      "data": {
+        "color": "#efeae0",
+        "sash": "#c9a24a"
+      },
+      "enabled": true,
+      "sort": 7
+    },
+    {
+      "id": "ao_vang",
+      "name": "Outfit Caramel Macchiato",
+      "type": "robe",
+      "price_sen": 500,
+      "price_ngoc": 0,
+      "unlock_level": 10,
+      "description": "Sắc vàng Caramel ngọt ngào, nổi bật giữa khung hình Live.",
+      "data": {
+        "color": "#e0a83a",
+        "sash": "#a8541e"
+      },
+      "enabled": true,
+      "sort": 8
+    },
+    {
+      "id": "ao_sen",
+      "name": "Outfit Pastel Peach",
+      "type": "robe",
+      "price_sen": 0,
+      "price_ngoc": 60,
+      "unlock_level": 1,
+      "description": "Sắc hồng đào nhẹ nhàng, tươi tắn.",
+      "data": {
+        "color": "#e8a6b8",
+        "sash": "#f6e3a0"
+      },
+      "enabled": true,
+      "sort": 9
+    },
+    {
+      "id": "chuoi_go",
+      "name": "Hạt Cafe Robusta Mộc",
+      "type": "beads",
+      "price_sen": 0,
+      "price_ngoc": 0,
+      "unlock_level": 1,
+      "description": "Mẻ hạt Robusta Buôn Ma Thuột thơm đậm.",
+      "data": {
+        "c1": "#d98a48",
+        "c2": "#e8a565",
+        "grain": "#8c4619",
+        "default": true
+      },
+      "enabled": true,
+      "sort": 10
+    },
+    {
+      "id": "chuoi_bode",
+      "name": "Hạt Cafe Arabica Cầu Đất",
+      "type": "beads",
+      "price_sen": 150,
+      "price_ngoc": 0,
+      "unlock_level": 2,
+      "description": "Hạt Arabica Đà Lạt chua thanh, hương hoa quả (+5% điểm Chill).",
+      "data": {
+        "c1": "#e9dcc0",
+        "c2": "#f5ecd6",
+        "grain": "#9a8462"
+      },
+      "enabled": true,
+      "sort": 11
+    },
+    {
+      "id": "chuoi_tram",
+      "name": "Bộ Phễu Pha V60 Gốm",
+      "type": "beads",
+      "price_sen": 400,
+      "price_ngoc": 0,
+      "unlock_level": 6,
+      "description": "Bộ dụng cụ Pour-over thủ công tinh tế (+10% điểm Chill).",
+      "data": {
+        "c1": "#5a3a22",
+        "c2": "#7a5232",
+        "grain": "#2a160a"
+      },
+      "enabled": true,
+      "sort": 12
+    },
+    {
+      "id": "chuoi_ngoc",
+      "name": "Bình Syphon Thủy Tinh Ngọc",
+      "type": "beads",
+      "price_sen": 0,
+      "price_ngoc": 80,
+      "unlock_level": 1,
+      "description": "Bình pha cà phê chân không nghệ thuật (+15% điểm Chill).",
+      "data": {
+        "c1": "#3f8a6a",
+        "c2": "#6ab894",
+        "grain": "#1f5a40",
+        "gloss": true
+      },
+      "enabled": true,
+      "sort": 13
+    },
+    {
+      "id": "chuoi_hophach",
+      "name": "Máy Pha Espresso Mini Gold",
+      "type": "beads",
+      "price_sen": 0,
+      "price_ngoc": 120,
+      "unlock_level": 1,
+      "description": "Chiết xuất lớp Crema vàng óng hoàn hảo (+25% điểm Chill).",
+      "data": {
+        "c1": "#e0901a",
+        "c2": "#f6c050",
+        "grain": "#a0500a",
+        "gloss": true
+      },
+      "enabled": true,
+      "sort": 14
+    },
+    {
+      "id": "bd_xam",
+      "name": "Ghế Đệm Nỉ Xám",
+      "type": "cushion",
+      "price_sen": 0,
+      "price_ngoc": 0,
+      "unlock_level": 1,
+      "description": "Đệm ngồi cafe êm ái tông xám hiện đại.",
+      "data": {
+        "color": "#3b3a3c",
+        "default": true
+      },
+      "enabled": true,
+      "sort": 15
+    },
+    {
+      "id": "bd_nau",
+      "name": "Ghế Đệm Da Vintage",
+      "type": "cushion",
+      "price_sen": 100,
+      "price_ngoc": 0,
+      "unlock_level": 2,
+      "description": "Đệm da nâu cổ điển ngồi học bài cả ngày không mỏi (+5% điểm Chill).",
+      "data": {
+        "color": "#5a3a26"
+      },
+      "enabled": true,
+      "sort": 16
+    },
+    {
+      "id": "bd_vang",
+      "name": "Ghế Sofa Kem Bơ",
+      "type": "cushion",
+      "price_sen": 300,
+      "price_ngoc": 0,
+      "unlock_level": 8,
+      "description": "Đệm ngồi êm ái sắc vàng kem ấm áp (+10% điểm Chill).",
+      "data": {
+        "color": "#c89030"
+      },
+      "enabled": true,
+      "sort": 17
+    },
+    {
+      "id": "bd_sen",
+      "name": "Ghế Đệm Pastel Hồng",
+      "type": "cushion",
+      "price_sen": 0,
+      "price_ngoc": 100,
+      "unlock_level": 1,
+      "description": "Đệm ngồi xinh xắn cho góc sống ảo (+20% điểm Chill).",
+      "data": {
+        "color": "#d97a95",
+        "lotus": true
+      },
+      "enabled": true,
+      "sort": 18
+    },
+    {
+      "id": "ao_vulan",
+      "name": "Outfit Rose Latte",
+      "type": "robe",
+      "price_sen": 0,
+      "price_ngoc": 100,
+      "unlock_level": 1,
+      "description": "Trang phục hồng trà sữa thanh lịch.",
+      "data": {
+        "color": "#e58fa6",
+        "sash": "#f6e3a0",
+        "pattern": "sen",
+        "accent": "#fff1d6",
+        "rank": "hiem"
+      },
+      "enabled": true,
+      "sort": 19
+    },
+    {
+      "id": "ao_may_bac",
+      "name": "Outfit Silver Mist",
+      "type": "robe",
+      "price_sen": 0,
+      "price_ngoc": 120,
+      "unlock_level": 1,
+      "description": "Tông bạc sương mù Đà Lạt sang trọng.",
+      "data": {
+        "color": "#8fa0b8",
+        "sash": "#e4e9f2",
+        "pattern": "may",
+        "accent": "#f4f7fc",
+        "rank": "hiem"
+      },
+      "enabled": true,
+      "sort": 20
+    },
+    {
+      "id": "ao_truc",
+      "name": "Outfit Matcha Green",
+      "type": "robe",
+      "price_sen": 0,
+      "price_ngoc": 140,
+      "unlock_level": 1,
+      "description": "Sắc xanh Matcha Uji mát mắt.",
+      "data": {
+        "color": "#2f6b4f",
+        "sash": "#d9c27a",
+        "pattern": "truc",
+        "accent": "#a9dca0",
+        "rank": "hiem"
+      },
+      "enabled": true,
+      "sort": 21
+    },
+    {
+      "id": "ao_nguyet",
+      "name": "Outfit Vanilla Cream",
+      "type": "robe",
+      "price_sen": 0,
+      "price_ngoc": 240,
+      "unlock_level": 1,
+      "description": "Trắng kem dịu nhẹ như lớp foam sữa.",
+      "data": {
+        "color": "#efece4",
+        "sash": "#b5892a",
+        "pattern": "sen",
+        "accent": "#d2a53f",
+        "shine": 0.5,
+        "aura": "#fff1c7",
+        "rank": "quy"
+      },
+      "enabled": true,
+      "sort": 22
+    },
+    {
+      "id": "ao_lien_hoa",
+      "name": "Outfit Velvet Berry",
+      "type": "robe",
+      "price_sen": 0,
+      "price_ngoc": 150,
+      "unlock_level": 1,
+      "description": "Trang phục nhung đỏ Berry nổi bật.",
+      "data": {
+        "color": "#9c2440",
+        "sash": "#f2c46d",
+        "pattern": "sen",
+        "accent": "#f6d27e",
+        "shine": 0.7,
+        "rank": "hiem"
+      },
+      "enabled": true,
+      "sort": 23
+    },
+    {
+      "id": "ao_thien_thanh",
+      "name": "Outfit Sky Blue Chill",
+      "type": "robe",
+      "price_sen": 0,
+      "price_ngoc": 220,
+      "unlock_level": 1,
+      "description": "Sắc xanh bầu trời trong trẻo.",
+      "data": {
+        "color": "#2a68aa",
+        "sash": "#f2e3b0",
+        "pattern": "may",
+        "accent": "#e8f2ff",
+        "shine": 0.7,
+        "aura": "#8fd3ff",
+        "rank": "quy"
+      },
+      "enabled": true,
+      "sort": 24
+    },
+    {
+      "id": "ao_hoang_kim",
+      "name": "Outfit VIP Gold Streamer",
+      "type": "robe",
+      "price_sen": 0,
+      "price_ngoc": 300,
+      "unlock_level": 1,
+      "description": "Trang phục ánh kim rực rỡ dành cho Idol TikTok Live.",
+      "data": {
+        "color": "#b98721",
+        "sash": "#7a2a18",
+        "pattern": "gam",
+        "accent": "#fff0b0",
+        "shine": 0.55,
+        "aura": "#ffd870",
+        "rank": "quy"
+      },
+      "enabled": true,
+      "sort": 25
+    },
+    {
+      "id": "chuoi_tudan",
+      "name": "Cối Xay Tay Comandante",
+      "type": "beads",
+      "price_sen": 0,
+      "price_ngoc": 110,
+      "unlock_level": 1,
+      "description": "Cối xay hạt thủ công cao cấp (+12% điểm Chill).",
+      "data": {
+        "c1": "#4a1a24",
+        "c2": "#6f2c38",
+        "grain": "#240a10",
+        "gloss": true,
+        "rank": "hiem"
+      },
+      "enabled": true,
+      "sort": 26
+    },
+    {
+      "id": "chuoi_thach_anh",
+      "name": "Bộ Ly Gốm Hồng Đào",
+      "type": "beads",
+      "price_sen": 0,
+      "price_ngoc": 140,
+      "unlock_level": 1,
+      "description": "Ly gốm thủ công giữ nhiệt tuyệt vời (+18% điểm Chill).",
+      "data": {
+        "c1": "#e7a6b8",
+        "c2": "#f8d6df",
+        "grain": "#c77d93",
+        "gloss": true,
+        "rank": "hiem"
+      },
+      "enabled": true,
+      "sort": 27
+    },
+    {
+      "id": "chuoi_luu_ly",
+      "name": "Bình Cold Brew Pha Lê",
+      "type": "beads",
+      "price_sen": 0,
+      "price_ngoc": 180,
+      "unlock_level": 1,
+      "description": "Ủ lạnh 18 giờ trong suốt như pha lê (+22% điểm Chill).",
+      "data": {
+        "c1": "#1f3f8f",
+        "c2": "#3f68c8",
+        "grain": "#e0bd5a",
+        "gloss": true,
+        "rank": "quy"
+      },
+      "enabled": true,
+      "sort": 28
+    },
+    {
+      "id": "chuoi_kim",
+      "name": "Bộ Ấm Barista Hoàng Kim",
+      "type": "beads",
+      "price_sen": 0,
+      "price_ngoc": 260,
+      "unlock_level": 1,
+      "description": "Bộ ấm cổ ngỗng mạ vàng đỉnh cao (+35% điểm Chill).",
+      "data": {
+        "c1": "#c8962e",
+        "c2": "#f3d078",
+        "grain": "#8a6010",
+        "gloss": true,
+        "metal": 0.8,
+        "rank": "quy"
+      },
+      "enabled": true,
+      "sort": 29
+    },
+    {
+      "id": "bd_may",
+      "name": "Ghế Lười Cloud Sofa",
+      "type": "cushion",
+      "price_sen": 0,
+      "price_ngoc": 90,
+      "unlock_level": 1,
+      "description": "Êm như ngồi trên mây (+15% điểm Chill).",
+      "data": {
+        "color": "#5f83ad",
+        "rank": "hiem"
+      },
+      "enabled": true,
+      "sort": 30
+    },
+    {
+      "id": "bd_tuyet",
+      "name": "Ghế Lông Cừu Trắng",
+      "type": "cushion",
+      "price_sen": 0,
+      "price_ngoc": 200,
+      "unlock_level": 1,
+      "description": "Đệm lông cừu Đà Lạt ấm áp (+18% điểm Chill).",
+      "data": {
+        "color": "#ece6da",
+        "lotus": true,
+        "petal": "#ffffff",
+        "rank": "quy"
+      },
+      "enabled": true,
+      "sort": 31
+    },
+    {
+      "id": "bd_ngoc",
+      "name": "Ghế Đệm Mint Ngọc Bích",
+      "type": "cushion",
+      "price_sen": 0,
+      "price_ngoc": 120,
+      "unlock_level": 1,
+      "description": "Sắc xanh bạc hà mát lành (+25% điểm Chill).",
+      "data": {
+        "color": "#2f7d6a",
+        "lotus": true,
+        "petal": "#8fe0c0",
+        "rank": "hiem"
+      },
+      "enabled": true,
+      "sort": 32
+    },
+    {
+      "id": "bd_kim_lien",
+      "name": "Ghế VIP Hoàng Kim Live",
+      "type": "cushion",
+      "price_sen": 0,
+      "price_ngoc": 240,
+      "unlock_level": 1,
+      "description": "Ghế ngồi phát sáng dành cho Top Chill (+35% điểm Chill).",
+      "data": {
+        "color": "#c8902f",
+        "lotus": true,
+        "petal": "#ffe08a",
+        "metal": 0.6,
+        "rank": "quy"
+      },
+      "enabled": true,
+      "sort": 33
+    },
+    {
+      "id": "tang_bao",
+      "name": "Đồng Phục Barista Trưởng",
+      "type": "robe",
+      "price_sen": 0,
+      "price_ngoc": 0,
+      "unlock_level": 1,
+      "description": "Bộ trang phục đặc biệt do Barista Trưởng tặng khách quen.",
+      "data": {
+        "color": "#8f5f26",
+        "sash": "#6b2416",
+        "pattern": "may",
+        "accent": "#d9b05a",
+        "shine": 0.2,
+        "rank": "quy",
+        "gift": true
+      },
+      "enabled": true,
+      "sort": 33
+    },
+    {
+      "id": "cay_sen",
+      "name": "Chậu sen",
+      "type": "plant",
+      "price_sen": 0,
+      "price_ngoc": 50,
+      "unlock_level": 1,
+      "description": "Sen không phải cây thân gỗ nên được trồng trong chậu đá. Tương truyền Đức Phật đản sinh bước bảy bước, mỗi bước nở một đoá sen. Mỗi 7 ngày cho 5 quả quý, tối đa 5 lần.",
+      "data": {
+        "kind": "sen",
+        "fruit": 5,
+        "harvests": 5,
+        "color": "#e58fb0"
+      },
+      "enabled": true,
+      "sort": 33
+    },
+    {
+      "id": "ao_cam_lan",
+      "name": "Outfit Master Roaster",
+      "type": "robe",
+      "price_sen": 0,
+      "price_ngoc": 380,
+      "unlock_level": 1,
+      "description": "Trang phục bậc thầy rang xay cà phê đặc sản.",
+      "data": {
+        "color": "#a3261b",
+        "sash": "#e0b040",
+        "pattern": "gam",
+        "accent": "#f0c860",
+        "shine": 0.5,
+        "aura": "#ffcf6a",
+        "rank": "quy"
+      },
+      "enabled": true,
+      "sort": 34
+    },
+    {
+      "id": "cay_bode",
+      "name": "Cây bồ đề",
+      "type": "plant",
+      "price_sen": 0,
+      "price_ngoc": 100,
+      "unlock_level": 1,
+      "description": "Đức Phật thành đạo dưới cội bồ đề (Ficus religiosa) ở Bodh Gaya. Mỗi 7 ngày cho 10 quả quý, tối đa 5 lần.",
+      "data": {
+        "kind": "bode",
+        "fruit": 10,
+        "harvests": 5,
+        "color": "#5d9a45"
+      },
+      "enabled": true,
+      "sort": 34
+    },
+    {
+      "id": "mu_kim_co",
+      "name": "Vòng kim cô",
+      "type": "hat",
+      "price_sen": 0,
+      "price_ngoc": 160,
+      "unlock_level": 1,
+      "description": "Vòng vàng trên trán Tôn Ngộ Không.",
+      "data": {
+        "model": "kim_co",
+        "rank": "hiem"
+      },
+      "enabled": true,
+      "sort": 35
+    },
+    {
+      "id": "cay_sala",
+      "name": "Cây sala",
+      "type": "plant",
+      "price_sen": 0,
+      "price_ngoc": 150,
+      "unlock_level": 1,
+      "description": "Sala (Shorea robusta) hoa nhỏ vàng trắng. Đức Phật đản sinh trong rừng sala ở Lâm Tỳ Ni và nhập Niết bàn giữa đôi cây sala ở Câu Thi Na. Mỗi 7 ngày cho 15 quả quý, tối đa 5 lần.",
+      "data": {
+        "kind": "sala",
+        "fruit": 15,
+        "harvests": 5,
+        "color": "#e8e0a8"
+      },
+      "enabled": true,
+      "sort": 35
+    },
+    {
+      "id": "mu_tu_kim",
+      "name": "Tử kim quan lông trĩ",
+      "type": "hat",
+      "price_sen": 0,
+      "price_ngoc": 320,
+      "unlock_level": 1,
+      "description": "Mũ vàng có hai lông trĩ dài như Tề Thiên Đại Thánh, rung theo bước chân.",
+      "data": {
+        "model": "tu_kim_quan",
+        "rank": "quy"
+      },
+      "enabled": true,
+      "sort": 36
+    },
+    {
+      "id": "qua_quy",
+      "name": "Quả quý",
+      "type": "fruit",
+      "price_sen": 0,
+      "price_ngoc": 0,
+      "unlock_level": 1,
+      "description": "Hái từ cây bạn đã trồng ở chùa. 1 quả đổi được 1 Ngọc.",
+      "data": {
+        "color": "#e6bd45",
+        "gift": true
+      },
+      "enabled": true,
+      "sort": 36
+    },
+    {
+      "id": "mu_ty_lu",
+      "name": "Mũ Tỳ Lư",
+      "type": "hat",
+      "price_sen": 0,
+      "price_ngoc": 220,
+      "unlock_level": 1,
+      "description": "Mũ năm cánh sen của Đường Tam Tạng.",
+      "data": {
+        "model": "ty_lu",
+        "rank": "quy"
+      },
+      "enabled": true,
+      "sort": 37
+    },
+    {
+      "id": "ao_hoa_sala",
+      "name": "Áo Hoa Sala",
+      "type": "robe",
+      "price_sen": 0,
+      "price_ngoc": 0,
+      "unlock_level": 1,
+      "description": "Áo màu hoa sala vàng trắng, trao cho người hứng đủ 1080 hoa. Không bán.",
+      "data": {
+        "color": "#efe6bd",
+        "sash": "#b99a3f",
+        "accent": "#d9c36a",
+        "rank": "quy",
+        "gift": true
+      },
+      "enabled": true,
+      "sort": 37
+    },
+    {
+      "id": "tr_thien_truong",
+      "name": "Thiền trượng cửu hoàn",
+      "type": "staff",
+      "price_sen": 0,
+      "price_ngoc": 200,
+      "unlock_level": 1,
+      "description": "Tích trượng đầu vàng, khoen đồng rung theo bước đi.",
+      "data": {
+        "model": "thien_truong",
+        "rank": "hiem"
+      },
+      "enabled": true,
+      "sort": 38
+    },
+    {
+      "id": "tr_kim_co_bong",
+      "name": "Kim Cô Bổng",
+      "type": "staff",
+      "price_sen": 0,
+      "price_ngoc": 280,
+      "unlock_level": 1,
+      "description": "Như Ý Kim Cô Bổng đỏ son, hai đầu bịt vàng.",
+      "data": {
+        "model": "kim_co_bong",
+        "rank": "quy"
+      },
+      "enabled": true,
+      "sort": 39
+    },
+    {
+      "id": "tr_dinh_ba",
+      "name": "Cửu xỉ đinh ba",
+      "type": "staff",
+      "price_sen": 0,
+      "price_ngoc": 150,
+      "unlock_level": 1,
+      "description": "Đinh ba chín răng của Trư Bát Giới.",
+      "data": {
+        "model": "dinh_ba",
+        "rank": "hiem"
+      },
+      "enabled": true,
+      "sort": 40
+    },
+    {
+      "id": "tr_nguyet_nha",
+      "name": "Nguyệt nha sản",
+      "type": "staff",
+      "price_sen": 0,
+      "price_ngoc": 150,
+      "unlock_level": 1,
+      "description": "Bảo trượng trăng khuyết của Sa Ngộ Tĩnh.",
+      "data": {
+        "model": "nguyet_nha",
+        "rank": "hiem"
+      },
+      "enabled": true,
+      "sort": 41
+    },
+    {
+      "id": "may_can_dau",
+      "name": "Cân Đẩu Vân",
+      "type": "cloud",
+      "price_sen": 0,
+      "price_ngoc": 360,
+      "unlock_level": 1,
+      "description": "Vầng mây vàng nhẹ bồng bềnh dưới chân khi đi lại.",
+      "data": {
+        "model": "can_dau",
+        "rank": "quy"
+      },
+      "enabled": true,
+      "sort": 42
+    },
+    {
+      "id": "lt_huou",
+      "name": "Tuần Lộc Đà Lạt Nhỏ",
+      "type": "pet",
+      "price_sen": 60,
+      "price_ngoc": 0,
+      "unlock_level": 1,
+      "description": "Chú tuần lộc nhỏ đáng yêu từ đồi thông Đà Lạt, theo chân bạn đến tận bàn cafe.",
+      "data": {
+        "model": "huou",
+        "color": "#c8924f",
+        "rank": "thuong"
+      },
+      "enabled": true,
+      "sort": 42
+    },
+    {
+      "id": "lt_tho_ngoc",
+      "name": "Thỏ Kem Latte",
+      "type": "pet",
+      "price_sen": 40,
+      "price_ngoc": 0,
+      "unlock_level": 1,
+      "description": "Bé thỏ trắng muốt như lớp bọt sữa Latte, lon ton đi theo bạn khắp trong quán cafe.",
+      "data": {
+        "model": "tho_ngoc",
+        "color": "#e8e4dc",
+        "rank": "thuong"
+      },
+      "enabled": true,
+      "sort": 43
+    },
+    {
+      "id": "lt_nghe",
+      "name": "Cún Shiba Tiệm Bánh",
+      "type": "pet",
+      "price_sen": 120,
+      "price_ngoc": 60,
+      "unlock_level": 1,
+      "description": "Chú cún Shiba tinh nghịch luôn vẫy đuôi chào khách mới vào quán.",
+      "data": {
+        "model": "nghe",
+        "color": "#c8602c",
+        "rank": "quy"
+      },
+      "enabled": true,
+      "sort": 44
+    },
+    {
+      "id": "lt_su_tu_xanh",
+      "name": "Mèo Anh Lông Xanh",
+      "type": "pet",
+      "price_sen": 180,
+      "price_ngoc": 90,
+      "unlock_level": 1,
+      "description": "Bé mèo Anh mặt tròn xoe, bộ lông xanh xám mịn màng cực kỳ quấn chủ.",
+      "data": {
+        "model": "su_tu_xanh",
+        "color": "#49a8a0",
+        "rank": "hiem"
+      },
+      "enabled": true,
+      "sort": 45
+    },
+    {
+      "id": "lt_thanh_long",
+      "name": "Thanh Long",
+      "type": "pet",
+      "price_sen": 0,
+      "price_ngoc": 680,
+      "unlock_level": 1,
+      "description": "Thần thú phương Đông trong Tứ Phương, thân phủ vảy ngọc, đuổi theo long châu. Đi dạo cùng bạn ngay trong quán cafe và ngoài sân.",
+      "data": {
+        "model": "thanh_long",
+        "color": "#1aa184",
+        "rank": "toi_thuong"
+      },
+      "enabled": true,
+      "sort": 46
+    },
+    {
+      "id": "lt_chu_tuoc",
+      "name": "Chu Tước",
+      "type": "pet",
+      "price_sen": 0,
+      "price_ngoc": 680,
+      "unlock_level": 1,
+      "description": "Thần điểu phương Nam trong Tứ Phương, lông đỏ son, đuôi phượng dài như ngọn lửa. Đi dạo cùng bạn ngay trong quán cafe và ngoài sân.",
+      "data": {
+        "model": "chu_tuoc",
+        "color": "#e8452f",
+        "rank": "toi_thuong"
+      },
+      "enabled": true,
+      "sort": 47
+    },
+    {
+      "id": "tr_tre_nga",
+      "name": "Trượng Tre Ngà",
+      "type": "staff",
+      "price_sen": 0,
+      "price_ngoc": 0,
+      "unlock_level": 1,
+      "description": "Cây tre ngà óng vàng trong truyền thuyết làng Gióng.",
+      "data": {
+        "model": "tre_nga",
+        "rank": "quy",
+        "legend": true
+      },
+      "enabled": true,
+      "sort": 48
+    },
+    {
+      "id": "lt_huyen_vu",
+      "name": "Huyền Vũ",
+      "type": "pet",
+      "price_sen": 0,
+      "price_ngoc": 680,
+      "unlock_level": 1,
+      "description": "Thần thú phương Bắc trong Tứ Phương, rùa mai huyền cùng rắn nhỏ quấn bên mình, tượng trưng cho sự trường thọ, vững bền. Đi dạo cùng bạn ngay trong quán cafe và ngoài sân.",
+      "data": {
+        "model": "huyen_vu",
+        "color": "#24566e",
+        "rank": "toi_thuong"
+      },
+      "enabled": true,
+      "sort": 48
+    },
+    {
+      "id": "ao_chien_bao",
+      "name": "Chiến Bào Sắt",
+      "type": "robe",
+      "price_sen": 0,
+      "price_ngoc": 0,
+      "unlock_level": 1,
+      "description": "Áo sắt sẫm dệt trám vàng, gợi nhớ tráng sĩ cưỡi ngựa sắt.",
+      "data": {
+        "color": "#3d444d",
+        "sash": "#d9a23c",
+        "pattern": "gam",
+        "accent": "#e0b552",
+        "shine": 0.5,
+        "aura": "#ffb25a",
+        "rank": "quy",
+        "legend": true
+      },
+      "enabled": true,
+      "sort": 49
+    },
+    {
+      "id": "lt_bach_tuong",
+      "name": "Bạch Tượng Lục Nha",
+      "type": "pet",
+      "price_sen": 0,
+      "price_ngoc": 1080,
+      "unlock_level": 1,
+      "description": "Voi trắng sáu ngà trong giấc mộng của hoàng hậu Ma Da trước khi Đức Phật đản sinh, cũng là voi của Bồ Tát Phổ Hiền, tượng trưng cho đại hạnh. Đi dạo cùng bạn ngay trong quán cafe và ngoài sân.",
+      "data": {
+        "model": "bach_tuong",
+        "color": "#f5e6c8",
+        "rank": "toi_thuong"
+      },
+      "enabled": true,
+      "sort": 49
+    },
+    {
+      "id": "ao_non_tan",
+      "name": "Áo Non Tản",
+      "type": "robe",
+      "price_sen": 0,
+      "price_ngoc": 0,
+      "unlock_level": 1,
+      "description": "Xanh núi Ba Vì, thêu mây quấn đỉnh non.",
+      "data": {
+        "color": "#2c6a55",
+        "sash": "#e6d59a",
+        "pattern": "may",
+        "accent": "#d7f0dd",
+        "shine": 0.4,
+        "aura": "#b9f0cf",
+        "rank": "quy",
+        "legend": true
+      },
+      "enabled": true,
+      "sort": 50
+    },
+    {
+      "id": "lt_trau_vang",
+      "name": "Trâu Vàng",
+      "type": "pet",
+      "price_sen": 0,
+      "price_ngoc": 1280,
+      "unlock_level": 1,
+      "description": "Trong Thập Mục Ngưu Đồ, chăn trâu là hình ảnh điều phục tâm. Trâu vàng không cần dây xỏ mũi, tượng trưng cho tâm đã thuần, thong dong đi giữa tám đoá sen vàng. Đi dạo cùng bạn ngay trong quán cafe và ngoài sân.",
+      "data": {
+        "model": "trau_vang",
+        "color": "#ffc93c",
+        "rank": "toi_thuong"
+      },
+      "enabled": true,
+      "sort": 50
+    },
+    {
+      "id": "may_song_bac",
+      "name": "Mây Sóng Bạc",
+      "type": "cloud",
+      "price_sen": 0,
+      "price_ngoc": 0,
+      "unlock_level": 1,
+      "description": "Vầng sóng xanh bạc nâng bước chân như giữa dòng sông Đà.",
+      "data": {
+        "model": "song_bac",
+        "rank": "quy",
+        "legend": true
+      },
+      "enabled": true,
+      "sort": 51
+    },
+    {
+      "id": "ao_vay_rong",
+      "name": "Áo Vảy Rồng",
+      "type": "robe",
+      "price_sen": 0,
+      "price_ngoc": 0,
+      "unlock_level": 1,
+      "description": "Gấm đỏ dệt vảy rồng vàng của dòng dõi Lạc Long.",
+      "data": {
+        "color": "#8c1f1a",
+        "sash": "#f0c24f",
+        "pattern": "vay",
+        "accent": "#f4cf66",
+        "shine": 0.6,
+        "aura": "#ffd77a",
+        "rank": "quy",
+        "legend": true
+      },
+      "enabled": true,
+      "sort": 52
+    },
+    {
+      "id": "bi_kiep_van_phat",
+      "name": "Bí Kiếp Vạn Phật Thần Chưởng",
+      "type": "bikiep",
+      "price_sen": 0,
+      "price_ngoc": 0,
+      "unlock_level": 1,
+      "description": "Cuốn sách sờn gáy của Lão Hành Khất, chỉ đổi cho người hữu duyên.",
+      "data": {
+        "legend": true
+      },
+      "enabled": true,
+      "sort": 52
+    },
+    {
+      "id": "bd_tram_sen",
+      "name": "Bồ Đoàn Trăm Sen",
+      "type": "cushion",
+      "price_sen": 0,
+      "price_ngoc": 0,
+      "unlock_level": 1,
+      "description": "Đài sen hồng ngà nhiều cánh, gợi tích bọc trăm trứng.",
+      "data": {
+        "color": "#f0b6c2",
+        "lotus": true,
+        "petal": "#ff9fb4",
+        "rank": "quy",
+        "legend": true
+      },
+      "enabled": true,
+      "sort": 53
+    },
+    {
+      "id": "tr_gay_than",
+      "name": "Gậy Thần",
+      "type": "staff",
+      "price_sen": 0,
+      "price_ngoc": 0,
+      "unlock_level": 1,
+      "description": "Cây gậy phép trong tích Chử Đồng Tử.",
+      "data": {
+        "model": "gay_than",
+        "rank": "quy",
+        "legend": true
+      },
+      "enabled": true,
+      "sort": 54
+    },
+    {
+      "id": "mu_non_than",
+      "name": "Nón Thần",
+      "type": "hat",
+      "price_sen": 0,
+      "price_ngoc": 1680,
+      "unlock_level": 1,
+      "description": "Chiếc nón phép đi cùng cây gậy thần, viền vàng mộc mạc.",
+      "data": {
+        "model": "non_than",
+        "rank": "quy",
+        "legend": true,
+        "sale_cap": 5
+      },
+      "enabled": true,
+      "sort": 55,
+      "left": 5
+    },
+    {
+      "id": "chuoi_dua_do",
+      "name": "Tràng Hạt Dưa Đỏ",
+      "type": "beads",
+      "price_sen": 0,
+      "price_ngoc": 0,
+      "unlock_level": 1,
+      "description": "Đỏ tươi như ruột dưa trên đảo của Mai An Tiêm.",
+      "data": {
+        "c1": "#c9272e",
+        "c2": "#ef5a57",
+        "grain": "#1f5a2c",
+        "gloss": true,
+        "rank": "quy",
+        "legend": true
+      },
+      "enabled": true,
+      "sort": 56
+    },
+    {
+      "id": "bd_mai_rua",
+      "name": "Bồ Đoàn Mai Rùa",
+      "type": "cushion",
+      "price_sen": 0,
+      "price_ngoc": 0,
+      "unlock_level": 1,
+      "description": "Mặt bồ đoàn dệt vân mai Rùa Vàng.",
+      "data": {
+        "color": "#d9a53f",
+        "shell": true,
+        "metal": 0.25,
+        "rank": "quy",
+        "legend": true
+      },
+      "enabled": true,
+      "sort": 57
+    },
+    {
+      "id": "tr_tram_dot",
+      "name": "Trượng Trăm Đốt",
+      "type": "staff",
+      "price_sen": 0,
+      "price_ngoc": 0,
+      "unlock_level": 1,
+      "description": "Cây tre xanh dày đốt của anh nông dân thật thà.",
+      "data": {
+        "model": "tram_dot",
+        "rank": "quy",
+        "legend": true
+      },
+      "enabled": true,
+      "sort": 58
+    },
+    {
+      "id": "chuoi_dau",
+      "name": "Tràng Hạt Dâu",
+      "type": "beads",
+      "price_sen": 0,
+      "price_ngoc": 0,
+      "unlock_level": 1,
+      "description": "Tím thẫm như quả dâu, gợi nhớ chùa Dâu cổ kính.",
+      "data": {
+        "c1": "#3c1537",
+        "c2": "#6c2a62",
+        "grain": "#1c0719",
+        "gloss": true,
+        "rank": "quy",
+        "legend": true
+      },
+      "enabled": true,
+      "sort": 59
+    },
+    {
+      "id": "lt_meo_cam",
+      "name": "Mèo Cam Hoàng Thượng",
+      "type": "pet",
+      "price_sen": 30,
+      "price_ngoc": 0,
+      "unlock_level": 1,
+      "description": "Hoàng thượng Mèo Cam mũm mĩm đeo chuông vàng, thích nằm sưởi nắng và đi dạo quanh bàn cafe cùng bạn.",
+      "data": {
+        "model": "meo_cam",
+        "color": "#f2923d",
+        "rank": "quy"
+      },
+      "enabled": true,
+      "sort": 40
+    },
+    {
+      "id": "lt_corgi",
+      "name": "Cún Corgi Mông Tròn",
+      "type": "pet",
+      "price_sen": 45,
+      "price_ngoc": 0,
+      "unlock_level": 1,
+      "description": "Chú cún Corgi chân ngắn tai vểnh, mông trái tim lắc lư siêu cấp đáng yêu trong quán cafe.",
+      "data": {
+        "model": "cun_corgi",
+        "color": "#e59a48",
+        "rank": "hiem"
+      },
+      "enabled": true,
+      "sort": 41
+    }
+  ],
+  "packages": [
+    {
+      "id": "p1000",
+      "ngoc": 1000,
+      "vnd": 500000,
+      "label": "1.000 Ngọc",
+      "tag": "+100%",
+      "hot": "Khuyến mãi lớn nhất"
+    },
+    {
+      "id": "p20",
+      "ngoc": 20,
+      "vnd": 20000,
+      "label": "20 Ngọc"
+    },
+    {
+      "id": "p55",
+      "ngoc": 55,
+      "vnd": 50000,
+      "label": "55 Ngọc",
+      "tag": "+10%"
+    },
+    {
+      "id": "p120",
+      "ngoc": 120,
+      "vnd": 100000,
+      "label": "120 Ngọc",
+      "tag": "+20%"
+    },
+    {
+      "id": "p260",
+      "ngoc": 260,
+      "vnd": 200000,
+      "label": "260 Ngọc",
+      "tag": "+30%"
+    }
+  ],
+  "appearance": {
+    "gender": [
+      "nam",
+      "nu"
+    ],
+    "hair": [
+      "troc",
+      "ngan",
+      "bui",
+      "dai"
+    ],
+    "skin": [
+      "#f1c7a3",
+      "#e0a67e",
+      "#d98b5f",
+      "#b9734a",
+      "#8f5638"
+    ]
+  },
+  "maxLevel": 100,
+  "levels": [
+    80,
+    243,
+    464,
+    735,
+    1051,
+    1406,
+    1800,
+    2229,
+    2691,
+    3185,
+    3710,
+    4264,
+    4846,
+    5456,
+    6093,
+    6756,
+    7444,
+    8157,
+    8894,
+    9655,
+    10439,
+    11245,
+    12074,
+    12925,
+    13797,
+    15219,
+    16725,
+    18316,
+    19996,
+    21764,
+    23624,
+    25575,
+    27620,
+    29761,
+    31997,
+    34332,
+    36766,
+    39301,
+    41938,
+    44678,
+    47523,
+    50474,
+    53532,
+    56699,
+    59976,
+    63363,
+    66863,
+    70477,
+    74205,
+    78049,
+    82010,
+    86090,
+    90289,
+    94608,
+    99049,
+    103613,
+    108301,
+    113113,
+    118052,
+    123118,
+    128312,
+    133636,
+    139090,
+    144675,
+    150393,
+    156244,
+    162230,
+    168351,
+    174609,
+    181004,
+    187538,
+    194212,
+    201025,
+    207981,
+    215079,
+    222320,
+    229705,
+    237236,
+    244913,
+    252737,
+    260709,
+    268831,
+    277102,
+    285524,
+    294097,
+    302824,
+    311704,
+    320738,
+    329928,
+    339274,
+    348777,
+    358438,
+    368257,
+    378237,
+    388377,
+    398678,
+    409141,
+    419768,
+    430558,
+    441513
+  ],
+  "event": {
+    "multiplier": 1,
+    "name": ""
+  },
+  "announcement": "☕ Chào mừng bạn đến với Quán Cafe Online 3D – Không gian Lofi Chill, Học bài, Gọi đồ uống 3D, Nuôi Mèo & Corgi và Tương tác TikTok Live! 🎧✨",
+  "announcementFx": "",
+  "tickers": [
+    {
+      "text": "☕ Chào mừng đến với Quán Cafe Online 3D – Chọn bàn, gọi Cà phê Phin / Matcha / Trà Sữa và bật nhạc Lofi học bài cùng mọi người!",
+      "link": ""
+    },
+    {
+      "text": "🎁 Bấm nút \"Quà TikTok / Pháo Hoa\" trên màn hình để bắn pháo hoa 3D & mưa tim rực rỡ khi đang Livestream!",
+      "link": ""
+    },
+    {
+      "text": "🐱 Hoàng Thượng Mèo Cam và Cún Corgi Mông Tròn đã có mặt trong quán — chạm vào thú cưng để cưng nựng nhé!",
+      "link": ""
+    },
+    {
+      "text": "🌧️ Thử bật chế độ \"Mưa Lofi\" và \"Góc Live\" để có khung hình TikTok Live cực chill!",
+      "link": "hoangoc"
+    }
+  ],
+  "ticker": "☕ Chào mừng đến với Quán Cafe Online 3D – Chọn bàn, gọi Cà phê Phin / Matcha / Trà Sữa và bật nhạc Lofi học bài cùng mọi người!",
+  "fund": {
+    "goal": 3000000,
+    "raised": 1855073
+  },
+  "sessions": [
+    {
+      "id": "sang",
+      "name": "Thời khoá sáng",
+      "start": 300,
+      "len": 20
+    },
+    {
+      "id": "toi",
+      "name": "Thời khoá tối",
+      "start": 1200,
+      "len": 30
+    }
+  ],
+  "serverNow": 1793547669485,
+  "paymentMode": "sepay",
+  "shopOff": false,
+  "chantAudio": null,
+  "donate": {
+    "bank": "MB",
+    "account": "0376105158",
+    "name": "TRAN DANH DAI",
+    "tag": ""
+  },
+  "exp": {
+    "mo": 1,
+    "bow": 3,
+    "bead": 1,
+    "round": 20,
+    "meditate": 4,
+    "sit": 1,
+    "incense": 10,
+    "candle": 5,
+    "flower": 8,
+    "bell": 5,
+    "visit": 10,
+    "sweep": 6,
+    "plant": 15
+  }
+}

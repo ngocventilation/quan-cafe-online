@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="build" content="cafe3d-v2" />
+  <meta name="theme-color" content="#1a110b" />
+  <title>Quán Cafe Online 3D – Lofi Chill, Học Bài &amp; TikTok Live</title>
+  <meta name="description" content="Không gian Quán Cafe 3D trực tuyến: gọi Cà phê Phin, Matcha, Trà sữa lên bàn 3D, bật nhạc Lofi mưa rơi học bài, nuôi Mèo Cam &amp; Corgi và bắn pháo hoa TikTok Live." />
+  <meta property="og:title" content="Quán Cafe Online 3D" />
+  <meta property="og:description" content="Quán Cafe 3D trực tuyến – Lofi Chill, Học bài &amp; Tương tác TikTok Live cùng mọi người." />
+  <meta property="og:url" content="https://www.niemphat.online/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="vi_VN" />
+  <meta property="og:site_name" content="Quán Cafe Online 3D" />
+  <meta property="og:image" content="https://www.niemphat.online/img/og.png" />
+  <link rel="icon" href="/favicon.ico" sizes="48x48" />
+  <link rel="icon" type="image/png" sizes="96x96" href="/img/favicon-96.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/img/icon-192.png" />
+  <link rel="canonical" href="https://www.niemphat.online/" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/img/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="stylesheet" href="/css/app.css?v=cafe3d2" />
+  <script type="importmap">
+    { "imports": {
+        "/js/api.js": "/js/api.js?v=cafe3d2",
+        "/js/audio.js": "/js/audio.js?v=cafe3d2",
+        "/js/avatar.js": "/js/avatar.js?v=cafe3d2",
+        "/js/beads.js": "/js/beads.js?v=cafe3d2",
+        "/js/chores.js": "/js/chores.js?v=cafe3d2",
+        "/js/cushion.js": "/js/cushion.js?v=cafe3d2",
+        "/js/exterior.js": "/js/exterior.js?v=cafe3d2",
+        "/js/gear.js": "/js/gear.js?v=cafe3d2",
+        "/js/grounds.js": "/js/grounds.js?v=cafe3d2",
+        "/js/help.js": "/js/help.js?v=cafe3d2",
+        "/js/icons.js": "/js/icons.js?v=cafe3d2",
+        "/js/kinh.js": "/js/kinh.js?v=cafe3d2",
+        "/js/lotus.js": "/js/lotus.js?v=cafe3d2",
+        "/js/main.js": "/js/main.js?v=cafe3d2",
+        "/js/mapview.js": "/js/mapview.js?v=cafe3d2",
+        "/js/music.js": "/js/music.js?v=cafe3d2",
+        "/js/pets.js": "/js/pets.js?v=cafe3d2",
+        "/js/share.js": "/js/share.js?v=cafe3d2",
+        "/js/statues.js": "/js/statues.js?v=cafe3d2",
+        "/js/temple.js": "/js/temple.js?v=cafe3d2",
+        "/js/textures.js": "/js/textures.js?v=cafe3d2",
+        "/js/thumbs.js": "/js/thumbs.js?v=cafe3d2",
+        "/js/tryon.js": "/js/tryon.js?v=cafe3d2",
+        "/js/world.js": "/js/world.js?v=cafe3d2",
+        "three": "https://unpkg.com/three@0.164.1/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.164.1/examples/jsm/" } }
+  </script>
+  <script>
+    // Tải song song cả cây module thay vì lần lượt theo từng tầng import: đỡ vài vòng mạng trên điện thoại
+    (() => {
+      const { imports: im } = JSON.parse(document.querySelector('script[type=importmap]').textContent);
+      const add = ['utils/BufferGeometryUtils.js', 'environments/RoomEnvironment.js', 'objects/Reflector.js', 'math/ImprovedNoise.js'].map((f) => im['three/addons/'] + f);
+      for (const href of [...Object.values(im).filter((u) => !u.endsWith('/')), ...add]) {
+        const l = document.createElement('link');
+        l.rel = 'modulepreload'; l.href = href; l.crossOrigin = 'anonymous';
+        document.head.append(l);
+      }
+    })();
+  </script>
+</head>
+<body>
+  <canvas id="scene"></canvas>
+  <div id="joy" class="joy"><div class="knob"></div></div>
+
+  <!-- KHỞI ĐỘNG -->
+  <section id="boot" class="screen boot">
+    <div class="boot-card">
+      <div class="logo">☕</div>
+      <h1>Quán Cafe Online 3D</h1>
+      <p>Không gian Lofi Chill · Học bài · Thú cưng &amp; TikTok Live</p>
+      <div class="lotus-load"><svg viewBox="0 0 100 100"><g class="petals">
+      <path d="M50 18c9 10 13 21 13 31S58 70 50 76c-8-6-13-17-13-27s4-21 13-31z"/>
+      <path d="M50 76C38 76 22 68 16 50c13-1 24 4 32 13"/><path d="M50 76c12 0 28-8 34-26-13-1-24 4-32 13"/>
+      <path d="M50 76C42 70 28 58 30 38c9 3 15 10 19 20"/><path d="M50 76c8-6 22-18 20-38-9 3-15 10-19 20"/></g>
+      <path class="water" d="M14 84c12 4 24 6 36 6s24-2 36-6"/></svg></div>
+      <div class="bar boot-bar"><i id="bootBar"></i></div>
+      <small id="bootMsg">Đang chuẩn bị quầy Barista &amp; nhạc Lofi…</small>
+    </div>
+  </section>
+
+  <!-- MÀN CHÀO (người cũ) -->
+  <section id="welcome" class="screen boot hidden">
+    <div class="boot-card">
+      <div class="logo">☕</div>
+      <h1>Quán Cafe Online 3D</h1>
+      <p id="welcomeText">Chào mừng bạn ghé quán ☕</p>
+      <button class="btn gold big" id="btnEnter">☕ Bước vào quán cafe</button>
+      <small>Nên bật âm thanh để nghe nhạc Lofi &amp; tiếng mưa rơi ngoài hiên</small>
+    </div>
+  </section>
+
+  <!-- TẠO NHÂN VẬT -->
+  <section id="setup" class="screen setup hidden">
+    <div class="setup-preview"><canvas id="previewCanvas"></canvas>
+      <div class="steps"><i class="on"></i><i></i></div>
+    </div>
+    <div class="setup-card">
+      <!-- bước 1 -->
+      <div class="step" data-step="1">
+        <h2>Chọn chi nhánh máy chủ</h2>
+        <p class="muted">Mỗi máy chủ có nhân vật, cấp Chill và Sao riêng. Khách mới nên chọn máy chủ được gợi ý; đã có tài khoản thì chọn đúng máy chủ cũ để đăng nhập.</p>
+        <div class="server-list" id="serverList"></div>
+      </div>
+      <!-- bước 2 -->
+      <div class="step hidden" data-step="2">
+        <h2 id="setupTitle">Tạo nhân vật đi Cafe</h2>
+        <label class="field">Nickname hiển thị trên bàn &amp; Live
+          <span class="name-row"><input id="fName" maxlength="24" placeholder="Đang tạo tên…" autocomplete="off" /><button type="button" class="dice name-grant" id="btnDice" title="Đổi tên ngẫu nhiên">🎲 Đổi tên</button></span>
+        </label>
+        <div class="field">Giới tính
+          <div class="chips" id="fGender">
+            <button data-v="nam" class="on">Nam</button><button data-v="nu">Nữ</button>
+          </div>
+        </div>
+        <details class="setup-more" id="fMore">
+          <summary>Tuỳ chỉnh thêm: tóc, màu da, Outfit, phong cách Chill</summary>
+          <div class="field">Kiểu tóc
+            <div class="chips" id="fHair">
+              <button data-v="troc">Cá tính</button><button data-v="ngan" class="on">Ngắn</button><button data-v="bui">Búi</button><button data-v="dai">Dài</button>
+            </div>
+          </div>
+          <div class="field">Màu da <div class="swatches" id="fSkin"></div></div>
+          <div class="field" id="fRobeWrap">Trang phục (Outfit)
+            <div class="chips" id="fRobe">
+              <button data-v="ao_lam" class="on">Denim Casual</button><button data-v="ao_xam">Barista Charcoal</button>
+            </div>
+          </div>
+          <div class="field" id="fSectWrap">Phong cách đi Cafe <small class="muted">(mỗi phong cách tăng điểm cộng Chill riêng)</small>
+            <div class="sect-list" id="sectList"></div>
+          </div>
+        </details>
+        <label class="consent" id="consentWrap"><input type="checkbox" id="fConsent" checked> <span>Tôi đồng ý tham gia cộng đồng văn minh, thân thiện và tích cực trên Quán Cafe Online 3D.</span></label>
+        <button class="link" id="btnRestore">Đã có tài khoản? Đăng nhập</button>
+      </div>
+      <div class="setup-nav">
+        <button class="btn ghost" id="btnPrev">Quay lại</button>
+        <button class="btn gold" id="btnNext">☕ Vào quán cafe</button>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- MÀN CHỜ VÀO QUÁN -->
+  <div id="fullScreen" class="full-screen hidden"><div class="full-card"><div class="full-lotus">☕</div><h3>Quán đang đông khách</h3><p id="fullMsg"></p><div id="fullFund" class="full-fund"></div><small id="fullCount"></small><button class="btn gold" id="fullRetry">Thử lại ngay</button></div></div>
+  <div id="idleWarn" class="idle-warn hidden"><b>Bạn còn đang ngồi ở bàn không?</b><small id="idleCount"></small><button class="btn gold small" id="idleStay">Mình vẫn đang chill</button></div>
+  <div id="idleScreen" class="full-screen hidden"><div class="full-card"><div class="full-lotus">☕</div><h3>Đã tạm rời bàn</h3><p>Bạn đã lâu không thao tác nên hệ thống tạm ngắt kết nối để nhường bàn cho khách khác.</p><button class="btn gold" id="idleBack">Quay lại quán</button></div></div>
+  <section id="loader" class="loader hidden">
+    <div class="loader-card">
+      <div class="lotus-load"><svg viewBox="0 0 100 100"><g class="petals">
+      <path d="M50 18c9 10 13 21 13 31S58 70 50 76c-8-6-13-17-13-27s4-21 13-31z"/>
+      <path d="M50 76C38 76 22 68 16 50c13-1 24 4 32 13"/><path d="M50 76c12 0 28-8 34-26-13-1-24 4-32 13"/>
+      <path d="M50 76C42 70 28 58 30 38c9 3 15 10 19 20"/><path d="M50 76c8-6 22-18 20-38-9 3-15 10-19 20"/></g>
+      <path class="water" d="M14 84c12 4 24 6 36 6s24-2 36-6"/></svg></div>
+      <h2 id="ldTitle">Đang ghé Quán Cafe…</h2>
+      <div class="bar"><i id="ldBar"></i></div>
+      <small id="ldStep">Đang bài trí bàn ghế &amp; quầy Barista</small>
+      <p class="quote" id="ldQuote"></p>
+      <p class="ld-busy hidden" id="ldBusy">Quán đang rất đông khách ghé thăm, bạn vui lòng đợi vài giây nhé ☕</p>
+    </div>
+  </section>
+
+  <!-- HƯỚNG DẪN TỪNG BƯỚC -->
+  <div id="coach" class="coach hidden">
+    <div class="coach-hole" id="coachHole"></div>
+    <div class="coach-tip" id="coachTip"><b id="coachTitle"></b><p id="coachText"></p>
+      <div class="coach-nav"><button class="link" id="coachSkip">Bỏ qua</button><span id="coachDots"></span><button class="btn small gold" id="coachNext">Tiếp</button></div></div>
+  </div>
+
+  <!-- HUD -->
+  <div id="hud" class="hud hidden">
+    <button id="ticker" class="ticker hidden" aria-label="Thông báo"><span class="tk-ic">📢</span><span class="tk-win"><span class="tk-txt" id="tickerTxt"></span></span></button>
+    <div class="hud-top">
+      <button id="meChip" class="me-chip">
+        <span class="me-ava" id="meAva"></span>
+        <span class="me-info"><b id="meName">…</b><small id="meTitle"></small><i class="xp"><i id="meXp"></i></i></span>
+        <span class="me-lv" id="meLv">1</span>
+      </button>
+      <div class="zoom-btns"><button id="btnZoomIn" title="Phóng to" aria-label="Phóng to">+</button><button id="btnZoomOut" title="Thu nhỏ" aria-label="Thu nhỏ">−</button></div>
+      <div class="top-right"><button class="help-btn ui-toggle" id="btnUi" title="Thu gọn menu để quay Live" aria-label="Thu gọn menu"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button><div class="wallet" id="wallet"><span title="Hạt Cafe"><svg class="i"><use href="#i-sen"/></svg> <b id="wSen">0</b></span><span title="Sao Live"><svg class="i"><use href="#i-ngoc"/></svg> <b id="wNgoc">0</b></span></div><button class="help-btn hidden" id="btnFull" title="Toàn màn hình" aria-label="Toàn màn hình"></button><button class="help-btn mail-btn" id="btnQue" title="Rút Thông điệp Cafe đầu ngày" aria-label="Thông điệp"><svg class="i"><use href="#i-story"/></svg><i class="mail-badge hidden" id="queBadge"></i></button><button class="help-btn mail-btn" id="btnWheel" title="Vòng quay Barista" aria-label="Vòng quay"><svg class="i"><use href="#i-gift"/></svg><i class="mail-badge hidden" id="wheelBadge"></i></button><button class="help-btn mail-btn" id="btnMail" title="Hòm thư quán" aria-label="Hòm thư"><svg class="i"><use href="#i-mail"/></svg><i class="mail-badge hidden" id="mailBadge"></i></button><button class="help-btn donate-btn" id="btnDonate" title="Top Donate & Ủng hộ quán" aria-label="Ủng hộ"><svg class="i"><use href="#i-heart"/></svg></button><button class="help-btn" id="btnShare" title="Chia sẻ phòng Live" aria-label="Chia sẻ"><svg class="i"><use href="#i-share"/></svg></button><button class="help-btn" id="btnHelp" title="Cách chơi & Live" aria-label="Cách chơi">?</button></div>
+    </div>
+    <div class="hud-temple">
+      <button id="tName" class="tname">Tiệm Cà Phê Phố Cổ</button>
+      <button id="btnOut" class="out-btn hidden"></button>
+      <button id="btnChore" class="out-btn chore-btn hidden"><svg class="i"><use href="#i-spark"/></svg> Pha chế phụ quán</button>
+      <span id="tOnline" title="Khách đang online trong quán"><i class="dot"></i> 1 đang chill</span>
+      <span id="sessPill" class="sess hidden"></span>
+      <span id="evBanner" class="ev hidden"></span>
+      <span id="buffBadge" class="buff hidden"></span>
+      <!-- Thanh Công Cụ TikTok Live & Không Gian Cafe 3D -->
+      <div id="liveBar" class="live-bar">
+        <button id="btnLiveRain" class="live-chip" title="Bật/tắt mưa rơi 3D ngoài cửa sổ & tiếng mưa Lofi">🌧️ Mưa Lofi</button>
+        <button id="btnLiveOrder" class="live-chip" title="Chọn đồ uống, bánh ngọt & Laptop bày lên bàn 3D">☕ Menu Bàn 3D</button>
+        <button id="btnLiveCam" class="live-chip" title="Bật/tắt Camera xoay tự động cho TikTok Live">🎥 Góc Live</button>
+        <button id="btnLiveGift" class="live-chip gift" title="Thả tim & bắn pháo hoa 3D trên màn hình Live">🎁 Quà TikTok</button>
+      </div>
+    </div>
+    <nav class="side-menu">
+      <button data-sheet="quests" title="Mục tiêu hàng ngày"><span><svg class="i"><use href="#i-scroll"/></svg></span><i class="badge hidden" id="qBadge"></i><em>Mục tiêu</em></button>
+      <button data-sheet="bag" title="Tủ đồ & Thú cưng"><span><svg class="i"><use href="#i-bag"/></svg></span><em>Tủ đồ</em></button>
+      <button data-sheet="shop" title="Menu & Cửa hàng"><span><svg class="i"><use href="#i-shop"/></svg></span><em>Cửa hàng</em></button>
+      <button data-sheet="community" title="Cộng đồng & Lời nhắn"><span><svg class="i"><use href="#i-users"/></svg></span><i class="badge hidden" id="cBadge"></i><em>Cộng đồng</em></button>
+      <button data-sheet="rank" title="Bảng xếp hạng Top Chill"><span><svg class="i"><use href="#i-trophy"/></svg></span><em>Top Chill</em></button>
+      <button data-sheet="map" title="Bản đồ 17 Quán Cafe 3D"><span><svg class="i"><use href="#i-map"/></svg></span><i class="badge dot hidden" id="mapDot"></i><em>Đổi Quán 3D</em></button>
+      <button data-sheet="guide" title="Phong cách Cafe & Chill"><span><svg class="i"><use href="#i-book"/></svg></span><em>Phong cách</em></button>
+      <button data-sheet="support" title="Góp ý & Donate"><span><svg class="i"><use href="#i-chat"/></svg></span><em>Donate</em></button>
+      <button id="btnServer" title="Đổi máy chủ"><span><svg class="i"><use href="#i-server"/></svg></span><em>Máy chủ</em></button>
+      <button id="btnFb" title="Cộng đồng" aria-label="Cộng đồng"><span><svg class="i"><use href="#i-fb"/></svg></span></button>
+      <button data-sheet="settings" title="Cài đặt Âm thanh & Đồ họa"><span><svg class="i"><use href="#i-gear"/></svg></span><em>Cài đặt</em></button>
+    </nav>
+    <aside id="wishDock" class="wish-dock hidden" aria-label="Thiệp tâm sự Live">
+      <header><span class="wd-lamp"><svg class="i"><use href="#i-lantern"/></svg></span><div><b>Thiệp Tâm Sự Live</b><small id="wdCount"></small></div>
+        <button id="wdClose" class="wd-x" title="Đóng khung Thiệp tâm sự" aria-label="Đóng"><svg class="i"><use href="#i-close"/></svg></button></header>
+      <div class="wd-tabs"><button data-wd="temple" class="on">Quán này</button><button data-wd="all">Tất cả quán</button><button data-wd="act">Hoạt động</button></div>
+      <div id="wdList" class="wd-list"></div>
+      <button id="wdRelease" class="btn gold wd-release"><svg class="i"><use href="#i-lantern"/></svg> Gửi lời nhắn lên Live</button>
+    </aside>
+    <button id="wdOpen" class="wd-open hidden" title="Mở khung Lời nhắn Live"><svg class="i"><use href="#i-lantern"/></svg> Lời nhắn Live</button>
+    <p class="guide" id="guide">Chạm bàn trống để ngồi · Kéo để xoay góc nhìn · Bấm ☕ Menu Bàn 3D hoặc 🎁 Quà TikTok để tương tác Live</p>
+
+    <div id="quyBar" class="quy-bar hidden"><b>Bạn đang cạn năng lượng vì chạy deadline</b><small>Đứng yên nghe nhạc Lofi để nạp lại năng lượng.</small><div class="fund-track"><i id="quyFill"></i></div><small id="quyLeft"></small><button id="quyListen" class="btn small gold">Nghe nhạc</button></div>
+    <div class="ctx-wrap"><button id="btnCtx" class="ctx hidden">Ngồi vào bàn</button></div>
+    <div class="actions">
+      <button id="btnBow" class="act"><span>☕</span><em id="bowLabel">Nhâm nhi</em></button>
+      <button id="btnBeads" class="act"><span>🫘</span><em>Pha Cafe</em></button>
+      <button id="btnChant" class="act"><span>🎵</span><em>Nhạc Lofi</em></button>
+      <button id="btnMeditate" class="act"><span>💻</span><em>Học &amp; Làm</em></button>
+      <button id="btnOffer" class="act"><span>🥐</span><em>Gọi Món</em></button>
+      <button id="btnPet" class="act"><span>🐾</span><em>Thú Cưng</em></button>
+    </div>
+    <div id="offerMenu" class="pop hidden">
+      <button data-offer="huong_tram">☕ Cà phê Phin Sữa Đá <b data-qty="huong_tram"></b></button>
+      <button data-offer="nen_sap">🍵 Matcha Latte Kem <b data-qty="nen_sap"></b></button>
+      <button data-offer="hoa_dang">🧋 Trà Sữa &amp; Bánh Ngọt <b data-qty="hoa_dang"></b></button>
+      <button data-offer="den_hoa_dang">💌 Gửi Thiệp Tâm Sự Live <b data-qty="den_hoa_dang"></b></button>
+      <button data-offer="bell">🔔 Rung Chuông Quầy Bar</button>
+    </div>
+  </div>
+
+  <!-- PHA CAFE / RANG HẠT ARABICA -->
+  <section id="beadsView" class="beads hidden">
+    <canvas id="beadsCanvas"></canvas>
+    <button class="pill back" id="btnBeadsBack"><svg class="i"><use href="#i-back"/></svg> Quay lại bàn</button>
+    <div class="bead-count">
+      <div><b id="beadNum">0</b> <span>/ 108 hạt Arabica</span></div>
+      <small id="beadRound">Mẻ rang đầu tiên</small>
+    </div>
+    <p class="bead-hint">Chạm hoặc vuốt xuống để rang xay từng hạt cà phê<br /><span id="beadGain"></span></p>
+  </section>
+
+  <!-- KẾT BẠN THÚ CƯNG & VÒNG QUAY -->
+  <div id="bondBox" class="bond-box hidden"><div class="bond-info"><b id="bondName"></b> <span id="bondRank"></span></div><div class="bond-bar"><i id="bondFill"></i></div><button class="btn small gold" id="bondBtn">Làm quen</button></div>
+  <section id="wheelView" class="wheel-view hidden">
+    <button class="pill back" id="btnWheelBack"><svg class="i"><use href="#i-back"/></svg> Quay lại bàn</button>
+    <div class="wheel-box" id="wheelBox"></div>
+  </section>
+
+  <section id="chantView" class="chant hidden">
+    <button class="pill back" id="btnChantBack"><svg class="i"><use href="#i-back"/></svg> Quay lại bàn</button>
+    <div class="chant-pick" id="chantPick"></div>
+    <p class="chant-note" id="chantNote"></p>
+    <div class="chant-lines" id="chantLines"></div>
+    <div class="chant-foot">
+      <div class="chant-count"><b id="chantNum">0</b><span id="chantOf"> / 0</span><small id="chantGain"></small></div>
+      <button class="mo" id="btnMo" aria-label="Gõ nhịp Lofi"><svg viewBox="0 0 120 100" aria-hidden="true"><defs><radialGradient id="moG" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#c47a3a"/><stop offset=".6" stop-color="#8a4a1e"/><stop offset="1" stop-color="#4a2410"/></radialGradient></defs><ellipse cx="60" cy="58" rx="50" ry="36" fill="url(#moG)"/><path d="M18 62c14 12 70 12 84 0" fill="none" stroke="#2a1408" stroke-width="5" stroke-linecap="round"/><path d="M34 34c14-9 38-9 52 0" fill="none" stroke="#e0a868" stroke-width="2.5" stroke-linecap="round" opacity=".55"/><circle cx="60" cy="20" r="7" fill="#6a3616"/></svg></button>
+      <div class="chant-auto">
+        <label><input type="checkbox" id="chantVoice" checked> Giọng đọc</label>
+        <label><input type="checkbox" id="chantAuto"> Tự động phiêu nhịp</label>
+        <label class="chant-tempo">Nhịp <input type="range" id="chantTempo" min="40" max="110" value="66"></label>
+        <small>Gõ theo nhịp Lofi để nhận điểm Chill từng câu</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- HỌC BÀI & LÀM VIỆC (STUDY WITH ME) -->
+  <section id="medView" class="meditate hidden">
+    <div class="med-pick" id="medPick">
+      <h2>💻 Học Bài &amp; Làm Việc (Study With Me)</h2>
+      <p>Mở chiếc Laptop 3D sáng đèn trên bàn, lắng nghe tiếng nhạc Lofi và tập trung hoàn thành mục tiêu của bạn.</p>
+      <div class="chips big" id="medDur">
+        <button data-m="5" class="on">5 phút</button><button data-m="10">10 phút</button><button data-m="20">20 phút</button><button data-m="30">30 phút</button><button data-m="0">Tự do</button>
+      </div>
+      <div class="row"><button class="btn ghost" id="medCancel">Để sau</button><button class="btn gold" id="medStart">💻 Bật Laptop &amp; Bắt đầu</button></div>
+    </div>
+    <div class="med-run hidden" id="medRun">
+      <div class="breath"><i></i><span id="breathText">Tập trung…</span></div>
+      <div class="med-time" id="medTime">00:00</div>
+      <p class="muted" id="medInfo"></p>
+      <button class="btn ghost" id="medStop">Hoàn thành phiên học</button>
+    </div>
+  </section>
+
+  <!-- BOTTOM SHEET -->
+  <div id="sheet" class="sheet hidden">
+    <div class="sheet-card">
+      <div class="sheet-head"><h3 id="sheetTitle"></h3><button class="x" id="sheetClose"><svg class="i"><use href="#i-close"/></svg></button></div>
+      <div class="tabs" id="sheetTabs"></div>
+      <div class="sheet-body" id="sheetBody"></div>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div id="modal" class="modal hidden"><div class="modal-card" id="modalCard"></div></div>
+
+  <div id="lanternLayer" class="lantern-layer"></div>
+  <div id="floaters" class="floaters"></div>
+  <div id="liveBannerLayer" class="live-banner-layer"></div>
+  <div id="toast" class="toast"></div>
+
+  <script type="module" src="/js/main.js?v=cafe3d2"></script>
+</body>
+</html>
